@@ -33,14 +33,18 @@ public class Productos extends javax.swing.JFrame {
     /**
      * Creates new form Productos
      */
-    
     public static String Id_Producto = "0";
+
     public Productos() {
         initComponents();
         Productos.CargarCategoria c = new Productos.CargarCategoria();
         Productos.CargarPresentacion pr = new Productos.CargarPresentacion();
+        Productos.CargarImpuesto cim = new Productos.CargarImpuesto();
+        Productos.CargarDescuento cdes = new Productos.CargarDescuento();
         ComboCategoriaP.setModel(c.getvalues());
         ComboPresentacionP.setModel(pr.getvalues());
+        ComboImp.setModel(cim.getvalues());
+        ComboDesc.setModel(cdes.getvalues());
         cargartabla();
         txtIDP.setVisible(Boolean.FALSE);
         BotonActivoP.setVisible(Boolean.FALSE);
@@ -95,6 +99,8 @@ public class Productos extends javax.swing.JFrame {
         txtDescripcionP = new javax.swing.JTextField();
         txtUnidadP = new javax.swing.JTextField();
         ComboCategoriaP = new javax.swing.JComboBox<>();
+        ComboDesc = new javax.swing.JComboBox<>();
+        ComboImp = new javax.swing.JComboBox<>();
         ComboPresentacionP = new javax.swing.JComboBox<>();
         txtTamañosP = new javax.swing.JTextField();
         txtLoteP = new javax.swing.JTextField();
@@ -120,7 +126,7 @@ public class Productos extends javax.swing.JFrame {
                 botonRegresarPMouseClicked(evt);
             }
         });
-        getContentPane().add(botonRegresarP, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 40, 150, 50));
+        getContentPane().add(botonRegresarP, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 50, 130, 30));
 
         botonAgregarP.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         botonAgregarP.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -128,7 +134,7 @@ public class Productos extends javax.swing.JFrame {
                 botonAgregarPMouseClicked(evt);
             }
         });
-        getContentPane().add(botonAgregarP, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 150, 130, 30));
+        getContentPane().add(botonAgregarP, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 140, 130, 40));
 
         botonEditarP.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         botonEditarP.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -136,7 +142,7 @@ public class Productos extends javax.swing.JFrame {
                 botonEditarPMouseClicked(evt);
             }
         });
-        getContentPane().add(botonEditarP, new org.netbeans.lib.awtextra.AbsoluteConstraints(470, 140, 150, 50));
+        getContentPane().add(botonEditarP, new org.netbeans.lib.awtextra.AbsoluteConstraints(470, 140, 120, 40));
 
         botonGuardarP.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         botonGuardarP.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -144,7 +150,7 @@ public class Productos extends javax.swing.JFrame {
                 botonGuardarPMouseClicked(evt);
             }
         });
-        getContentPane().add(botonGuardarP, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 140, 150, 50));
+        getContentPane().add(botonGuardarP, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 140, 120, 40));
 
         botonCancelarP.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         botonCancelarP.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -152,7 +158,7 @@ public class Productos extends javax.swing.JFrame {
                 botonCancelarPMouseClicked(evt);
             }
         });
-        getContentPane().add(botonCancelarP, new org.netbeans.lib.awtextra.AbsoluteConstraints(820, 140, 140, 50));
+        getContentPane().add(botonCancelarP, new org.netbeans.lib.awtextra.AbsoluteConstraints(800, 140, 120, 40));
 
         botonRestringirP.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         botonRestringirP.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -160,7 +166,7 @@ public class Productos extends javax.swing.JFrame {
                 botonRestringirPMouseClicked(evt);
             }
         });
-        getContentPane().add(botonRestringirP, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 230, 130, 40));
+        getContentPane().add(botonRestringirP, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 220, 130, 40));
 
         txtNombreP.setFont(new java.awt.Font("Georgia", 0, 14)); // NOI18N
         txtNombreP.setForeground(new java.awt.Color(153, 153, 153));
@@ -193,7 +199,7 @@ public class Productos extends javax.swing.JFrame {
                 txtNombrePKeyTyped(evt);
             }
         });
-        getContentPane().add(txtNombreP, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 285, 200, 30));
+        getContentPane().add(txtNombreP, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 280, 200, 30));
 
         txtDescripcionP.setFont(new java.awt.Font("Georgia", 0, 14)); // NOI18N
         txtDescripcionP.setForeground(new java.awt.Color(153, 153, 153));
@@ -218,7 +224,7 @@ public class Productos extends javax.swing.JFrame {
                 txtDescripcionPKeyTyped(evt);
             }
         });
-        getContentPane().add(txtDescripcionP, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 332, 200, 30));
+        getContentPane().add(txtDescripcionP, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 320, 200, 30));
 
         txtUnidadP.setFont(new java.awt.Font("Georgia", 0, 14)); // NOI18N
         txtUnidadP.setForeground(new java.awt.Color(153, 153, 153));
@@ -248,7 +254,7 @@ public class Productos extends javax.swing.JFrame {
                 txtUnidadPKeyTyped(evt);
             }
         });
-        getContentPane().add(txtUnidadP, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 473, 200, 30));
+        getContentPane().add(txtUnidadP, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 460, 200, 30));
 
         ComboCategoriaP.setFont(new java.awt.Font("Georgia", 1, 14)); // NOI18N
         ComboCategoriaP.setForeground(new java.awt.Color(153, 153, 153));
@@ -260,7 +266,31 @@ public class Productos extends javax.swing.JFrame {
                 ComboCategoriaPMousePressed(evt);
             }
         });
-        getContentPane().add(ComboCategoriaP, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 380, 200, 30));
+        getContentPane().add(ComboCategoriaP, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 370, 190, 30));
+
+        ComboDesc.setFont(new java.awt.Font("Georgia", 1, 14)); // NOI18N
+        ComboDesc.setForeground(new java.awt.Color(153, 153, 153));
+        ComboDesc.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Seleccione Descuento..." }));
+        ComboDesc.setBorder(null);
+        ComboDesc.setOpaque(false);
+        ComboDesc.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                ComboDescMousePressed(evt);
+            }
+        });
+        getContentPane().add(ComboDesc, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 730, 190, 30));
+
+        ComboImp.setFont(new java.awt.Font("Georgia", 1, 14)); // NOI18N
+        ComboImp.setForeground(new java.awt.Color(153, 153, 153));
+        ComboImp.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Seleccione Impuesto..." }));
+        ComboImp.setBorder(null);
+        ComboImp.setOpaque(false);
+        ComboImp.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                ComboImpMousePressed(evt);
+            }
+        });
+        getContentPane().add(ComboImp, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 690, 190, 30));
 
         ComboPresentacionP.setFont(new java.awt.Font("Georgia", 1, 14)); // NOI18N
         ComboPresentacionP.setForeground(new java.awt.Color(153, 153, 153));
@@ -272,7 +302,7 @@ public class Productos extends javax.swing.JFrame {
                 ComboPresentacionPMousePressed(evt);
             }
         });
-        getContentPane().add(ComboPresentacionP, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 427, 200, 30));
+        getContentPane().add(ComboPresentacionP, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 410, 190, 30));
 
         txtTamañosP.setFont(new java.awt.Font("Georgia", 0, 14)); // NOI18N
         txtTamañosP.setForeground(new java.awt.Color(153, 153, 153));
@@ -297,7 +327,7 @@ public class Productos extends javax.swing.JFrame {
                 txtTamañosPKeyTyped(evt);
             }
         });
-        getContentPane().add(txtTamañosP, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 521, 200, 30));
+        getContentPane().add(txtTamañosP, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 510, 200, 30));
 
         txtLoteP.setFont(new java.awt.Font("Georgia", 0, 14)); // NOI18N
         txtLoteP.setForeground(new java.awt.Color(153, 153, 153));
@@ -327,7 +357,7 @@ public class Productos extends javax.swing.JFrame {
                 txtLotePKeyTyped(evt);
             }
         });
-        getContentPane().add(txtLoteP, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 570, 200, 30));
+        getContentPane().add(txtLoteP, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 550, 200, 30));
 
         txtPrecioHistorico.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         txtPrecioHistorico.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -335,7 +365,7 @@ public class Productos extends javax.swing.JFrame {
                 txtPrecioHistoricoMouseClicked(evt);
             }
         });
-        getContentPane().add(txtPrecioHistorico, new org.netbeans.lib.awtextra.AbsoluteConstraints(471, 226, 140, 50));
+        getContentPane().add(txtPrecioHistorico, new org.netbeans.lib.awtextra.AbsoluteConstraints(471, 226, 120, 30));
 
         txtPrecioP.setFont(new java.awt.Font("Georgia", 0, 14)); // NOI18N
         txtPrecioP.setForeground(new java.awt.Color(153, 153, 153));
@@ -360,7 +390,7 @@ public class Productos extends javax.swing.JFrame {
                 txtPrecioPKeyTyped(evt);
             }
         });
-        getContentPane().add(txtPrecioP, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 660, 200, 30));
+        getContentPane().add(txtPrecioP, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 640, 200, 30));
 
         txtBuscarP.setFont(new java.awt.Font("Georgia", 0, 14)); // NOI18N
         txtBuscarP.setText("Buscar Por ID,Nombre o Estado");
@@ -384,7 +414,7 @@ public class Productos extends javax.swing.JFrame {
                 txtBuscarPKeyTyped(evt);
             }
         });
-        getContentPane().add(txtBuscarP, new org.netbeans.lib.awtextra.AbsoluteConstraints(700, 232, 240, 30));
+        getContentPane().add(txtBuscarP, new org.netbeans.lib.awtextra.AbsoluteConstraints(670, 230, 240, 30));
 
         GrupoProductos.add(BotonActivoP);
         BotonActivoP.setText("Activo");
@@ -404,7 +434,7 @@ public class Productos extends javax.swing.JFrame {
                 txtFechaVencimientoPMousePressed(evt);
             }
         });
-        getContentPane().add(txtFechaVencimientoP, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 613, 200, 30));
+        getContentPane().add(txtFechaVencimientoP, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 600, 200, 20));
         getContentPane().add(txtIDP, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 210, 100, 20));
 
         GrupoProductos.add(BotonInactivoP);
@@ -419,20 +449,20 @@ public class Productos extends javax.swing.JFrame {
 
         tablaP.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
-                {null, null, null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null, null, null},
-                {null, null, null, null, null, null, null, null, null, null, null}
+                {null, null, null, null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null, null, null, null},
+                {null, null, null, null, null, null, null, null, null, null, null, null, null}
             },
             new String [] {
-                "ID Producto", "Nombre Producto", "Descripcion Producto", "Categoria", "Presentacion", "Unidad", "Tamaños", "Lote", "Fecha Vencimiento", "Precio", "Estado"
+                "ID Producto", "Nombre Producto", "Descripcion Producto", "Categoria", "Presentacion", "Unidad", "Tamaños", "Lote", "Fecha Vencimiento", "Precio", "Impuesto", "Descuento", "Estado"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
+                java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
             };
             boolean[] canEdit = new boolean [] {
-                false, false, false, false, false, false, false, false, false, false, false
+                false, false, false, false, false, false, false, false, false, false, false, false, false
             };
 
             public Class getColumnClass(int columnIndex) {
@@ -450,10 +480,10 @@ public class Productos extends javax.swing.JFrame {
         });
         TablaP.setViewportView(tablaP);
 
-        getContentPane().add(TablaP, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 330, 700, 360));
+        getContentPane().add(TablaP, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 330, 660, 360));
 
-        Productos.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/Pantalla Productos(2).png"))); // NOI18N
-        getContentPane().add(Productos, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1010, -1));
+        Productos.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/Pantalla Productos(4).png"))); // NOI18N
+        getContentPane().add(Productos, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 990, -1));
 
         pack();
         setLocationRelativeTo(null);
@@ -494,10 +524,12 @@ public class Productos extends javax.swing.JFrame {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
         String FechaV = sdf.format(txtFechaVencimientoP.getDate());
         String Precio = txtPrecioP.getText();
+        int desc = ComboDesc.getSelectedIndex();
+        int impu = ComboImp.getSelectedIndex();
 
         try {
             Connection con = Conexion.getConexion();
-            PreparedStatement ps = con.prepareStatement("Update Productos set Nombre_Producto=?,Descripcion=?,Id_Categoria=?,Id_Presentacion=?, Lote=?,Fecha_Vencimiento=?,Unidades=?,Tamaño=?,Precio=? Where Id_Producto=?");
+            PreparedStatement ps = con.prepareStatement("Update Productos set Nombre_Producto=?,Descripcion=?,Id_Categoria=?,Id_Presentacion=?, Lote=?,Fecha_Vencimiento=?,Unidades=?,Tamaño=?,Precio=?, Id_Descuento=?,Id_Impuesto=? Where Id_Producto=?");
             ps.setString(1, Nombre);
             ps.setString(2, Descripcion);
             ps.setInt(3, Categoria);
@@ -507,7 +539,9 @@ public class Productos extends javax.swing.JFrame {
             ps.setString(5, Lote);
             ps.setString(6, FechaV);
             ps.setString(9, Precio);
-            ps.setInt(10, Id);
+            ps.setInt(10, desc);
+            ps.setInt(11, impu);
+            ps.setInt(12, Id);
             ps.executeUpdate();
             JOptionPane.showMessageDialog(null, "Registro Actualizado");
             cargartabla();
@@ -522,7 +556,8 @@ public class Productos extends javax.swing.JFrame {
 
     private void botonGuardarPMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_botonGuardarPMouseClicked
         if (txtNombreP.getText().equals("Ingrese Nombre Producto") && txtDescripcionP.getText().equals("Ingrese Descripción Producto") && ComboCategoriaP.getSelectedIndex() == 0 && ComboPresentacionP.getSelectedIndex() == 0
-                && txtUnidadP.getText().equals("Ingrese Unidades Producto") && txtTamañosP.getText().equals("Ingrese Tamaño Producto") && txtLoteP.getText().equals("Ingrese Lote Producto") && txtFechaVencimientoP.getDate().equals("") && txtPrecioP.getText().equals("Ingrese Precio Producto")) {
+                && txtUnidadP.getText().equals("Ingrese Unidades Producto") && txtTamañosP.getText().equals("Ingrese Tamaño Producto") && txtLoteP.getText().equals("Ingrese Lote Producto") && txtFechaVencimientoP.getDate().equals("") && txtPrecioP.getText().equals("Ingrese Precio Producto")
+                && ComboImp.getSelectedIndex() == 0 && ComboDesc.getSelectedIndex() == 0) {
             JOptionPane.showMessageDialog(null, "Debes llenar todos los campos", "Advertencia", JOptionPane.WARNING_MESSAGE);
         } else {
             if (txtNombreP.getText().equals("Ingrese Nombre Producto")) {
@@ -543,6 +578,10 @@ public class Productos extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(null, "Debe ingresar la fecha de vencimiento", "Advertencia", JOptionPane.WARNING_MESSAGE);
             } else if (txtPrecioP.getText().equals("Ingrese Precio Producto")) {
                 JOptionPane.showMessageDialog(null, "Debe ingresar un precio", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            } else if (ComboImp.getSelectedIndex() == 0) {
+                JOptionPane.showMessageDialog(null, "Debe Seleccionar un Impuesto", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            } else if (ComboDesc.getSelectedIndex() == 0) {
+                JOptionPane.showMessageDialog(null, "Debe Seleccionar un Descuento", "Advertencia", JOptionPane.WARNING_MESSAGE);
             } else {
                 String Nombre = txtNombreP.getText();
                 String Descripcion = txtDescripcionP.getText();
@@ -554,10 +593,12 @@ public class Productos extends javax.swing.JFrame {
                 SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
                 String FechaV = sdf.format(txtFechaVencimientoP.getDate());
                 String Precio = txtPrecioP.getText();
+                int desc = ComboDesc.getSelectedIndex();
+                int impu = ComboImp.getSelectedIndex();
 
                 try {
                     Connection con = Conexion.getConexion();
-                    PreparedStatement ps = con.prepareStatement("Insert into Productos (Nombre_Producto, Descripcion,Id_Categoria,Id_Presentacion,Lote,Fecha_Vencimiento,Id_Estado,Unidades,Tamaño,Precio) VALUES(?,?,?,?,?,?,?,?,?,?)");
+                    PreparedStatement ps = con.prepareStatement("Insert into Productos (Nombre_Producto, Descripcion,Id_Categoria,Id_Presentacion,Lote,Fecha_Vencimiento,Id_Estado,Unidades,Tamaño,Precio,Id_Impuesto,Id_Descuento) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)");
                     ps.setString(1, Nombre);
                     ps.setString(2, Descripcion);
                     ps.setInt(3, Categoria);
@@ -568,6 +609,8 @@ public class Productos extends javax.swing.JFrame {
                     ps.setString(9, Tamaño);
                     ps.setString(10, Precio);
                     ps.setInt(7, 1);
+                    ps.setInt(12, desc);
+                    ps.setInt(11, impu);
                     ps.executeUpdate();
                     JOptionPane.showMessageDialog(null, "Registro guardado");
                     cargartabla();
@@ -592,11 +635,13 @@ public class Productos extends javax.swing.JFrame {
 
         try {
             Connection con = Conexion.getConexion();
-            ps = con.prepareStatement("Select P.Id_Producto,P.Nombre_Producto, P.Descripcion, C.Categoria, PR.Presentacion,P.Unidades, P.Tamaño, P.Lote, P.Fecha_Vencimiento, P.Precio, E.Estado\n"
+            ps = con.prepareStatement("Select P.Id_Producto,P.Nombre_Producto, P.Descripcion, C.Categoria, PR.Presentacion,P.Unidades, P.Tamaño, P.Lote, P.Fecha_Vencimiento, P.Precio,TI.ISV,DP.Descripcion ,E.Estado\n"
                     + "From Productos as P\n"
                     + "Inner Join Categorias as C On P.Id_Categoria=C.Id_Categoria\n"
                     + "Inner Join Presentacion as PR ON P.Id_Presentacion=PR.Id_Presentacion\n"
                     + "Inner Join Estado as E ON P.Id_Estado=E.Id_Estado\n"
+                    + "Inner Join DescuentoProducto as DP on P.Id_Descuento=DP.Id_DescuentoP\n"
+                    + "Inner Join Tipo_Impuesto as TI ON P.Id_Impuesto=TI.Id_Tipo_Impuesto\n"
                     + "ORDER BY P.Id_Producto");
             rs = ps.executeQuery();
             rsmd = rs.getMetaData();
@@ -674,12 +719,14 @@ public class Productos extends javax.swing.JFrame {
             PreparedStatement ps;
             ResultSet rs;
             Connection con = Conexion.getConexion();
-            ps = con.prepareStatement("Select P.Nombre_Producto, P.Descripcion, C.Categoria, PR.Presentacion,P.Unidades, P.Tamaño, P.Lote, P.Fecha_Vencimiento, P.Precio, E.Estado\n"
+            ps = con.prepareStatement("Select P.Nombre_Producto, P.Descripcion, C.Categoria, PR.Presentacion,P.Unidades, P.Tamaño, P.Lote, P.Fecha_Vencimiento, P.Precio,TI.ISV,DP.Descripcion ,E.Estado\n"
                     + "From Productos as P\n"
                     + "Inner Join Categorias as C On P.Id_Categoria=C.Id_Categoria\n"
                     + "Inner Join Presentacion as PR ON P.Id_Presentacion=PR.Id_Presentacion\n"
                     + "Inner Join Estado as E ON P.Id_Estado=E.Id_Estado\n"
-                    + "Where P.Id_Producto=?\n"
+                    + "Inner Join DescuentoProducto as DP on P.Id_Descuento=DP.Id_DescuentoP\n"
+                    + "Inner Join Tipo_Impuesto as TI ON P.Id_Impuesto=TI.Id_Tipo_Impuesto\n"
+                    + "Where Id_Producto=?\n"
                     + "ORDER BY P.Id_Producto");
             ps.setInt(1, id);
             rs = ps.executeQuery();
@@ -689,6 +736,8 @@ public class Productos extends javax.swing.JFrame {
                 txtNombreP.setText(rs.getString("Nombre_Producto"));
                 txtDescripcionP.setText(rs.getString("Descripcion"));
                 ComboCategoriaP.setSelectedItem(rs.getString("Categoria"));
+                ComboImp.setSelectedItem(rs.getString("ISV"));
+                ComboDesc.setSelectedItem(rs.getString("Descripcion"));
                 ComboPresentacionP.setSelectedItem(rs.getString("Presentacion"));
                 txtLoteP.setText(rs.getString("Lote"));
                 txtFechaVencimientoP.setDate(rs.getDate("Fecha_Vencimiento"));
@@ -705,7 +754,7 @@ public class Productos extends javax.swing.JFrame {
             BotonActivoP.setVisible(Boolean.TRUE);
             Habillitar();
             txtFechaVencimientoP.setEnabled(Boolean.FALSE);
-            Id_Producto=txtIDP.getText();
+            Id_Producto = txtIDP.getText();
             System.out.println(Id_Producto);
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(null, ex.toString());
@@ -1038,7 +1087,7 @@ public class Productos extends javax.swing.JFrame {
     }//GEN-LAST:event_txtFechaVencimientoPMousePressed
 
     private void txtPrecioHistoricoMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txtPrecioHistoricoMouseClicked
-         PrecioHistoricoProducto php= new PrecioHistoricoProducto();
+        PrecioHistoricoProducto php = new PrecioHistoricoProducto();
         {
             php.setVisible(true);
             dispose();
@@ -1054,6 +1103,14 @@ public class Productos extends javax.swing.JFrame {
 
         }
     }//GEN-LAST:event_botonRestringirPMouseClicked
+
+    private void ComboDescMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ComboDescMousePressed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_ComboDescMousePressed
+
+    private void ComboImpMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ComboImpMousePressed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_ComboImpMousePressed
 
     public void validarNumerosLetras(java.awt.event.KeyEvent e) {
         if (e.getKeyChar() >= 33 && e.getKeyChar() <= 47
@@ -1101,6 +1158,8 @@ public class Productos extends javax.swing.JFrame {
     private javax.swing.JRadioButton BotonActivoP;
     private javax.swing.JRadioButton BotonInactivoP;
     private javax.swing.JComboBox<String> ComboCategoriaP;
+    private javax.swing.JComboBox<String> ComboDesc;
+    private javax.swing.JComboBox<String> ComboImp;
     private javax.swing.JComboBox<String> ComboPresentacionP;
     private javax.swing.ButtonGroup GrupoProductos;
     private javax.swing.JLabel Productos;
@@ -1184,13 +1243,15 @@ public class Productos extends javax.swing.JFrame {
     }
 
     void buscarData(String valor) {
-        String[] titulos = {"ID Producto", "Nombre Producto", "Descripción", "Categoría Producto", "Presentación Producto", "Unidades", "Tamaño", "Lote ", "Fecha Vencimiento", "Precio", "IdEstado"};
+        String[] titulos = {"ID Producto", "Nombre Producto", "Descripción", "Categoría Producto", "Presentación Producto", "Unidades", "Tamaño", "Lote ", "Fecha Vencimiento", "Precio", "Impuesto", "Descuento", "IdEstado"};
         String[] registros = new String[13];
-        String sql = "Select  P.Id_Producto,P.Nombre_Producto, P.Descripcion, C.Categoria, PR.Presentacion, P.Unidades, P.Tamaño, P.Lote, P.Fecha_Vencimiento,P.Precio, E.Estado\n"
+        String sql = "Select P.Id_Producto,P.Nombre_Producto, P.Descripcion, C.Categoria, PR.Presentacion,P.Unidades, P.Tamaño, P.Lote, P.Fecha_Vencimiento, P.Precio,TI.ISV,DP.Descripcion ,E.Estado\n"
                 + "From Productos as P\n"
                 + "Inner Join Categorias as C On P.Id_Categoria=C.Id_Categoria\n"
                 + "Inner Join Presentacion as PR ON P.Id_Presentacion=PR.Id_Presentacion\n"
                 + "Inner Join Estado as E ON P.Id_Estado=E.Id_Estado\n"
+                + "Inner Join DescuentoProducto as DP on P.Id_Descuento=DP.Id_DescuentoP\n"
+                + "Inner Join Tipo_Impuesto as TI ON P.Id_Impuesto=TI.Id_Tipo_Impuesto\n"
                 + "WHERE CONCAT (P.Id_Producto, ' ',P. Nombre_Producto, ' ',C.Categoria) LIKE '%" + valor + "%'\n"
                 + "ORDER BY P.Id_Producto";
 
@@ -1214,6 +1275,8 @@ public class Productos extends javax.swing.JFrame {
                 registros[8] = rs.getString("Unidades");
                 registros[9] = rs.getString("Tamaño");
                 registros[10] = rs.getString("Precio");
+                registros[11] = rs.getString("ISV");
+                registros[12] = rs.getString("Descripcion");
                 model.addRow(registros);
             }
 
@@ -1223,8 +1286,54 @@ public class Productos extends javax.swing.JFrame {
             Logger.getLogger(Clientes.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
-    
-    public void inventario(){
-        
-   }
+
+    public void inventario() {
+
+    }
+
+    public class CargarImpuesto {
+
+        public DefaultComboBoxModel getvalues() {
+
+            DefaultComboBoxModel modelo = new DefaultComboBoxModel();
+            try {
+                Connection con = Conexion.getConexion();
+                String sql = "Select ISV from Tipo_Impuesto";
+                Statement st = con.createStatement();
+                ResultSet rs = st.executeQuery(sql);
+                modelo.addElement("Seleccione Impuesto...");
+                while (rs.next()) {
+                    modelo.addElement(rs.getString(1));
+                }
+                con.close();
+                rs.close();
+            } catch (Exception e) {
+                System.out.println(e);
+            }
+            return modelo;
+        }
+    }
+
+    public class CargarDescuento {
+
+        public DefaultComboBoxModel getvalues() {
+
+            DefaultComboBoxModel modelo = new DefaultComboBoxModel();
+            try {
+                Connection con = Conexion.getConexion();
+                String sql = "Select Descripcion from DescuentoProducto";
+                Statement st = con.createStatement();
+                ResultSet rs = st.executeQuery(sql);
+                modelo.addElement("Seleccione Descuento...");
+                while (rs.next()) {
+                    modelo.addElement(rs.getString(1));
+                }
+                con.close();
+                rs.close();
+            } catch (Exception e) {
+                System.out.println(e);
+            }
+            return modelo;
+        }
+    }
 }

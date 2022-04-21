@@ -22,6 +22,7 @@ import java.util.Date;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 
 /**
  *
@@ -56,12 +57,23 @@ public class PantallaCompras extends javax.swing.JFrame {
 
     public PantallaCompras() {
         initComponents();
+        txtidCompra.setText(RegistroCompras.Id_Comp);
+
+        if (txtidCompra.getText() != "0") {
+            cargarcampose();
+            habilitarDetalle();
+            cargarFact();
+            ComboEstado.setEnabled(Boolean.TRUE);
+            //CargarProductor cp = new PantallaCompras.CargarProductor();
+              //  ComboProductos.setModel(cp.getvalues());
+        }
+        //cargarcampose();
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DAY_OF_WEEK, -10);
         //Calendar cale = Calendar.getInstance();
         //cale.add(Calendar.DAY_OF_WEEK, -10);
         Calendar calen = Calendar.getInstance();
-        calen.add(Calendar.DAY_OF_WEEK, +20);
+        calen.add(Calendar.DAY_OF_WEEK, +1);
         //Calendar calendar = Calendar.getInstance();
         //cal.add(Calendar.YEAR, +1);//5 year before
         Calendar calendario = Calendar.getInstance();
@@ -72,12 +84,21 @@ public class PantallaCompras extends javax.swing.JFrame {
         Date mini = calen.getTime();
         //Date maximo = cale.getTime();
         Date maxi = calendario.getTime();
-
+        FechaCompra.setDateFormatString("dd/MM/yyyy");
+        FechaEntrega.setDateFormatString("dd/MM/yyyy");
+        FechaVencimiento.setDateFormatString("dd/MM/yyyy");
         FechaCompra.setSelectableDateRange(min, max);
         FechaEntrega.setSelectableDateRange(min, max);
         FechaVencimiento.setSelectableDateRange(mini, maxi);
+        FechaCompra.setDate(maxi);
         CargarProveedor ch = new PantallaCompras.CargarProveedor();
         ComboProveedor.setModel(ch.getvalues());
+        CargarEstado ce = new PantallaCompras.CargarEstado();
+        ComboEstado.setModel(ce.getvalues());
+        ComboEstado.setSelectedIndex(1);
+        AutoCompleteDecorator.decorate(ComboEstado);
+        AutoCompleteDecorator.decorate(ComboProductos);
+        AutoCompleteDecorator.decorate(ComboProveedor);
         //lbfechaentrega.setVisible(Boolean.TRUE);
     }
 
@@ -95,7 +116,6 @@ public class PantallaCompras extends javax.swing.JFrame {
         txtTotalCompra = new javax.swing.JTextField();
         txtDescuento = new javax.swing.JTextField();
         txtDescripcion = new javax.swing.JTextField();
-        txtHora = new javax.swing.JTextField();
         txtNumeroFactura = new javax.swing.JTextField();
         txtIdDetalle = new javax.swing.JLabel();
         txtidCompra = new javax.swing.JLabel();
@@ -122,6 +142,7 @@ public class PantallaCompras extends javax.swing.JFrame {
         jScrollPane1 = new javax.swing.JScrollPane();
         tablacompra = new javax.swing.JTable();
         ComboProveedor = new javax.swing.JComboBox<>();
+        ComboEstado = new javax.swing.JComboBox<>();
         BotonBuscar = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
 
@@ -133,12 +154,12 @@ public class PantallaCompras extends javax.swing.JFrame {
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
 
         lbfechacompra.setBackground(new java.awt.Color(255, 255, 255));
-        lbfechacompra.setFont(new java.awt.Font("Georgia", 0, 14)); // NOI18N
+        lbfechacompra.setFont(new java.awt.Font("Georgia", 0, 10)); // NOI18N
         lbfechacompra.setForeground(new java.awt.Color(153, 153, 153));
         lbfechacompra.setText("Fecha de Compra");
         lbfechacompra.setToolTipText("");
         lbfechacompra.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        getContentPane().add(lbfechacompra, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 160, 170, 30));
+        getContentPane().add(lbfechacompra, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 150, 170, 30));
 
         txtTotalCompra.setFont(new java.awt.Font("Georgia", 0, 14)); // NOI18N
         txtTotalCompra.setForeground(new java.awt.Color(153, 153, 153));
@@ -210,31 +231,6 @@ public class PantallaCompras extends javax.swing.JFrame {
         });
         getContentPane().add(txtDescripcion, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 160, 192, 30));
 
-        txtHora.setFont(new java.awt.Font("Georgia", 0, 14)); // NOI18N
-        txtHora.setForeground(new java.awt.Color(153, 153, 153));
-        txtHora.setText("Ingrese Hora");
-        txtHora.setBorder(null);
-        txtHora.setOpaque(false);
-        txtHora.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusGained(java.awt.event.FocusEvent evt) {
-                txtHoraFocusGained(evt);
-            }
-            public void focusLost(java.awt.event.FocusEvent evt) {
-                txtHoraFocusLost(evt);
-            }
-        });
-        txtHora.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mousePressed(java.awt.event.MouseEvent evt) {
-                txtHoraMousePressed(evt);
-            }
-        });
-        txtHora.addKeyListener(new java.awt.event.KeyAdapter() {
-            public void keyTyped(java.awt.event.KeyEvent evt) {
-                txtHoraKeyTyped(evt);
-            }
-        });
-        getContentPane().add(txtHora, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 264, 195, 30));
-
         txtNumeroFactura.setFont(new java.awt.Font("Georgia", 0, 14)); // NOI18N
         txtNumeroFactura.setForeground(new java.awt.Color(153, 153, 153));
         txtNumeroFactura.setText("Ingrese Número Factura");
@@ -264,25 +260,25 @@ public class PantallaCompras extends javax.swing.JFrame {
         getContentPane().add(txtIdProv, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 120, 20, 20));
 
         lbfechavencimiento.setBackground(new java.awt.Color(255, 255, 255));
-        lbfechavencimiento.setFont(new java.awt.Font("Georgia", 0, 14)); // NOI18N
+        lbfechavencimiento.setFont(new java.awt.Font("Georgia", 0, 10)); // NOI18N
         lbfechavencimiento.setForeground(new java.awt.Color(153, 153, 153));
         lbfechavencimiento.setText("Fecha de Vencimiento");
         lbfechavencimiento.setToolTipText("");
         lbfechavencimiento.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        getContentPane().add(lbfechavencimiento, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 270, 170, 20));
+        getContentPane().add(lbfechavencimiento, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 260, 170, 20));
 
         lbfechaentrega.setBackground(new java.awt.Color(255, 255, 255));
-        lbfechaentrega.setFont(new java.awt.Font("Georgia", 0, 14)); // NOI18N
+        lbfechaentrega.setFont(new java.awt.Font("Georgia", 0, 10)); // NOI18N
         lbfechaentrega.setForeground(new java.awt.Color(153, 153, 153));
         lbfechaentrega.setText("Fecha de Entrega");
         lbfechaentrega.setToolTipText("");
         lbfechaentrega.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
         lbfechaentrega.setNextFocusableComponent(FechaEntrega);
-        getContentPane().add(lbfechaentrega, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 220, 150, 20));
+        getContentPane().add(lbfechaentrega, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 210, 150, 20));
         getContentPane().add(txtIdProducto, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 350, 40, 20));
 
         FechaVencimiento.setToolTipText("Fecha Vencimiento");
-        getContentPane().add(FechaVencimiento, new org.netbeans.lib.awtextra.AbsoluteConstraints(45, 265, 195, 30));
+        getContentPane().add(FechaVencimiento, new org.netbeans.lib.awtextra.AbsoluteConstraints(45, 275, 195, 20));
 
         FechaEntrega.setFont(new java.awt.Font("Georgia", 0, 14)); // NOI18N
         FechaEntrega.addFocusListener(new java.awt.event.FocusAdapter() {
@@ -298,17 +294,18 @@ public class PantallaCompras extends javax.swing.JFrame {
                 FechaEntregaMousePressed(evt);
             }
         });
-        getContentPane().add(FechaEntrega, new org.netbeans.lib.awtextra.AbsoluteConstraints(45, 212, 195, 30));
+        getContentPane().add(FechaEntrega, new org.netbeans.lib.awtextra.AbsoluteConstraints(45, 222, 200, 20));
 
         FechaCompra.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 FechaCompraMouseClicked(evt);
             }
         });
-        getContentPane().add(FechaCompra, new org.netbeans.lib.awtextra.AbsoluteConstraints(45, 160, 195, 30));
+        getContentPane().add(FechaCompra, new org.netbeans.lib.awtextra.AbsoluteConstraints(45, 170, 195, 20));
 
         ComboProductos.setFont(new java.awt.Font("Georgia", 1, 14)); // NOI18N
         ComboProductos.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Seleccione Productos" }));
+        ComboProductos.setEnabled(false);
         ComboProductos.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mousePressed(java.awt.event.MouseEvent evt) {
                 ComboProductosMousePressed(evt);
@@ -325,6 +322,7 @@ public class PantallaCompras extends javax.swing.JFrame {
         txtNumeroFacturaC.setForeground(new java.awt.Color(153, 153, 153));
         txtNumeroFacturaC.setText("Ingrese Número Factura");
         txtNumeroFacturaC.setBorder(null);
+        txtNumeroFacturaC.setEnabled(false);
         txtNumeroFacturaC.setOpaque(false);
         txtNumeroFacturaC.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
@@ -354,12 +352,14 @@ public class PantallaCompras extends javax.swing.JFrame {
         getContentPane().add(botonRegresar, new org.netbeans.lib.awtextra.AbsoluteConstraints(31, 20, 130, 40));
         getContentPane().add(BotonCancelar, new org.netbeans.lib.awtextra.AbsoluteConstraints(820, 260, 130, 40));
 
+        BotonGuardar.setBackground(java.awt.Color.lightGray);
+        BotonGuardar.setForeground(new java.awt.Color(204, 204, 204));
         BotonGuardar.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 BotonGuardarMouseClicked(evt);
             }
         });
-        getContentPane().add(BotonGuardar, new org.netbeans.lib.awtextra.AbsoluteConstraints(821, 150, 130, 40));
+        getContentPane().add(BotonGuardar, new org.netbeans.lib.awtextra.AbsoluteConstraints(831, 160, 120, 30));
 
         BotonEditar.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -483,7 +483,7 @@ public class PantallaCompras extends javax.swing.JFrame {
                 BotonEditarCMouseClicked(evt);
             }
         });
-        getContentPane().add(BotonEditarC, new org.netbeans.lib.awtextra.AbsoluteConstraints(281, 456, 120, 40));
+        getContentPane().add(BotonEditarC, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 460, 120, 30));
 
         BotonEliminarC.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -536,12 +536,27 @@ public class PantallaCompras extends javax.swing.JFrame {
 
         ComboProveedor.setFont(new java.awt.Font("Georgia", 1, 14)); // NOI18N
         ComboProveedor.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Seleccione Proveedor" }));
+        ComboProveedor.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                ComboProveedorItemStateChanged(evt);
+            }
+        });
         ComboProveedor.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mousePressed(java.awt.event.MouseEvent evt) {
                 ComboProveedorMousePressed(evt);
             }
         });
-        getContentPane().add(ComboProveedor, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 160, 200, 30));
+        getContentPane().add(ComboProveedor, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 160, 200, 30));
+
+        ComboEstado.setFont(new java.awt.Font("Georgia", 1, 14)); // NOI18N
+        ComboEstado.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Seleccione Estado" }));
+        ComboEstado.setEnabled(false);
+        ComboEstado.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                ComboEstadoMousePressed(evt);
+            }
+        });
+        getContentPane().add(ComboEstado, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 267, 200, 30));
 
         BotonBuscar.setFont(new java.awt.Font("Georgia", 0, 14)); // NOI18N
         BotonBuscar.setForeground(new java.awt.Color(153, 153, 153));
@@ -587,14 +602,16 @@ public class PantallaCompras extends javax.swing.JFrame {
 
     private void FechaEntregaFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_FechaEntregaFocusLost
         if (FechaEntrega.getDate().equals("")) {
-            lbfechaentrega.setVisible(Boolean.TRUE);
+            //lbfechaentrega.setVisible(Boolean.TRUE);
             //FechaEntrega.setForeground(new Color(153, 153, 153));
         }
     }//GEN-LAST:event_FechaEntregaFocusLost
 
     private void BotonGuardarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonGuardarMouseClicked
         ObtenerID();
-        if (txtNumeroFactura.getText().equals("Ingrese Número Factura") || txtHora.getText().equals("Ingrese Hora") || ComboProveedor.equals("Seleccione Proveedor")
+        Calendar Cal = Calendar.getInstance();
+        String fec = Cal.get(Cal.HOUR_OF_DAY) + ":" + Cal.get(Cal.MINUTE) + ":" + Cal.get(Cal.SECOND);
+        if (txtNumeroFactura.getText().equals("Ingrese Número Factura") || ComboEstado.equals("Seleccione Estado") || ComboProveedor.equals("Seleccione Proveedor")
                 || txtDescripcion.getText().equals("Ingrese Descripción") || txtDescuento.getText().equals("Ingrese Descuento") || txtTotalCompra.getText().equals("Ingrese Total")
                 || FechaCompra.getDate().equals("") || FechaEntrega.getDate().equals("") || FechaVencimiento.getDate().equals("")) {
             JOptionPane.showMessageDialog(null, "No se puede Guardar datos vacios");
@@ -608,8 +625,8 @@ public class PantallaCompras extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(null, "Debe seleccionar un proveedor");
             } else if (txtNumeroFactura.getText().equals("Ingrese Número Factura")) {
                 JOptionPane.showMessageDialog(null, "Debe ingresar número de factura");
-            } else if (txtHora.getText().equals("Ingrese Hora")) {
-                JOptionPane.showMessageDialog(null, "Debe ingresar Hora");
+            } else if (ComboEstado.getSelectedItem().equals("Seleccione Estado")) {
+                JOptionPane.showMessageDialog(null, "Debe Seleccionar Estado");
             } else if (txtDescripcion.getText().equals("Ingrese Descripción")) {
                 JOptionPane.showMessageDialog(null, "Debe ingresar Descripción");
             } else if (txtDescuento.getText().equals("Ingrese Descuento")) {
@@ -618,8 +635,7 @@ public class PantallaCompras extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(null, "Debe ingresar el total de la compra");
             }
         } else {
-            int Numerofactura = Integer.parseInt(txtNumeroFactura.getText());
-            String Hora = txtHora.getText();
+           String Numerofactura = txtNumeroFactura.getText();
             String Descripcion = txtDescripcion.getText();
             String Descuento = txtDescuento.getText();
             String tcompra = txtTotalCompra.getText();
@@ -631,22 +647,22 @@ public class PantallaCompras extends javax.swing.JFrame {
 
             try {
                 Connection con = Conexion.getConexion();
-                PreparedStatement ps = con.prepareStatement("Insert into Compras (Id_Proveedor, Num_Factura,Fecha_Compra,Fecha_Entrega, Fecha_Vencimiento,Hora, Descripcion,Descuento,Total_Compra) VALUES(?,?,?,?,?,?,?,?,?)");
+                PreparedStatement ps = con.prepareStatement("Insert into Compras (Id_Proveedor, Num_Factura,Fecha_Compra,Fecha_Entrega, Fecha_Vencimiento, Descripcion,Descuento,Total_Compra,Id_EstadoC) VALUES(?,?,?,?,?,?,?,?,?)");
                 ps.setInt(1, Prov);
-                ps.setInt(2, Numerofactura);
+                ps.setString(2, Numerofactura);
                 ps.setString(3, FechaCom);
                 ps.setString(4, FechaEnt);
                 ps.setString(5, Fechavenc);
-                ps.setString(6, Hora);
-                ps.setString(7, Descripcion);
-                ps.setString(8, Descuento);
-                ps.setString(9, tcompra);
+                ps.setString(6, Descripcion);
+                ps.setString(7, Descuento);
+                ps.setString(8, tcompra);
+                ps.setInt(9, ComboEstado.getSelectedIndex());
                 ps.executeUpdate();
 
                 JOptionPane.showMessageDialog(null, "Registro guardado");
                 //Inhabillitar();
                 cargarFact();
-                //ObtenerID();
+                habilitarDetalle();
                 CargarProductor cp = new PantallaCompras.CargarProductor();
                 ComboProductos.setModel(cp.getvalues());
 
@@ -657,8 +673,8 @@ public class PantallaCompras extends javax.swing.JFrame {
     }//GEN-LAST:event_BotonGuardarMouseClicked
 
     private void BotonEditarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonEditarMouseClicked
-        long Numerofactura = Long.getLong(txtNumeroFactura.getText());
-        String Hora = txtHora.getText();
+        String Numerofactura = txtNumeroFactura.getText();
+//        String Hora = txtHora.getText();
         String Descripcion = txtDescripcion.getText();
         String Descuento = txtDescuento.getText();
         String tcompra = txtTotalCompra.getText();
@@ -668,16 +684,17 @@ public class PantallaCompras extends javax.swing.JFrame {
         String Fechavenc = sdf.format(FechaVencimiento.getDate());
         int Prov = Integer.parseInt(txtIdProv.getText());
         int Id_Compra = Integer.parseInt(txtidCompra.getText());
+        String Estado = "";
 
         try {
             Connection con = Conexion.getConexion();
-            PreparedStatement ps = con.prepareStatement("Update Compras set Id_Proveedor=?, Num_Factura=?,Fecha_Compra=?,Fecha_Entrega=?, Fecha_Vencimiento=?,Hora=?, Descripcion=?,Descuento=?,Total_Compra=? where Id_Compra=?)");
+            PreparedStatement ps = con.prepareStatement("Update Compras set Id_Proveedor=?, Num_Factura=?,Fecha_Compra=?,Fecha_Entrega=?, Fecha_Vencimiento=?,Id_EstadoC=?, Descripcion=?,Descuento=?,Total_Compra=? where Id_Compra=?");
             ps.setInt(1, Prov);
-            ps.setLong(2, Numerofactura);
+            ps.setString(2, Numerofactura);
             ps.setString(3, FechaCom);
             ps.setString(4, FechaEnt);
             ps.setString(5, Fechavenc);
-            ps.setString(6, Hora);
+            ps.setInt(6, ComboEstado.getSelectedIndex());
             ps.setString(7, Descripcion);
             ps.setString(8, Descuento);
             ps.setString(9, tcompra);
@@ -703,7 +720,7 @@ public class PantallaCompras extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(null, "Debe seleccionar un producto");
             } else if (txtNumeroFacturaC.getText().equals("Ingrese Número Factura")) {
                 JOptionPane.showMessageDialog(null, "Debe ingresar número de factura");
-            } else if (txtHora.getText().equals("Ingrese Hora")) {
+            } else if (ComboEstado.getSelectedItem().equals("Seleccione Estado")) {
                 JOptionPane.showMessageDialog(null, "Debe ingresar Hora");
             } else if (txtCostoUnitario.getText().equals("Ingrese Costo Unitario")) {
                 JOptionPane.showMessageDialog(null, "Debe ingresar Costo Unitario");
@@ -722,16 +739,23 @@ public class PantallaCompras extends javax.swing.JFrame {
             String cantidad = txtCantidad.getText();
             String ISv = txtISV.getText();
             int Prod = Integer.parseInt(txtIdProducto.getText());
+            int IDDT = 1;
+            if (ComboEstado.getSelectedIndex() == 1) {
+                IDDT = 1;
+            } else if (ComboEstado.getSelectedIndex() == 2) {
+                IDDT = 2;
+            }
 
             try {
                 Connection con = Conexion.getConexion();
-                PreparedStatement ps = con.prepareStatement("Insert Into Detalle_Compra(Id_Compra,Id_Producto,Costo_Unitario,Descuento,Cantidad,ISV) Values (?,?,?,?,?,?)");
+                PreparedStatement ps = con.prepareStatement("Insert Into Detalle_Compra(Id_Compra,Id_Producto,Costo_Unitario,Descuento,Cantidad,ISV,Id_EstadoDC) Values (?,?,?,?,?,?,?)");
                 ps.setInt(1, idcompra);
                 ps.setInt(2, Prod);
                 ps.setString(3, costou);
                 ps.setString(4, Descuento);
                 ps.setString(5, cantidad);
                 ps.setString(6, ISv);
+                ps.setInt(7, IDDT);
                 ps.executeUpdate();
 
                 JOptionPane.showMessageDialog(null, "Registro guardado");
@@ -791,7 +815,17 @@ public class PantallaCompras extends javax.swing.JFrame {
     }//GEN-LAST:event_tablacompraMouseClicked
 
     private void BotonEditarCMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonEditarCMouseClicked
-        // TODO add your handling code here:
+           try {
+                Connection con = Conexion.getConexion();
+                PreparedStatement ps = con.prepareStatement("Update Detalle_Compra set Id_EstadoDC=2 where Id_Detalle_Compra=?");
+                ps.setInt(1,Integer.parseInt(txtIdDetalle.getText()));
+                ps.executeUpdate();
+                JOptionPane.showMessageDialog(null, "Registro Actualizado");
+                cargartabla();
+
+            } catch (SQLException ex) {
+                JOptionPane.showMessageDialog(null, ex.toString());
+            }
     }//GEN-LAST:event_BotonEditarCMouseClicked
 
     private void txtNumeroFacturaFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtNumeroFacturaFocusGained
@@ -812,20 +846,6 @@ public class PantallaCompras extends javax.swing.JFrame {
         }
 
     }//GEN-LAST:event_txtNumeroFacturaFocusLost
-
-    private void txtHoraFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtHoraFocusGained
-        if (txtHora.getText().equals("Ingrese Hora")) {
-            txtHora.setText("");
-            txtHora.setForeground(new Color(0, 0, 0));
-        }
-    }//GEN-LAST:event_txtHoraFocusGained
-
-    private void txtHoraFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtHoraFocusLost
-        if (txtNumeroFactura.getText().equals("")) {
-            txtNumeroFactura.setText("Ingrese Hora");
-            txtNumeroFactura.setForeground(new Color(153, 153, 153));
-        }
-    }//GEN-LAST:event_txtHoraFocusLost
 
     private void txtDescripcionFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtDescripcionFocusGained
         if (txtDescripcion.getText().equals("Ingrese Descripción")) {
@@ -1053,14 +1073,6 @@ public class PantallaCompras extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_txtNumeroFacturaMousePressed
 
-    private void txtHoraMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txtHoraMousePressed
-        if (txtHora.isEnabled() == false) {
-
-            JOptionPane.showMessageDialog(null, "Dar Click en Guardar o Editar para utilizar el campo", "Advertencia", JOptionPane.WARNING_MESSAGE);
-
-        }
-    }//GEN-LAST:event_txtHoraMousePressed
-
     private void txtDescripcionMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txtDescripcionMousePressed
         if (txtDescripcion.isEnabled() == false) {
 
@@ -1156,13 +1168,6 @@ public class PantallaCompras extends javax.swing.JFrame {
 
     }//GEN-LAST:event_botonRegresarMouseClicked
 
-    private void txtHoraKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtHoraKeyTyped
-        validarNumeros(evt);
-        if (txtHora.getText().length() > 5) {
-            evt.consume();
-        }
-    }//GEN-LAST:event_txtHoraKeyTyped
-
     private void txtDescuentoKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtDescuentoKeyTyped
         validarNumeros(evt);
         if (txtDescuento.getText().length() > 4) {
@@ -1180,6 +1185,16 @@ public class PantallaCompras extends javax.swing.JFrame {
     private void txtISVActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtISVActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txtISVActionPerformed
+
+    private void ComboEstadoMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ComboEstadoMousePressed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_ComboEstadoMousePressed
+
+    private void ComboProveedorItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_ComboProveedorItemStateChanged
+        ObtenerID();
+        CargarProductor cp = new PantallaCompras.CargarProductor();
+     ComboProductos.setModel(cp.getvalues());        
+    }//GEN-LAST:event_ComboProveedorItemStateChanged
     public void validarNumeros(java.awt.event.KeyEvent e) {
         if (e.getKeyChar() >= 33 && e.getKeyChar() <= 47
                 || e.getKeyChar() >= 58 && e.getKeyChar() <= 238) {
@@ -1231,6 +1246,7 @@ public class PantallaCompras extends javax.swing.JFrame {
     private javax.swing.JLabel BotonEditarC;
     private javax.swing.JLabel BotonEliminarC;
     private javax.swing.JLabel BotonGuardar;
+    private javax.swing.JComboBox<String> ComboEstado;
     private javax.swing.JComboBox<String> ComboProductos;
     private javax.swing.JComboBox<String> ComboProveedor;
     private com.toedter.calendar.JDateChooser FechaCompra;
@@ -1249,7 +1265,6 @@ public class PantallaCompras extends javax.swing.JFrame {
     private javax.swing.JTextField txtDescripcion;
     private javax.swing.JTextField txtDescuento;
     private javax.swing.JTextField txtDescuentoC;
-    private javax.swing.JTextField txtHora;
     private javax.swing.JTextField txtISV;
     private javax.swing.JLabel txtIdDetalle;
     private javax.swing.JLabel txtIdProducto;
@@ -1349,6 +1364,28 @@ public class PantallaCompras extends javax.swing.JFrame {
         }
     }
 
+    public class CargarEstado {
+
+        public DefaultComboBoxModel getvalues() {
+            DefaultComboBoxModel modelo = new DefaultComboBoxModel();
+            try {
+                ResultSet rs;
+                Connection con = Conexion.getConexion();
+                PreparedStatement ps = con.prepareStatement("Select Estado from EstadoC");
+                rs = ps.executeQuery();
+                modelo.addElement("Seleccione Estado");
+                while (rs.next()) {
+                    modelo.addElement(rs.getString(1));
+                }
+                con.close();
+                rs.close();
+            } catch (Exception e) {
+                System.out.println(e);
+            }
+            return modelo;
+        }
+    }
+
     public void ObtenerID() {
         String Nombre = ComboProveedor.getSelectedItem().toString();
         try {
@@ -1386,12 +1423,12 @@ public class PantallaCompras extends javax.swing.JFrame {
     }
 
     public void cargarFact() {
-        int Factura = Integer.parseInt(txtNumeroFactura.getText());
+        String Factura = txtNumeroFactura.getText();
         try {
             ResultSet rs;
             Connection con = Conexion.getConexion();
             PreparedStatement ps = con.prepareStatement("Select Id_Compra From Compras Where Num_Factura=?");
-            ps.setInt(1, Factura);
+            ps.setString(1, Factura);
             rs = ps.executeQuery();
 
             while (rs.next()) {
@@ -1403,4 +1440,47 @@ public class PantallaCompras extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, ex.toString());
         }
     }
+
+    public void cargarcampose() {
+        int id = Integer.parseInt(txtidCompra.getText());
+        try {
+
+            PreparedStatement ps;
+            ResultSet rs;
+            Connection con = Conexion.getConexion();
+            ps = con.prepareStatement("Select C.Id_Compra, c.Num_Factura,P.Nombre_Empresa, C.Fecha_Compra,C.Fecha_Entrega,C.Fecha_Vencimiento,C.Descripcion,C.Descuento,C.Total_Compra, E.Estado\n"
+                    + "from Compras as C \n"
+                    + "Inner Join Proveedor as P ON C.Id_Proveedor = P.Id_Proveedor\n"
+                    + "Inner Join EstadoC as E on C.Id_EstadoC=E.Id_EstadoC\n"
+                    + "Where C.Id_Compra=?");
+            ps.setInt(1, id);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                FechaCompra.setDate(rs.getDate("Fecha_Compra"));
+                FechaEntrega.setDate(rs.getDate("Fecha_Entrega"));
+                FechaVencimiento.setDate(rs.getDate("Fecha_Vencimiento"));
+                txtDescripcion.setText(rs.getString("Descripcion"));
+                ComboProveedor.setSelectedItem(rs.getString("Nombre_Empresa"));
+                ComboEstado.setSelectedItem(rs.getString("Estado"));
+                txtDescuento.setText(rs.getString("Descuento"));
+                txtNumeroFactura.setText(rs.getString("Num_Factura"));
+                txtTotalCompra.setText(rs.getString("Total_Compra"));
+            }
+            cargartabla();
+
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null, ex.toString());
+        }
+    }
+
+    public void habilitarDetalle() {
+        ComboProductos.setEnabled(Boolean.TRUE);
+        txtDescuentoC.setEnabled(Boolean.TRUE);
+        txtISV.setEnabled(Boolean.TRUE);
+        txtNumeroFacturaC.setEnabled(Boolean.FALSE);
+        txtCostoUnitario.setEnabled(Boolean.TRUE);
+        txtCantidad.setEnabled(Boolean.TRUE);
+    }
+
 }

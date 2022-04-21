@@ -1,0 +1,349 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+	<queryString>
+		<![CDATA[SELEct * from Factura]]>
+	</queryString>
+	<field name="Id_Factura" class="java.lang.Integer">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="Id_Cliente" class="java.lang.Integer">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="Fecha_Factura" class="java.sql.Date">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="Hora" class="java.sql.Time">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="Num_Factura" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="Id_Empleado" class="java.lang.Integer">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="Id_Tipo_Pago" class="java.lang.Integer">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="Id_Parametro" class="java.lang.Integer">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="Num_Tarjeta" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="montotarjeta" class="java.math.BigDecimal">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<filterExpression><![CDATA[$F{Id_Factura}$F{Id_Factura}=$F{Id_Factura}]]></filterExpression>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="536" splitType="Stretch">
+			<rectangle radius="10">
+				<reportElement x="0" y="0" width="331" height="140"/>
+			</rectangle>
+			<rectangle radius="10">
+				<reportElement x="342" y="0" width="213" height="140"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="100" y="8" width="219" height="29"/>
+				<textElement textAlignment="Center">
+					<font fontName="Georgia" size="24"/>
+				</textElement>
+				<text><![CDATA[FARMACIA SAG]]></text>
+			</staticText>
+			<rectangle>
+				<reportElement x="0" y="174" width="266" height="20"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="0" y="254" width="100" height="202"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="0" y="214" width="554" height="20"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="342" y="14" width="80" height="20"/>
+				<textElement textAlignment="Center">
+					<font fontName="Georgia" size="12"/>
+				</textElement>
+				<text><![CDATA[Fecha Inicio]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="342" y="34" width="80" height="20"/>
+				<textElement textAlignment="Center">
+					<font fontName="Georgia" size="12"/>
+				</textElement>
+				<text><![CDATA[ Fecha Final]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="342" y="54" width="65" height="17"/>
+				<textElement textAlignment="Center">
+					<font fontName="Georgia" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[CAI ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="342" y="88" width="213" height="20"/>
+				<textElement textAlignment="Center">
+					<font fontName="Georgia" size="12" isBold="true"/>
+				</textElement>
+				<text><![CDATA[F A C T U R A]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="176" width="100" height="20"/>
+				<textElement>
+					<font fontName="Georgia"/>
+				</textElement>
+				<text><![CDATA[Fecha Emisión:]]></text>
+			</staticText>
+			<rectangle>
+				<reportElement x="266" y="174" width="288" height="20"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="0" y="234" width="100" height="20"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="100" y="234" width="221" height="20"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="321" y="234" width="113" height="20"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="434" y="234" width="120" height="20"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="100" y="254" width="221" height="202"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="321" y="254" width="113" height="202"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="434" y="254" width="120" height="202"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="0" y="236" width="100" height="20"/>
+				<textElement textAlignment="Center">
+					<font fontName="Georgia"/>
+				</textElement>
+				<text><![CDATA[Cantidad]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="100" y="236" width="221" height="20"/>
+				<textElement textAlignment="Center">
+					<font fontName="Georgia"/>
+				</textElement>
+				<text><![CDATA[Descripción]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="321" y="236" width="113" height="20"/>
+				<textElement textAlignment="Center">
+					<font fontName="Georgia"/>
+				</textElement>
+				<text><![CDATA[Precio Unitario]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="434" y="236" width="121" height="20"/>
+				<textElement textAlignment="Center">
+					<font fontName="Georgia"/>
+				</textElement>
+				<text><![CDATA[Importe]]></text>
+			</staticText>
+			<rectangle>
+				<reportElement x="0" y="194" width="266" height="20"/>
+			</rectangle>
+			<rectangle>
+				<reportElement x="267" y="194" width="287" height="20"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="266" y="197" width="55" height="20"/>
+				<textElement>
+					<font fontName="Georgia"/>
+				</textElement>
+				<text><![CDATA[RTN:]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="0" y="196" width="100" height="20"/>
+				<textElement>
+					<font fontName="Georgia"/>
+				</textElement>
+				<text><![CDATA[Nombre Cliente:]]></text>
+			</staticText>
+			<rectangle>
+				<reportElement x="0" y="154" width="554" height="20"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="0" y="156" width="100" height="20"/>
+				<textElement>
+					<font fontName="Georgia"/>
+				</textElement>
+				<text><![CDATA[Vendedor:]]></text>
+			</staticText>
+			<rectangle>
+				<reportElement x="321" y="456" width="233" height="20"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="321" y="456" width="113" height="20"/>
+				<textElement>
+					<font fontName="Georgia"/>
+				</textElement>
+				<text><![CDATA[Sub Total]]></text>
+			</staticText>
+			<rectangle>
+				<reportElement x="321" y="476" width="233" height="20"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="321" y="476" width="113" height="20"/>
+				<textElement>
+					<font fontName="Georgia"/>
+				</textElement>
+				<text><![CDATA[ISV]]></text>
+			</staticText>
+			<rectangle>
+				<reportElement x="321" y="496" width="233" height="20"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="321" y="496" width="113" height="20"/>
+				<textElement>
+					<font fontName="Georgia"/>
+				</textElement>
+				<text><![CDATA[Descuento]]></text>
+			</staticText>
+			<rectangle>
+				<reportElement x="321" y="516" width="233" height="20"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="321" y="516" width="113" height="20"/>
+				<textElement>
+					<font fontName="Georgia"/>
+				</textElement>
+				<text><![CDATA[Total]]></text>
+			</staticText>
+			<image>
+				<reportElement x="11" y="29" width="89" height="94"/>
+				<imageExpression class="java.lang.String"><![CDATA["C:\\Users\\Allisson Castro\\Desktop\\FarmaciaSAG1\\FarmaciaSAG1\\src\\Informes\\LOGOSAG_2_.jpg"]]></imageExpression>
+			</image>
+			<staticText>
+				<reportElement x="117" y="49" width="202" height="34"/>
+				<textElement textAlignment="Center">
+					<font fontName="Georgia" isBold="false"/>
+				</textElement>
+				<text><![CDATA[Colonia 21 de octubre,Calle principal, Tegucigalpa M.D.C]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="166" y="92" width="100" height="20"/>
+				<textElement textAlignment="Center"/>
+				<text><![CDATA[Teléfono: 9799-8491]]></text>
+			</staticText>
+			<staticText>
+				<reportElement x="266" y="157" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[Hora:]]></text>
+			</staticText>
+			<rectangle>
+				<reportElement x="0" y="456" width="319" height="80"/>
+			</rectangle>
+			<staticText>
+				<reportElement x="41" y="487" width="225" height="20"/>
+				<textElement textAlignment="Center">
+					<font fontName="Georgia" size="12"/>
+				</textElement>
+				<text><![CDATA[La factura es beneficio de todos, exijala.]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="307" y="197" width="230" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{RTN}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="407" y="54" width="147" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{CAI}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd MMMMM yyyy">
+				<reportElement x="427" y="14" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.util.Date"><![CDATA[$F{Fecha_Inicio}]]></textFieldExpression>
+			</textField>
+			<textField pattern="dd MMMMM yyyy">
+				<reportElement x="427" y="34" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.util.Date"><![CDATA[$F{Fecha_Final}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement x="366" y="108" width="171" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{Factura_Num_Factura}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="52" y="154" width="199" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{Empleados_NombreE}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="79" y="174" width="187" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.util.Date"><![CDATA[$F{Factura_Fecha_Factura}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="79" y="194" width="77" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{Cliente_Nombre_Cliente}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="166" y="194" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{Cliente_Apellido_Cliente}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="342" y="177" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{Tipo_Pago_Tipo_Pago}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="266" y="176" width="56" height="20"/>
+				<textElement>
+					<font fontName="Georgia"/>
+				</textElement>
+				<text><![CDATA[Tipo Pago:]]></text>
+			</staticText>
+			<textField pattern="h.mm a">
+				<reportElement x="319" y="157" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.sql.Time"><![CDATA[$F{Hora}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="0" y="254" width="100" height="202"/>
+				<textElement/>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{DetalleFactura_Cantidad}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="440" y="160" width="100" height="188"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$F{Id_Factura}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="366" y="154" width="100" height="194"/>
+				<textElement/>
+				<textFieldExpression class="java.sql.Time"><![CDATA[$F{Hora}]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="90" splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="61" splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="125" splitType="Stretch"/>
+	</detail>
+	<columnFooter>
+		<band height="45" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>

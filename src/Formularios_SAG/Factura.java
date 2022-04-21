@@ -18,6 +18,10 @@ import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JCheckBox;
 import javax.swing.JOptionPane;
@@ -26,6 +30,14 @@ import javax.swing.table.DefaultTableModel;
 import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 import sun.security.util.Length;
 import javax.swing.table.DefaultTableModel;
+import net.sf.jasperreports.engine.JRDataSource;
+import net.sf.jasperreports.engine.JREmptyDataSource;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperExportManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
 
 /**
  *
@@ -54,18 +66,24 @@ public class Factura extends javax.swing.JFrame {
     Double Descuento = 0.00;
     Double Total = 0.00;
     Double descuentar = 0.00;
+    String tarjeta = "";
+    Double monto = 0.00;
+    int edad = 0;
     public static String regresar = "";
-    boolean agrega=false;
+    boolean agrega = false;
+
     public Factura() {
         initComponents();
+        Ncaja.setText(Operaciones2.caja);
+        Usuario.setText(Operaciones2.Id_Empleado);
+
         CargarTP ctp = new Factura.CargarTP();
         ComboTipoPago.setModel(ctp.getvalues());
         CargarProductor cp = new Factura.CargarProductor();
         ComboProducto.setModel(cp.getvalues());
         CargarTipoDescuento ctd = new Factura.CargarTipoDescuento();
         ComboDescuentoF.setModel(ctd.getvalues());
-        CargarTipoImpuesto cti = new Factura.CargarTipoImpuesto();
-        ComboTipoImpuesto.setModel(cti.getvalues());
+
         model.setColumnIdentifiers(titulos);
         tablacompra.setModel(model);
         AutoCompleteDecorator.decorate(ComboProducto);
@@ -75,8 +93,10 @@ public class Factura extends javax.swing.JFrame {
         Fecha.setSelectableDateRange(min, min);
         Fecha.setDate(min);
         Calendar Cal = Calendar.getInstance();
-        String fec = Cal.get(Cal.HOUR_OF_DAY) + ":" + Cal.get(Cal.MINUTE) + ":" + Cal.get(Cal.SECOND);
-        txtHoraF.setText(fec);
+        // String fec = Cal.get(Cal.HOUR_OF_DAY) + ":" + Cal.get(Cal.MINUTE) + ":" + Cal.get(Cal.SECOND);
+        String timeStamp = new SimpleDateFormat("HH:mm:ss").format(Calendar.getInstance().getTime());
+        txtHoraF.setText(timeStamp);
+        idFactura.setText("1");
     }
 
     /**
@@ -97,14 +117,12 @@ public class Factura extends javax.swing.JFrame {
         txtBuscarP = new javax.swing.JTextField();
         txtImpuesto = new javax.swing.JTextField();
         txtDescuentoP = new javax.swing.JTextField();
-        ComboDescuento = new javax.swing.JComboBox<>();
-        ComboTipoImpuesto = new javax.swing.JComboBox<>();
         ComboProducto = new javax.swing.JComboBox<>();
         txtStockP = new javax.swing.JTextField();
         txtPrecioUnitario = new javax.swing.JTextField();
         txtCantidadP = new javax.swing.JTextField();
         BotonEliminarP = new javax.swing.JLabel();
-        BotonEditarP = new javax.swing.JLabel();
+        Botongenerar = new javax.swing.JLabel();
         BotonAgregarP = new javax.swing.JLabel();
         buscarC = new javax.swing.JLabel();
         ComboDescuentoF = new javax.swing.JComboBox<>();
@@ -126,6 +144,9 @@ public class Factura extends javax.swing.JFrame {
         BotonGuardarF = new javax.swing.JLabel();
         btncalimpuesto = new javax.swing.JLabel();
         btncaldescuento = new javax.swing.JLabel();
+        txtpordesc = new javax.swing.JTextField();
+        txtporimpuesto = new javax.swing.JTextField();
+        jLabel2 = new javax.swing.JLabel();
         idDescuento = new javax.swing.JLabel();
         aplicardescuento = new javax.swing.JLabel();
         jScrollPane2 = new javax.swing.JScrollPane();
@@ -203,7 +224,9 @@ public class Factura extends javax.swing.JFrame {
             }
         });
         getContentPane().add(txtDescP, new org.netbeans.lib.awtextra.AbsoluteConstraints(590, 664, 140, 30));
-        getContentPane().add(Ncaja, new org.netbeans.lib.awtextra.AbsoluteConstraints(780, 90, 50, 20));
+
+        Ncaja.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        getContentPane().add(Ncaja, new org.netbeans.lib.awtextra.AbsoluteConstraints(700, 110, 100, 20));
 
         txtSubTotalP.setFont(new java.awt.Font("Georgia", 0, 14)); // NOI18N
         txtSubTotalP.setForeground(new java.awt.Color(153, 153, 153));
@@ -223,7 +246,7 @@ public class Factura extends javax.swing.JFrame {
                 txtSubTotalPMousePressed(evt);
             }
         });
-        getContentPane().add(txtSubTotalP, new org.netbeans.lib.awtextra.AbsoluteConstraints(590, 624, 140, 30));
+        getContentPane().add(txtSubTotalP, new org.netbeans.lib.awtextra.AbsoluteConstraints(610, 630, 120, 30));
 
         txtBuscarP.setFont(new java.awt.Font("Georgia", 0, 14)); // NOI18N
         txtBuscarP.setForeground(new java.awt.Color(153, 153, 153));
@@ -291,28 +314,6 @@ public class Factura extends javax.swing.JFrame {
             }
         });
         getContentPane().add(txtDescuentoP, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 514, 180, 30));
-
-        ComboDescuento.setForeground(new java.awt.Color(153, 153, 153));
-        ComboDescuento.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Seleccione Descuento", "Descuento 5%" }));
-        ComboDescuento.setBorder(null);
-        ComboDescuento.setOpaque(false);
-        ComboDescuento.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                ComboDescuentoItemStateChanged(evt);
-            }
-        });
-        getContentPane().add(ComboDescuento, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 510, 190, 30));
-
-        ComboTipoImpuesto.setForeground(new java.awt.Color(153, 153, 153));
-        ComboTipoImpuesto.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Seleccione Tipo ISV", " ", " " }));
-        ComboTipoImpuesto.setBorder(null);
-        ComboTipoImpuesto.setOpaque(false);
-        ComboTipoImpuesto.addItemListener(new java.awt.event.ItemListener() {
-            public void itemStateChanged(java.awt.event.ItemEvent evt) {
-                ComboTipoImpuestoItemStateChanged(evt);
-            }
-        });
-        getContentPane().add(ComboTipoImpuesto, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 470, 190, 30));
 
         ComboProducto.setForeground(new java.awt.Color(153, 153, 153));
         ComboProducto.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Seleccione Producto" }));
@@ -418,8 +419,8 @@ public class Factura extends javax.swing.JFrame {
             }
         });
         getContentPane().add(txtCantidadP, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 430, 180, 30));
-        getContentPane().add(BotonEliminarP, new org.netbeans.lib.awtextra.AbsoluteConstraints(501, 326, 130, 40));
-        getContentPane().add(BotonEditarP, new org.netbeans.lib.awtextra.AbsoluteConstraints(360, 330, 130, 40));
+        getContentPane().add(BotonEliminarP, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 330, 120, 30));
+        getContentPane().add(Botongenerar, new org.netbeans.lib.awtextra.AbsoluteConstraints(850, 330, 120, 30));
 
         BotonAgregarP.setEnabled(false);
         BotonAgregarP.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -432,6 +433,9 @@ public class Factura extends javax.swing.JFrame {
         buscarC.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 buscarCMouseClicked(evt);
+            }
+            public void mouseEntered(java.awt.event.MouseEvent evt) {
+                buscarCMouseEntered(evt);
             }
         });
         getContentPane().add(buscarC, new org.netbeans.lib.awtextra.AbsoluteConstraints(270, 150, 30, 30));
@@ -479,6 +483,17 @@ public class Factura extends javax.swing.JFrame {
 
         ComboTipoPago.setForeground(new java.awt.Color(153, 153, 153));
         ComboTipoPago.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Seleccione Tipo de Pago" }));
+        ComboTipoPago.setEnabled(false);
+        ComboTipoPago.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                ComboTipoPagoItemStateChanged(evt);
+            }
+        });
+        ComboTipoPago.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                ComboTipoPagoMouseClicked(evt);
+            }
+        });
         getContentPane().add(ComboTipoPago, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 255, 190, 30));
 
         txtDescuento.setFont(new java.awt.Font("Georgia", 0, 14)); // NOI18N
@@ -632,13 +647,20 @@ public class Factura extends javax.swing.JFrame {
             }
         });
         getContentPane().add(btnDescuentoT, new org.netbeans.lib.awtextra.AbsoluteConstraints(530, 200, 20, 30));
-        getContentPane().add(Usuario, new org.netbeans.lib.awtextra.AbsoluteConstraints(920, 90, 50, 20));
+
+        Usuario.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        getContentPane().add(Usuario, new org.netbeans.lib.awtextra.AbsoluteConstraints(820, 110, 130, 20));
 
         BotonEliminarF.setEnabled(false);
         getContentPane().add(BotonEliminarF, new org.netbeans.lib.awtextra.AbsoluteConstraints(840, 250, 120, 40));
 
         BotonEditarF.setEnabled(false);
-        getContentPane().add(BotonEditarF, new org.netbeans.lib.awtextra.AbsoluteConstraints(831, 190, 140, 50));
+        BotonEditarF.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                BotonEditarFMouseClicked(evt);
+            }
+        });
+        getContentPane().add(BotonEditarF, new org.netbeans.lib.awtextra.AbsoluteConstraints(850, 200, 120, 30));
 
         BotonRegresar.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -648,9 +670,13 @@ public class Factura extends javax.swing.JFrame {
         getContentPane().add(BotonRegresar, new org.netbeans.lib.awtextra.AbsoluteConstraints(31, 26, 130, 40));
         getContentPane().add(txtIdProducto, new org.netbeans.lib.awtextra.AbsoluteConstraints(680, 320, 40, 20));
 
+        BotonGuardarF.setEnabled(false);
         BotonGuardarF.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 BotonGuardarFMouseClicked(evt);
+            }
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                BotonGuardarFMousePressed(evt);
             }
         });
         getContentPane().add(BotonGuardarF, new org.netbeans.lib.awtextra.AbsoluteConstraints(840, 140, 130, 40));
@@ -668,6 +694,82 @@ public class Factura extends javax.swing.JFrame {
             }
         });
         getContentPane().add(btncaldescuento, new org.netbeans.lib.awtextra.AbsoluteConstraints(250, 510, 30, 30));
+
+        txtpordesc.setFont(new java.awt.Font("Georgia", 0, 14)); // NOI18N
+        txtpordesc.setForeground(new java.awt.Color(153, 153, 153));
+        txtpordesc.setText("Descuento");
+        txtpordesc.setBorder(null);
+        txtpordesc.setEnabled(false);
+        txtpordesc.setOpaque(false);
+        txtpordesc.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                txtpordescFocusGained(evt);
+            }
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                txtpordescFocusLost(evt);
+            }
+        });
+        txtpordesc.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                txtpordescMouseClicked(evt);
+            }
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                txtpordescMousePressed(evt);
+            }
+        });
+        txtpordesc.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtpordescActionPerformed(evt);
+            }
+        });
+        txtpordesc.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                txtpordescKeyReleased(evt);
+            }
+        });
+        getContentPane().add(txtpordesc, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 510, 180, 30));
+
+        txtporimpuesto.setFont(new java.awt.Font("Georgia", 0, 14)); // NOI18N
+        txtporimpuesto.setForeground(new java.awt.Color(153, 153, 153));
+        txtporimpuesto.setText("Impuesto");
+        txtporimpuesto.setBorder(null);
+        txtporimpuesto.setEnabled(false);
+        txtporimpuesto.setOpaque(false);
+        txtporimpuesto.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                txtporimpuestoFocusGained(evt);
+            }
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                txtporimpuestoFocusLost(evt);
+            }
+        });
+        txtporimpuesto.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                txtporimpuestoMouseClicked(evt);
+            }
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                txtporimpuestoMousePressed(evt);
+            }
+        });
+        txtporimpuesto.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtporimpuestoActionPerformed(evt);
+            }
+        });
+        txtporimpuesto.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                txtporimpuestoKeyReleased(evt);
+            }
+        });
+        getContentPane().add(txtporimpuesto, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 470, 180, 30));
+
+        jLabel2.setText("jLabel2");
+        jLabel2.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jLabel2MouseClicked(evt);
+            }
+        });
+        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(860, 30, -1, -1));
         getContentPane().add(idDescuento, new org.netbeans.lib.awtextra.AbsoluteConstraints(890, 340, 50, 20));
 
         aplicardescuento.setText("Aplicar");
@@ -750,7 +852,7 @@ public class Factura extends javax.swing.JFrame {
         getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 590, 470, 100));
 
         jLabel1.setForeground(new java.awt.Color(153, 153, 153));
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/Pantalla Factura.png"))); // NOI18N
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/Pantalla Factura(1).png"))); // NOI18N
         jLabel1.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mousePressed(java.awt.event.MouseEvent evt) {
                 jLabel1MousePressed(evt);
@@ -1207,14 +1309,14 @@ public class Factura extends javax.swing.JFrame {
 
     private void tablacompraMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tablacompraMouseClicked
         if (tabladetalle.getRowCount() == 0) {
-            
-               agrega = true;
-           
-        }else if(tabladetalle.getRowCount() != 0) {
+
+            agrega = true;
+
+        } else if (tabladetalle.getRowCount() != 0) {
             if (Seleccionados(2)) {
-               agrega = true;
-            }else{
-               agrega = false;
+                agrega = true;
+            } else {
+                agrega = false;
             }
         }
     }//GEN-LAST:event_tablacompraMouseClicked
@@ -1240,9 +1342,11 @@ public class Factura extends javax.swing.JFrame {
             PreparedStatement ps;
             ResultSet rs;
             Connection con = Conexion.getConexion();
-            ps = con.prepareStatement("Select P.Precio, I.Stock\n"
-                    + "from Productos as P \n"
+            ps = con.prepareStatement("Select P.Precio, I.Stock,TI.equivalente,DP.Equivalente\n"
+                    + "from Productos as P\n"
                     + "Inner Join Inventario as I on P.Id_Producto =I.Id_Producto\n"
+                    + "Inner Join Tipo_Impuesto as TI ON P.Id_Impuesto=TI.Id_Tipo_Impuesto\n"
+                    + "Inner Join DescuentoProducto as DP ON DP.Id_DescuentoP=P.Id_Descuento\n"
                     + "Where P.Id_Producto=?\n"
                     + "Order by P.Id_Producto");
             ps.setInt(1, id);
@@ -1252,6 +1356,8 @@ public class Factura extends javax.swing.JFrame {
 
                 txtPrecioUnitario.setText(rs.getString("Precio"));
                 txtStockP.setText(rs.getString("Stock"));
+                txtpordesc.setText(rs.getString("Equivalente"));
+                txtporimpuesto.setText(rs.getString("equivalente"));
             }
             txtCantidadP.setEnabled(Boolean.TRUE);
 
@@ -1260,9 +1366,9 @@ public class Factura extends javax.swing.JFrame {
         }
         llenar_tabla();
         if (tabladetalle.getRowCount() == 0) {
-            
-               agrega = true;
-           
+
+            agrega = true;
+
         }
     }//GEN-LAST:event_ComboProductoItemStateChanged
 
@@ -1295,13 +1401,6 @@ public class Factura extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_txtNumeroFacturaMousePressed
 
-    private void ComboTipoImpuestoItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_ComboTipoImpuestoItemStateChanged
-
-        if (txtCantidadP.getText().equals("Ingrese Cantidad")) {
-            JOptionPane.showMessageDialog(null, "Debe ingresar cantidad de producto para calcular impuesto", "Error", JOptionPane.ERROR_MESSAGE);
-        }
-    }//GEN-LAST:event_ComboTipoImpuestoItemStateChanged
-
     private void BotonGuardarFMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonGuardarFMouseClicked
         if (ComboTipoPago.equals("Seleccione Tipo de Pago...")) {
             JOptionPane.showMessageDialog(null, "Seleccione tipo de pago");
@@ -1315,7 +1414,7 @@ public class Factura extends javax.swing.JFrame {
             //ComboTipoPago.getSelectedIndex()
             try {
                 Connection con = Conexion.getConexion();
-                PreparedStatement ps = con.prepareStatement("Insert into Factura (Id_Cliente,Fecha_Factura,Hora, Num_Factura,Id_Empleado, Id_Tipo_Pago,Id_Parametro) VALUES(?,?,?,?,?,?,?)");
+                PreparedStatement ps = con.prepareStatement("Insert into Factura (Id_Cliente,Fecha_Factura,Hora, Num_Factura,Id_Empleado, Id_Tipo_Pago,Id_Parametro,Num_Tarjeta,montotarjeta) VALUES(?,?,?,?,?,?,?,?,?)");
                 ps.setInt(1, idcliente);
                 ps.setString(2, FechaCom);
                 ps.setString(3, Hora);
@@ -1323,6 +1422,8 @@ public class Factura extends javax.swing.JFrame {
                 ps.setInt(5, 2);
                 ps.setInt(6, ComboTipoPago.getSelectedIndex());
                 ps.setInt(7, idcai);
+                ps.setString(8, tarjeta);
+                ps.setString(9, String.valueOf(monto));
                 ps.executeUpdate();
 
                 JOptionPane.showMessageDialog(null, "Registro guardado");
@@ -1330,6 +1431,7 @@ public class Factura extends javax.swing.JFrame {
                 txtNumeroFactura.setText(factura);
 
                 cargarFact();
+                ComboDescuentoF.setEnabled(Boolean.TRUE);
                 ComboProducto.setEnabled(Boolean.TRUE);
                 BotonAgregarP.setEnabled(Boolean.TRUE);
 
@@ -1344,36 +1446,33 @@ public class Factura extends javax.swing.JFrame {
     }//GEN-LAST:event_txtImpuestoMouseClicked
 
     private void btncalimpuestoMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btncalimpuestoMouseClicked
-        Double Cantidad = Double.parseDouble(txtCantidadP.getText());
-        Double precio = Double.parseDouble(txtPrecioUnitario.getText());
-        Double valor = (Cantidad * precio) * 0.12;
-        if (ComboTipoImpuesto.getSelectedIndex() == 1) {
-            txtImpuesto.setText(valor.toString());
-            Impuesto = Impuesto + valor;
-            System.out.println(Impuesto);
 
+       
+        
+        if (txtCantidadP.getText().equals("Ingrese Cantidad")){
+             JOptionPane.showMessageDialog(null, "Debe ingresar cantidad de producto para calcular impuesto", "Error", JOptionPane.ERROR_MESSAGE);
+            
         } else {
-            JOptionPane.showMessageDialog(null, "Debe ingresar cantidad de producto para calcular impuesto", "Error", JOptionPane.ERROR_MESSAGE);
+            Double Cantidad = Double.parseDouble(txtCantidadP.getText());
+            Double precio = Double.parseDouble(txtPrecioUnitario.getText());
+            Double impuesto = Double.parseDouble(txtporimpuesto.getText());
+            Double valor = (Cantidad * precio) * impuesto;
+            txtImpuesto.setText(new DecimalFormat("####.##").format(valor));
         }
     }//GEN-LAST:event_btncalimpuestoMouseClicked
 
     private void btncaldescuentoMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btncaldescuentoMouseClicked
-        Double Cantidad = Double.parseDouble(txtCantidadP.getText());
-        Double precio = Double.parseDouble(txtPrecioUnitario.getText());
-        Double valor = (Cantidad * precio) * 0.05;
-        Double Valor1 = 0.00;
-        if (ComboTipoImpuesto.getSelectedIndex() == 1) {
-            txtDescuentoP.setText(new DecimalFormat("####.##").format(valor));
-            Descuento = Descuento + valor;
 
+        if (txtCantidadP.getText() == "Ingrese Cantidad") {
+            JOptionPane.showMessageDialog(null, "Debe ingresar cantidad de producto para calcular descuento", "Error", JOptionPane.ERROR_MESSAGE);
         } else {
-            txtDescuentoP.setText(Valor1.toString());
+            Double Cantidad = Double.parseDouble(txtCantidadP.getText());
+            Double precio = Double.parseDouble(txtPrecioUnitario.getText());
+            Double Descuento = Double.parseDouble(txtpordesc.getText());
+            Double valor = (Cantidad * precio) * Descuento;
+            txtDescuentoP.setText(new DecimalFormat("####.##").format(valor));
         }
     }//GEN-LAST:event_btncaldescuentoMouseClicked
-
-    private void ComboDescuentoItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_ComboDescuentoItemStateChanged
-        // TODO add your handling code here:
-    }//GEN-LAST:event_ComboDescuentoItemStateChanged
 
     private void tabladetalleMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tabladetalleMouseClicked
         // TODO add your handling code here:
@@ -1399,8 +1498,9 @@ public class Factura extends javax.swing.JFrame {
 
     private void BotonAgregarPMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonAgregarPMouseClicked
         cargarFact();
-         if (agrega == true) {
-          if (ComboProducto.equals("Seleccione Tipo de Pago...")) {
+        if (agrega == true) {
+
+            if (ComboProducto.equals("Seleccione Tipo de Pago...")) {
                 JOptionPane.showMessageDialog(null, "Seleccione tipo de pago");
 
             } else {
@@ -1425,19 +1525,22 @@ public class Factura extends javax.swing.JFrame {
 
                     JOptionPane.showMessageDialog(null, "Registro guardado");
 
-                    txtNumeroFactura.setText(factura);
+                   // txtNumeroFactura.setText(factura);
 
                     CARGARtp();
                     ComboDescuentoF.setEnabled(Boolean.TRUE);
+                    ComboTipoPago.setEnabled(Boolean.TRUE);
+                    BotonGuardarF.setEnabled(Boolean.TRUE);
+
                     ObtenerTotales();
 
                 } catch (SQLException ex) {
                     JOptionPane.showMessageDialog(null, ex.toString());
                 }
             }
-       }else if(agrega == false) {
-             JOptionPane.showMessageDialog(null, "Este producto no está disponible para venta sin receta médica");
-         }
+        } else if (agrega == false) {
+            JOptionPane.showMessageDialog(null, "Este producto no está disponible para venta sin receta médica");
+        }
     }//GEN-LAST:event_BotonAgregarPMouseClicked
 
     private void txtImpuestoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtImpuestoActionPerformed
@@ -1454,12 +1557,9 @@ public class Factura extends javax.swing.JFrame {
         } else {
             if (idDescuento.getText().equals("1")) {
                 //boolean canContinue = false;
-                int number = 0;
-
-                String userResponse = JOptionPane.showInputDialog(this, "Ingrese Edad: ", 0);
-
-                number = Integer.parseInt(userResponse);
-                if (number >= 60) {
+                if (txtAgregarNombre.getText().equals("Consumidor Final")) {
+                    JOptionPane.showMessageDialog(null, "No se puede aplicar descuento de la tercera edad al consumido final debe ingresar un RTN y buscar cliente o agregar un nuevo cliente", "Advertencia", JOptionPane.WARNING_MESSAGE);
+                } else if (edad >= 60) {
                     Double Descuentos = 0.00;
                     Double Obtener = Double.parseDouble(txtSubTotalP.getText());
 
@@ -1535,7 +1635,7 @@ public class Factura extends javax.swing.JFrame {
     }//GEN-LAST:event_AgregarMouseClicked
 
     private void ComboProductoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ComboProductoActionPerformed
-       /* TablaRender tr = new TablaRender();
+        /* TablaRender tr = new TablaRender();
         if (tabladetalle.getRowCount() != 0) {
             if (Seleccionados(2)) {
                JOptionPane.showMessageDialog(null, "está seleccionada");
@@ -1546,6 +1646,123 @@ public class Factura extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, "No tiene checks");
         }*/
     }//GEN-LAST:event_ComboProductoActionPerformed
+
+    private void txtpordescFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtpordescFocusGained
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtpordescFocusGained
+
+    private void txtpordescFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtpordescFocusLost
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtpordescFocusLost
+
+    private void txtpordescMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txtpordescMouseClicked
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtpordescMouseClicked
+
+    private void txtpordescMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txtpordescMousePressed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtpordescMousePressed
+
+    private void txtpordescActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtpordescActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtpordescActionPerformed
+
+    private void txtpordescKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtpordescKeyReleased
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtpordescKeyReleased
+
+    private void txtporimpuestoFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtporimpuestoFocusGained
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtporimpuestoFocusGained
+
+    private void txtporimpuestoFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtporimpuestoFocusLost
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtporimpuestoFocusLost
+
+    private void txtporimpuestoMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txtporimpuestoMouseClicked
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtporimpuestoMouseClicked
+
+    private void txtporimpuestoMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txtporimpuestoMousePressed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtporimpuestoMousePressed
+
+    private void txtporimpuestoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtporimpuestoActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtporimpuestoActionPerformed
+
+    private void txtporimpuestoKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtporimpuestoKeyReleased
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtporimpuestoKeyReleased
+
+    private void buscarCMouseEntered(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_buscarCMouseEntered
+        // TODO add your handling code here:
+    }//GEN-LAST:event_buscarCMouseEntered
+
+    private void jLabel2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel2MouseClicked
+        //File file = new File("");
+        try {
+            JasperReport archivo = JasperCompileManager.compileReport("");
+            Map<String, Object> map = new HashMap<String, Object>();
+            Conexion con = new Conexion();
+            JRDataSource data = new JREmptyDataSource();
+            JasperPrint prin = JasperFillManager.fillReport(archivo, null, data);
+            JasperExportManager.exportReportToPdfFile(prin, "reporte.pdf");
+        } catch (JRException ex) {
+            Logger.getLogger(Factura.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
+
+    }//GEN-LAST:event_jLabel2MouseClicked
+
+    private void ComboTipoPagoItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_ComboTipoPagoItemStateChanged
+        if (ComboTipoPago.getSelectedIndex() == 2) {
+
+            tarjeta = JOptionPane.showInputDialog("Ingrese Número de tarjeta:");
+            monto = Double.parseDouble(txtTotalaPagarP.getText());
+
+        } else if ((ComboTipoPago.getSelectedIndex() == 3)) {
+            //String Mon=
+            tarjeta = JOptionPane.showInputDialog("Ingrese Número de tarjeta:");
+            String Mon = JOptionPane.showInputDialog("Ingrese Monto:");
+            if (Double.parseDouble(Mon) >= Double.parseDouble(txtTotalaPagarP.getText())) {
+                JOptionPane.showMessageDialog(null, "El monto de la tarjeta debe ser menor al total", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            } else {
+                monto = Double.parseDouble(Mon);
+            }
+        }
+    }//GEN-LAST:event_ComboTipoPagoItemStateChanged
+
+    private void ComboTipoPagoMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ComboTipoPagoMouseClicked
+        // TODO add your handling code here:
+    }//GEN-LAST:event_ComboTipoPagoMouseClicked
+
+    private void BotonGuardarFMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonGuardarFMousePressed
+        if (BotonGuardarF.isEnabled() == false) {
+
+            JOptionPane.showMessageDialog(null, "Debes guardar al menos un detalle", "Advertencia", JOptionPane.WARNING_MESSAGE);
+
+        }
+    }//GEN-LAST:event_BotonGuardarFMousePressed
+
+    private void BotonEditarFMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonEditarFMouseClicked
+
+        try {
+            Connection con = Conexion.getConexion();
+            PreparedStatement ps = con.prepareStatement("Update Factura set Id_Cliente=?, Id_Tipo_Pago=?, Num_Tarjeta=?, montotarjeta=? where Id_Factura=?");
+            ps.setInt(1, idcliente);
+            ps.setInt(2, ComboTipoPago.getSelectedIndex());
+            ps.setString(3, tarjeta);
+            ps.setString(4, String.valueOf(monto));
+            ps.setInt(5, Integer.parseInt(idFactura.getText()));
+            ps.executeUpdate();
+            JOptionPane.showMessageDialog(null, "Registro Actualizado");
+
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null, ex.toString());
+        }
+
+    }//GEN-LAST:event_BotonEditarFMouseClicked
 
     /**
      * @param args the command line arguments
@@ -1586,15 +1803,13 @@ public class Factura extends javax.swing.JFrame {
     private javax.swing.JLabel Agregar;
     private javax.swing.JLabel BotonAgregarP;
     private javax.swing.JLabel BotonEditarF;
-    private javax.swing.JLabel BotonEditarP;
     private javax.swing.JLabel BotonEliminarF;
     private javax.swing.JLabel BotonEliminarP;
     private javax.swing.JLabel BotonGuardarF;
     private javax.swing.JLabel BotonRegresar;
-    private javax.swing.JComboBox<String> ComboDescuento;
+    private javax.swing.JLabel Botongenerar;
     private javax.swing.JComboBox<String> ComboDescuentoF;
     private javax.swing.JComboBox<String> ComboProducto;
-    private javax.swing.JComboBox<String> ComboTipoImpuesto;
     private javax.swing.JComboBox<String> ComboTipoPago;
     private com.toedter.calendar.JDateChooser Fecha;
     private javax.swing.JLabel Ncaja;
@@ -1607,6 +1822,7 @@ public class Factura extends javax.swing.JFrame {
     private javax.swing.JLabel idDescuento;
     private javax.swing.JLabel idFactura;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTable tablacompra;
@@ -1628,6 +1844,8 @@ public class Factura extends javax.swing.JFrame {
     private javax.swing.JTextField txtStockP;
     private javax.swing.JTextField txtSubTotalP;
     private javax.swing.JTextField txtTotalaPagarP;
+    private javax.swing.JTextField txtpordesc;
+    private javax.swing.JTextField txtporimpuesto;
     // End of variables declaration//GEN-END:variables
 
     private void buscarIDCliente(String cliente) {
@@ -1635,7 +1853,7 @@ public class Factura extends javax.swing.JFrame {
         try {
             ResultSet rs;
             Connection con = Conexion.getConexion();
-            PreparedStatement ps = con.prepareStatement("Select Nombre_Cliente+' '+Apellido_Cliente as NC, Id_Cliente from Cliente where RTN=?");
+            PreparedStatement ps = con.prepareStatement("Select Nombre_Cliente+' '+Apellido_Cliente as NC, Id_Cliente,(Year(GETDate())- Year(Fecha_Nacimiento))as Edad from Cliente where RTN=?");
             ps.setString(1, cliente);
             rs = ps.executeQuery();
 
@@ -1643,6 +1861,7 @@ public class Factura extends javax.swing.JFrame {
 
                 txtAgregarNombre.setText(rs.getString("NC"));
                 idcliente = rs.getInt("Id_Cliente");
+                edad = Integer.parseInt(rs.getString("Edad"));
 
             } else {
                 JOptionPane.showMessageDialog(null, "El Cliente no se encuentra en la Base de datos verifique que el RTN brindado sea correcto, o ingrese el cliente", "Advertencia", JOptionPane.WARNING_MESSAGE);
@@ -1786,6 +2005,7 @@ public class Factura extends javax.swing.JFrame {
         ResultSetMetaData rsmd;
         int columnas;
         int id = Integer.parseInt(txtIdProducto.getText());
+        //int Res=0;
         try {
             Connection con = Conexion.getConexion();
             ps = con.prepareStatement("Select RM.Id_Restriccion, RM.Restriccion\n"
@@ -1800,11 +2020,28 @@ public class Factura extends javax.swing.JFrame {
             columnas = rsmd.getColumnCount();
 
             while (rs.next()) {
+                /*String Res=rs.getString("Restriccion");
+                System.out.print(Res);
+                if(Res!="Receta MedicaReceta Medica"){
+                  String va = "No tiene Restriccion";
+                    Object datas[] = {0, va, false};
+                    model.addRow(datas); 
+                 
+                }else{
+                   String va = "No tiene Restriccion";
+                    Object datas[] = {0, va, false};
+                    model.addRow(datas); */
                 Object[] fila = new Object[columnas];
                 for (int indice = 0; indice < columnas; indice++) {
                     fila[indice] = rs.getObject(indice + 1);
                 }
                 model.addRow(fila);
+
+            }
+            if (tabladetalle.getColumnCount() == 0) {
+                String va = "No tiene Restriccion";
+                Object datas[] = {0, va, false};
+                model.addRow(datas);
             }
 
         } catch (SQLException ex) {
@@ -1816,6 +2053,7 @@ public class Factura extends javax.swing.JFrame {
     ResultSet rs;
     Connection con = Conexion.getConexion();
     JCheckBox check = new JCheckBox();
+
     /*public void llenar_tabla2() {
         String[] titulos = {"Id_Restricción", "Restricción", "Verificación"};
         String[] registros = new String[3];
@@ -1841,17 +2079,16 @@ public class Factura extends javax.swing.JFrame {
         } catch (Exception e) {
         }
     }*/
-
     public void cargarCAI() {
         try {
             ResultSet rs;
             Connection con = Conexion.getConexion();
-            PreparedStatement ps = con.prepareStatement("Select CAI,Valor_Actual,Id_Parametro_Factura from Parametro_Factura");
-            // ps.setInt(1, Prove);
+            PreparedStatement ps = con.prepareStatement("Select CAI,CONCAT(PuntodeEmision,'-',NumeroEstablecimiento,'-',TipoDocumento,'-000000',Valor_Actual) as Factura,Id_Parametro_Factura from Parametro_Factura where IdSucursal=?");
+            ps.setInt(1, Integer.parseInt(Operaciones2.Id_Agencia));
             rs = ps.executeQuery();
             while (rs.next()) {
                 txtCaiF.setText(rs.getString("CAI"));
-                factura = rs.getString("Valor_Actual");
+                factura = rs.getString("Factura");
                 idcai = rs.getInt("Id_Parametro_Factura");
             }
 

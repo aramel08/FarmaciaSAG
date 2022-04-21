@@ -979,7 +979,7 @@ public class Clientes extends javax.swing.JFrame {
         if (txtEmail.getText().length() > 30) {
             JOptionPane.showMessageDialog(null, "Alcanzaste el máximo de caracteres para este campo", "Advertencia", JOptionPane.WARNING_MESSAGE);
             evt.consume();
-        } else if (txtEmail.getText().length() > 0) {
+        } else if (txtEmail.getText().length() > 15) {
             if (!txtEmail.getText().matches("^([a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\\\\.[a-zA-Z0-9-]+)*)")) {
                 JOptionPane.showMessageDialog(null, "No repitas caracteres de forma incorrecta", "Error ", JOptionPane.ERROR_MESSAGE);
                 evt.consume();

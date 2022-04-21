@@ -133,7 +133,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
         });
         getContentPane().add(BotonCliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 180, 150, 100));
 
-        Menu.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/Menu_1.png"))); // NOI18N
+        Menu.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/Menu_2.png"))); // NOI18N
         Menu.setText("jLabel2");
         getContentPane().add(Menu, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1030, 730));
 
@@ -151,7 +151,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
     }//GEN-LAST:event_BotonClienteMouseClicked
 
     private void BotonEmpleadoMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonEmpleadoMouseClicked
-        Empleados EM = new Empleados();
+        Empleados1 EM = new Empleados1();
         {
             EM.setVisible(true);
             dispose();
@@ -196,7 +196,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
     }//GEN-LAST:event_BotonAlmacenMouseClicked
 
     private void BotonComprasMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonComprasMouseClicked
-         PantallaCompras PC = new PantallaCompras();
+         RegistroCompras PC = new RegistroCompras();
         {
             PC.setVisible(true);
             dispose();
@@ -205,7 +205,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
     }//GEN-LAST:event_BotonComprasMouseClicked
 
     private void BotonFacturaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonFacturaMouseClicked
-        Factura F = new Factura();
+        RegistroVentas F = new RegistroVentas();
         {
             F.setVisible(true);
             dispose();

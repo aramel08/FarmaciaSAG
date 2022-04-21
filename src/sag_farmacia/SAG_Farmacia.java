@@ -5,6 +5,9 @@
  */
 package sag_farmacia;
 
+import Formularios_SAG.Login;
+import Formularios_SAG.PantallaPrincipal;
+
 /**
  *
  * @author arame
@@ -15,7 +18,11 @@ public class SAG_Farmacia {
      * @param args the command line arguments
      */
     public static void main(String[] args) {
-        // TODO code application logic here
+        PantallaPrincipal PP= new PantallaPrincipal();
+        PP.setVisible(true);
+        
+        
     }
+    
     
 }

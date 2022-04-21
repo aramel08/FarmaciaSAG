@@ -617,9 +617,9 @@ public class Proveedores extends javax.swing.JFrame {
        if (txtNombreEmpresaPro.getText().equals("")) {
             txtNombreEmpresaPro.setText("Ingrese Nombre de la Empresa");
             txtNombreEmpresaPro.setForeground(new Color(153, 153, 153));
-            } else if (txtNombreEmpresaPro.getText().length() < 10) {
+             } else if (txtNombreEmpresaPro.getText().length() < 10) {
             JOptionPane.showMessageDialog(null, "El nombre debe tener al menos 10 caracteres", "Advertencia", JOptionPane.WARNING_MESSAGE);
-        
+
         }
        
        
@@ -712,7 +712,7 @@ public class Proveedores extends javax.swing.JFrame {
     }//GEN-LAST:event_txtRTNProKeyTyped
 
     private void txtNombreEmpresaProKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtNombreEmpresaProKeyTyped
-         if (txtNombreEmpresaPro.getText().length() > 12) {
+         if (txtNombreEmpresaPro.getText().length() > 30) {
             JOptionPane.showMessageDialog(null, "Alcanzaste el máximo de caracteres para este campo", "Advertencia", JOptionPane.WARNING_MESSAGE);
             evt.consume();
         } else if (txtNombreEmpresaPro.getText().length() > 0) {

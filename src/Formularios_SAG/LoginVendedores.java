@@ -5,6 +5,17 @@
  */
 package Formularios_SAG;
 
+import Conexion.Conexion;
+import encriptacion.Encode;
+import java.awt.Image;
+import java.awt.Toolkit;
+import java.awt.event.KeyEvent;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import javax.swing.JOptionPane;
+
 /**
  *
  * @author Allisson Castro
@@ -14,8 +25,15 @@ public class LoginVendedores extends javax.swing.JFrame {
     /**
      * Creates new form LoginVendedores
      */
+    
     public LoginVendedores() {
         initComponents();
+    }
+
+    @Override
+    public Image getIconImage() {
+        Image retValue = Toolkit.getDefaultToolkit().getImage(ClassLoader.getSystemResource("componentes/LOGOSAG(2).png"));
+        return retValue;
     }
 
     /**
@@ -27,21 +45,159 @@ public class LoginVendedores extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        BotonIngresar = new javax.swing.JLabel();
+        txtContrasenaV = new javax.swing.JPasswordField();
+        txtUsuarioV = new javax.swing.JTextField();
+        jLabel1 = new javax.swing.JLabel();
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
-        );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
-        );
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setIconImage(getIconImage());
+        setUndecorated(true);
+        getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        BotonIngresar.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                BotonIngresarMouseClicked(evt);
+            }
+        });
+        getContentPane().add(BotonIngresar, new org.netbeans.lib.awtextra.AbsoluteConstraints(841, 486, 270, 70));
+
+        txtContrasenaV.setFont(new java.awt.Font("Georgia", 0, 18)); // NOI18N
+        txtContrasenaV.setBorder(null);
+        txtContrasenaV.setOpaque(false);
+        txtContrasenaV.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                txtContrasenaVKeyReleased(evt);
+            }
+        });
+        getContentPane().add(txtContrasenaV, new org.netbeans.lib.awtextra.AbsoluteConstraints(859, 330, 320, 50));
+
+        txtUsuarioV.setFont(new java.awt.Font("Georgia", 0, 18)); // NOI18N
+        txtUsuarioV.setBorder(null);
+        txtUsuarioV.setOpaque(false);
+        txtUsuarioV.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                txtUsuarioVFocusGained(evt);
+            }
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                txtUsuarioVFocusLost(evt);
+            }
+        });
+        getContentPane().add(txtUsuarioV, new org.netbeans.lib.awtextra.AbsoluteConstraints(860, 190, 320, 70));
+
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/Pantalla Login V.png"))); // NOI18N
+        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
 
         pack();
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
+
+    public boolean resultado = false;
+
+    public boolean validarVendedor() {
+        Conexion cc = new Conexion();
+        Connection cn = cc.getConexion();
+        Encode encode = new Encode();
+        String secretKey = "farmaciaSAG";
+        String vendedor = txtUsuarioV.getText();
+        String pass = String.valueOf(txtContrasenaV.getPassword());
+        String sql = "SELECT * FROM Empleados WHERE Usuario = '" + vendedor + "'";
+
+        if (txtUsuarioV.getText().isEmpty() && txtContrasenaV.getText().isEmpty() || txtUsuarioV.getText().isEmpty() || txtContrasenaV.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Debes escribir un usuario y una contraseña", "Advertencia", JOptionPane.WARNING_MESSAGE);
+
+        } else {
+            try {
+                Statement st = cn.createStatement();
+                ResultSet rs = st.executeQuery(sql);
+
+                if (rs.next()) {
+                    String usuario = rs.getString("usuario");
+                    int intentos = Integer.parseInt(rs.getString("Intentos"));
+                    if (rs.getString("Intentos").equals("0")) {
+                        JOptionPane.showMessageDialog(null, "Usuario inactivo, comuniquese con el administrador del sistema para restablecer su usuario", "Acceso denegado", JOptionPane.ERROR_MESSAGE);
+                        txtContrasenaV.setText("");
+
+                    } else if (encode.deecnode(secretKey, rs.getString("Contrasena")).equals(pass)) {
+                        boolean resultado = true;
+                        Operaciones2 ad = new Operaciones2();
+                        ad.setVisible(true);
+                        this.dispose();
+                        try {
+                            String sqlRestar = "UPDATE Empleados SET Intentos = ? WHERE Empleados.Usuario = ? ";
+                            PreparedStatement pst = (PreparedStatement) cn.prepareStatement(sqlRestar);
+                            pst.setString(1, String.valueOf("3"));
+                            pst.setString(2, vendedor);
+                            pst.execute();
+
+                        } catch (Exception e) {
+                            System.out.println(e.getMessage());
+                        }
+                    } else {
+                        --intentos;
+                        if (intentos == 0) {
+                            JOptionPane.showMessageDialog(null, "Ha excedido el número de intentos para ingresar \n" + "Su usuario ha sido deshabilitado", "Acceso denegado", JOptionPane.ERROR_MESSAGE);
+                            txtUsuarioV.setText("");
+                            txtContrasenaV.setText("");
+                            try {
+                                String sqlEstado = "UPDATE Empleados SET Intentos = ? WHERE Empleados.Usuario = ? ";
+                                PreparedStatement pst = (PreparedStatement) cn.prepareStatement(sqlEstado);
+                                pst.setString(1, String.valueOf(intentos));
+                                pst.setString(2, vendedor);
+                                pst.execute();
+
+                            } catch (Exception e) {
+                                System.out.println(e.getMessage());
+
+                            }
+                        } else {
+                            try {
+                                String sqlEstado = "UPDATE Empleados SET Intentos = ? WHERE Empleados.Usuario = ? ";
+                                PreparedStatement pst = (PreparedStatement) cn.prepareStatement(sqlEstado);
+                                pst.setString(1, String.valueOf(intentos));
+                                pst.setString(2, vendedor);
+                                pst.execute();
+
+                            } catch (Exception e) {
+                                System.out.println(e.getMessage());
+                            }
+                            JOptionPane.showMessageDialog(null, "Usuario o clave incorrecta, te quedan " + intentos + " intentos", "Advertencia", JOptionPane.WARNING_MESSAGE);
+                            txtContrasenaV.setText("");
+                        }
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(null, "Asegurate de usar un usuario y una contraseña correctos", "Advertencia", JOptionPane.WARNING_MESSAGE);
+                }
+
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(null, "No se pudo establecer la conexión", "Error", JOptionPane.ERROR_MESSAGE);
+                System.out.println(e.getMessage());
+                txtUsuarioV.setText("");
+                txtContrasenaV.setText("");
+            }
+        }
+        return resultado;
+    }
+
+
+    private void BotonIngresarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonIngresarMouseClicked
+        validarVendedor();
+    }//GEN-LAST:event_BotonIngresarMouseClicked
+
+    private void txtUsuarioVFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtUsuarioVFocusGained
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtUsuarioVFocusGained
+
+    private void txtUsuarioVFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtUsuarioVFocusLost
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtUsuarioVFocusLost
+
+    private void txtContrasenaVKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtContrasenaVKeyReleased
+        if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
+//            validarVendedor();
+        }
+
+    }//GEN-LAST:event_txtContrasenaVKeyReleased
 
     /**
      * @param args the command line arguments
@@ -69,6 +225,7 @@ public class LoginVendedores extends javax.swing.JFrame {
             java.util.logging.Logger.getLogger(LoginVendedores.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
+        //</editor-fold>
 
         /* Create and display the form */
         java.awt.EventQueue.invokeLater(new Runnable() {
@@ -79,5 +236,9 @@ public class LoginVendedores extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JLabel BotonIngresar;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JPasswordField txtContrasenaV;
+    private javax.swing.JTextField txtUsuarioV;
     // End of variables declaration//GEN-END:variables
 }

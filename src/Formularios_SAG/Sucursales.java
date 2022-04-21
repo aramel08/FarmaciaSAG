@@ -146,7 +146,7 @@ public class Sucursales extends javax.swing.JFrame {
                 botonEditarSMouseClicked(evt);
             }
         });
-        getContentPane().add(botonEditarS, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 140, 140, 50));
+        getContentPane().add(botonEditarS, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 150, 130, 30));
 
         botonGerenciaS.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         botonGerenciaS.addMouseListener(new java.awt.event.MouseAdapter() {
