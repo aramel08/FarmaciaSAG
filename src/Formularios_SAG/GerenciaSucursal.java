@@ -6,6 +6,8 @@
 package Formularios_SAG;
 
 import Conexion.Conexion;
+import Logs.log;
+import Reportes.ReportView;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -15,9 +17,17 @@ import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.view.JasperViewer;
 
 /**
  *
@@ -28,26 +38,30 @@ public class GerenciaSucursal extends javax.swing.JFrame {
     /**
      * Creates new form GerenciaSucursal
      */
+    log lo = new log();
+    String gerencias = "Gerencia Sucusal";
+
     public GerenciaSucursal() {
         initComponents();
         Calendar cal = Calendar.getInstance();
-        cal.add(Calendar.DAY_OF_WEEK,-10);
+        cal.add(Calendar.DAY_OF_WEEK, -10);
         Calendar cale = Calendar.getInstance();
-        cale.add(Calendar.YEAR,-3);
+        cale.add(Calendar.YEAR, -3);
         Calendar calen = Calendar.getInstance();
-        calen.add(Calendar.DAY_OF_WEEK,-1);
+        calen.add(Calendar.DAY_OF_WEEK, -1);
         Date min = cal.getTime();
         Date mini = cale.getTime();
         Date max = new Date();
-        Date maxi= calen.getTime();
+        Date maxi = calen.getTime();
         CargarCargo ch = new CargarCargo();
         ComboNombreEmpleadoGS.setModel(ch.getvalues());
         CargarSucursal cs = new CargarSucursal();
         ComboNombreSurcursalGS.setModel(cs.getvalues());
-         cargartabla();
-         Inhabillitar();
-        FechaFinal.setSelectableDateRange( min,max);
-       FechaInicial.setSelectableDateRange(mini, maxi);
+        cargartabla();
+        usuario.setText(Login.txtUsuario.getText());
+        Inhabillitar();
+        FechaFinal.setSelectableDateRange(min, max);
+        FechaInicial.setSelectableDateRange(mini, maxi);
     }
 
     /**
@@ -71,6 +85,10 @@ public class GerenciaSucursal extends javax.swing.JFrame {
         txtIdGS = new javax.swing.JLabel();
         txtIdEmpleado = new javax.swing.JLabel();
         txtBuscarPro = new javax.swing.JTextField();
+        reporte = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        usuario = new javax.swing.JLabel();
+        txtIdS = new javax.swing.JLabel();
         TablaGerente = new javax.swing.JScrollPane();
         TablaGerencia = new javax.swing.JTable();
         GerenciaSucursal = new javax.swing.JLabel();
@@ -137,6 +155,29 @@ public class GerenciaSucursal extends javax.swing.JFrame {
         });
         getContentPane().add(txtBuscarPro, new org.netbeans.lib.awtextra.AbsoluteConstraints(660, 220, 240, 30));
 
+        reporte.setBackground(new java.awt.Color(204, 204, 204));
+        reporte.setFont(new java.awt.Font("Georgia", 0, 14)); // NOI18N
+        reporte.setForeground(new java.awt.Color(255, 255, 255));
+        reporte.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/analitica.png"))); // NOI18N
+        reporte.setText("REPORTE");
+        reporte.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                reporteMouseClicked(evt);
+            }
+        });
+        getContentPane().add(reporte, new org.netbeans.lib.awtextra.AbsoluteConstraints(780, 50, 120, 40));
+
+        jLabel3.setFont(new java.awt.Font("Georgia", 0, 12)); // NOI18N
+        jLabel3.setForeground(new java.awt.Color(102, 102, 102));
+        jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel3.setText("Usuario");
+        getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 640, 70, -1));
+
+        usuario.setFont(new java.awt.Font("Georgia", 1, 18)); // NOI18N
+        usuario.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        getContentPane().add(usuario, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 620, 230, 20));
+        getContentPane().add(txtIdS, new org.netbeans.lib.awtextra.AbsoluteConstraints(740, 270, 20, 20));
+
         TablaGerencia.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null, null},
@@ -170,7 +211,7 @@ public class GerenciaSucursal extends javax.swing.JFrame {
         });
         TablaGerente.setViewportView(TablaGerencia);
 
-        getContentPane().add(TablaGerente, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 290, 630, 360));
+        getContentPane().add(TablaGerente, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 290, 630, 280));
 
         GerenciaSucursal.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/Pantalla Gerente-Sucursal.png"))); // NOI18N
         GerenciaSucursal.setText("jLabel1");
@@ -185,14 +226,14 @@ public class GerenciaSucursal extends javax.swing.JFrame {
     }//GEN-LAST:event_txtBuscarProActionPerformed
 
     private void BotonEditarGSMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonEditarGSMouseClicked
-       
+         String Editar="Editar Gerencia Sucursal";
         if (FechaFinal.getDate().equals("")) {
             JOptionPane.showMessageDialog(null, "No se puede Actualizar datos vacios");
         } else {
             int Id = Integer.parseInt(txtIdGS.getText());
             SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-            String FechaF= sdf.format(FechaFinal.getDate());
-            
+            String FechaF = sdf.format(FechaFinal.getDate());
+
             try {
                 Connection con = Conexion.getConexion();
                 PreparedStatement ps = con.prepareStatement("Update GerenteSucursal set Fecha_Final=? where Id_Gerente =?");
@@ -205,19 +246,23 @@ public class GerenciaSucursal extends javax.swing.JFrame {
                 Inhabillitar();
 
             } catch (SQLException ex) {
+              lo.LogBitacora("Error: No se pudo actualizar la gerencia sucursal " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), gerencias,Editar);
+
                 JOptionPane.showMessageDialog(null, ex.toString());
             }
         }
     }//GEN-LAST:event_BotonEditarGSMouseClicked
 
     private void BotonGuardarGSMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonGuardarGSMouseClicked
+        String GuardarSucursal="Guardar Sucursal";
         ObtenerID();
+        ObtenerIdS();
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-            String FechaF= sdf.format(FechaFinal.getDate());
-        String FechaI =sdf.format(FechaInicial.getDate());
+        String FechaF = sdf.format(FechaFinal.getDate());
+        String FechaI = sdf.format(FechaInicial.getDate());
         int Empleado = Integer.parseInt(txtIdEmpleado.getText());
-        int Sucursal = ComboNombreSurcursalGS.getSelectedIndex();
-        
+        int Sucursal = Integer.parseInt(txtIdS.getText());
+
         if (FechaFinal.getDate().equals("") || FechaInicial.getDate().equals("")) {
             JOptionPane.showMessageDialog(null, "No se puede Guardar datos vacios");
         } else {
@@ -235,6 +280,8 @@ public class GerenciaSucursal extends javax.swing.JFrame {
                 Inhabillitar();
 
             } catch (SQLException ex) {
+               lo.LogBitacora("Error: No se pudo guardar gerencia sucursal " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), gerencias,GuardarSucursal);
+
                 JOptionPane.showMessageDialog(null, ex.toString());
             }
         }
@@ -245,12 +292,13 @@ public class GerenciaSucursal extends javax.swing.JFrame {
     }//GEN-LAST:event_BotonAgregarGSMouseClicked
 
     private void BotonCancelarGSMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonCancelarGSMouseClicked
-       Limpiar();
-       Inhabillitar();
+        Limpiar();
+        Inhabillitar();
     }//GEN-LAST:event_BotonCancelarGSMouseClicked
 
     private void TablaGerenciaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_TablaGerenciaMouseClicked
-       try {
+        String TablaGerencia1="Tabla Gerencia";
+        try {
             int fila = TablaGerencia.getSelectedRow();
             int id = Integer.parseInt(TablaGerencia.getValueAt(fila, 0).toString());
             PreparedStatement ps;
@@ -276,27 +324,45 @@ public class GerenciaSucursal extends javax.swing.JFrame {
             FechaInicial.setEnabled(Boolean.FALSE);
             ComboNombreEmpleadoGS.enable(Boolean.FALSE);
             ComboNombreSurcursalGS.enable(Boolean.FALSE);
-           FechaFinal.setEnabled(Boolean.TRUE);
+            FechaFinal.setEnabled(Boolean.TRUE);
 
             BotonEditarGS.isEnabled();
             BotonCancelarGS.isEnabled();
             BotonGuardarGS.enable(Boolean.FALSE);
             //Habilitar();
         } catch (SQLException ex) {
+            lo.LogBitacora("Error: No se pudo actualizar la tabla gerencia sucursal " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), gerencias,TablaGerencia1);
+
             JOptionPane.showMessageDialog(null, ex.toString());
         }
     }//GEN-LAST:event_TablaGerenciaMouseClicked
 
     private void BotonRegresarGSMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonRegresarGSMouseClicked
-     java.awt.EventQueue.invokeLater(new Runnable() {
+        java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new MenuPrincipal().setVisible(true);
             }
         });
         this.dispose();
 
-   
+
     }//GEN-LAST:event_BotonRegresarGSMouseClicked
+
+    private void reporteMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_reporteMouseClicked
+        net.sf.jasperreports.engine.JasperReport reporte;
+        HashMap hm = new HashMap();
+        hm.put("Usuario", usuario.getText());
+        try {
+            Connection con = Conexion.getConexion();
+            reporte = JasperCompileManager.compileReport("src/Reportes/ReporteGerencia.jrxml");
+            JasperPrint jp = JasperFillManager.fillReport(reporte, hm, con);
+            JasperViewer.viewReport(jp, true);
+            ReportView view = new ReportView(jp, false);
+            view.setVisible(true);
+        } catch (JRException ex) {
+            Logger.getLogger(Clientes.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_reporteMouseClicked
 
     /**
      * @param args the command line arguments
@@ -346,12 +412,17 @@ public class GerenciaSucursal extends javax.swing.JFrame {
     private javax.swing.JLabel GerenciaSucursal;
     private javax.swing.JTable TablaGerencia;
     private javax.swing.JScrollPane TablaGerente;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel reporte;
     private javax.swing.JTextField txtBuscarPro;
     private javax.swing.JLabel txtIdEmpleado;
     private javax.swing.JLabel txtIdGS;
+    private javax.swing.JLabel txtIdS;
+    private javax.swing.JLabel usuario;
     // End of variables declaration//GEN-END:variables
   private void cargartabla() {
-        DefaultTableModel modeloTabla = (DefaultTableModel) TablaGerencia.getModel();
+        String CargarTablaG="Cargar tabla gerencia";
+      DefaultTableModel modeloTabla = (DefaultTableModel) TablaGerencia.getModel();
         modeloTabla.setRowCount(0);
 
         PreparedStatement ps;
@@ -380,6 +451,8 @@ public class GerenciaSucursal extends javax.swing.JFrame {
 
             // JOptionPane.showMessageDialog(null, "Registro guardado");
         } catch (SQLException ex) {
+          lo.LogBitacora("Error: No se pudo cargar la gerencia sucursal " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), gerencias,CargarTablaG);
+
             JOptionPane.showMessageDialog(null, ex.toString());
         }
     }
@@ -387,7 +460,7 @@ public class GerenciaSucursal extends javax.swing.JFrame {
     public class CargarSucursal {
 
         public DefaultComboBoxModel getvalues() {
-
+             String CargarCombo="Cargar sucursal";
             DefaultComboBoxModel modelo = new DefaultComboBoxModel();
             try {
                 Connection con = Conexion.getConexion();
@@ -401,6 +474,8 @@ public class GerenciaSucursal extends javax.swing.JFrame {
                 con.close();
                 rs.close();
             } catch (Exception e) {
+             lo.LogBitacora("Error: No se pudo cargar la sucursal " + "Excepción: " + e + ". Origen: " + this.getClass().getSimpleName(), gerencias,CargarCombo);
+
                 System.out.println(e);
             }
             return modelo;
@@ -408,13 +483,13 @@ public class GerenciaSucursal extends javax.swing.JFrame {
     }
 
     public class CargarCargo {
-
+          String CargarCargo="Cargar cargo";
         public DefaultComboBoxModel getvalues() {
 
             DefaultComboBoxModel modelo = new DefaultComboBoxModel();
             try {
                 Connection con = Conexion.getConexion();
-                String sql = "select NombreE from Empleados where Id_Cargo=2";
+                String sql = "select NombreE from Empleados where Id_Cargo=3";
                 Statement st = con.createStatement();
                 ResultSet rs = st.executeQuery(sql);
                 modelo.addElement("Seleccione Cargo...");
@@ -424,12 +499,14 @@ public class GerenciaSucursal extends javax.swing.JFrame {
                 con.close();
                 rs.close();
             } catch (Exception e) {
+                 lo.LogBitacora("Error: No se pudo cargar cargo " + "Excepción: " + e + ". Origen: " + this.getClass().getSimpleName(), gerencias,CargarCargo);
+
                 System.out.println(e);
             }
             return modelo;
         }
     }
-    
+
     private void Habilitar() {
         FechaFinal.setEnabled(Boolean.TRUE);
         ComboNombreSurcursalGS.enable(Boolean.TRUE);
@@ -442,37 +519,58 @@ public class GerenciaSucursal extends javax.swing.JFrame {
         ComboNombreSurcursalGS.enable(Boolean.FALSE);
         FechaInicial.setEnabled(Boolean.FALSE);
         ComboNombreEmpleadoGS.enable(Boolean.FALSE);
-        
 
     }
+
     private void Limpiar() {
         //row new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
         txtIdGS.setText("");
 
-       
         ComboNombreEmpleadoGS.setSelectedIndex(0);
         ComboNombreSurcursalGS.setSelectedIndex(0);
 
- 
-
     }
-    public void ObtenerID(){
-        String Nombre=ComboNombreEmpleadoGS.getSelectedItem().toString();
-        try {
-                ResultSet rs;
-                Connection con = Conexion.getConexion();
-                PreparedStatement ps = con.prepareStatement("Select Id_Empleado From Empleados Where NombreE=?");
-                ps.setString(1, Nombre);
-                rs = ps.executeQuery();
-                
-               while (rs.next()) {
-                txtIdEmpleado.setText(rs.getString("Id_Empleado"));
-               }
-                
 
-            } catch (SQLException ex) {
-                JOptionPane.showMessageDialog(null, ex.toString());
+    public void ObtenerID() {
+        String ObtenerID="Obtener ID";
+        String Nombre = ComboNombreEmpleadoGS.getSelectedItem().toString();
+        try {
+            ResultSet rs;
+            Connection con = Conexion.getConexion();
+            PreparedStatement ps = con.prepareStatement("Select Id_Empleado From Empleados Where NombreE=?");
+            ps.setString(1, Nombre);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                txtIdEmpleado.setText(rs.getString("Id_Empleado"));
             }
+
+        } catch (SQLException ex) {
+          lo.LogBitacora("Error: No se pudo carar ID de empleado " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), gerencias,ObtenerID);
+ 
+            JOptionPane.showMessageDialog(null, ex.toString());
+        }
+    }
+
+    public void ObtenerIdS() {
+        String ObtenerIDSU="Obtener ID Sucursal";
+        String Nombre = ComboNombreSurcursalGS.getSelectedItem().toString();
+        try {
+            ResultSet rs;
+            Connection con = Conexion.getConexion();
+            PreparedStatement ps = con.prepareStatement("Select Id_Sucursal From Sucursal Where Nombre=?");
+            ps.setString(1, Nombre);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                txtIdS.setText(rs.getString("Id_Sucursal"));
+            }
+
+        } catch (SQLException ex) {
+            lo.LogBitacora("Error: No se pudo obtener ID sucursal " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), gerencias,ObtenerIDSU);
+
+            JOptionPane.showMessageDialog(null, ex.toString());
+        }
     }
 
 }

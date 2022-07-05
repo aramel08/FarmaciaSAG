@@ -5,6 +5,7 @@
  */
 package Formularios_SAG;
 
+import Logs.log;
 import java.awt.Image;
 import java.awt.Toolkit;
 
@@ -13,6 +14,7 @@ import java.awt.Toolkit;
  * @author Allisson Castro
  */
 public class MenuPrincipal extends javax.swing.JFrame {
+
 
     /**
      * Creates new form Menu_Principal
@@ -25,6 +27,8 @@ public class MenuPrincipal extends javax.swing.JFrame {
 
     public MenuPrincipal() {
         initComponents();
+        usuario.setText(Login.txtUsuario.getText());
+        
     }
 
     /**
@@ -46,6 +50,8 @@ public class MenuPrincipal extends javax.swing.JFrame {
         BotonProveedores = new javax.swing.JLabel();
         BotonEmpleado = new javax.swing.JLabel();
         BotonCliente = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        usuario = new javax.swing.JLabel();
         Menu = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -132,6 +138,16 @@ public class MenuPrincipal extends javax.swing.JFrame {
             }
         });
         getContentPane().add(BotonCliente, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 180, 150, 100));
+
+        jLabel2.setFont(new java.awt.Font("Georgia", 0, 12)); // NOI18N
+        jLabel2.setForeground(new java.awt.Color(102, 102, 102));
+        jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel2.setText("Usuario");
+        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 700, 70, -1));
+
+        usuario.setFont(new java.awt.Font("Georgia", 1, 18)); // NOI18N
+        usuario.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        getContentPane().add(usuario, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 680, 230, 20));
 
         Menu.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/Menu_2.png"))); // NOI18N
         Menu.setText("jLabel2");
@@ -275,5 +291,7 @@ public class MenuPrincipal extends javax.swing.JFrame {
     private javax.swing.JLabel BotonSalir;
     private javax.swing.JLabel BotonSucursal;
     private javax.swing.JLabel Menu;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel usuario;
     // End of variables declaration//GEN-END:variables
 }

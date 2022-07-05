@@ -6,6 +6,8 @@
 package Formularios_SAG;
 
 import Conexion.Conexion;
+import Logs.log;
+import Reportes.ReportView;
 import java.awt.Color;
 import java.awt.Image;
 import java.awt.Toolkit;
@@ -15,17 +17,25 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.view.JasperViewer;
 
 /**
  *
  * @author Allisson Castro
  */
 public class Inventario extends javax.swing.JFrame {
-
+    log lo = new log();
+    String inventario = "Inventario";
     /**
      * Creates new form Inventario
      */
@@ -38,6 +48,7 @@ public class Inventario extends javax.swing.JFrame {
     public Inventario() {
         initComponents();
         cargartabla();
+        usuario.setText(Login.txtUsuario.getText());
     }
 
     /**
@@ -50,7 +61,10 @@ public class Inventario extends javax.swing.JFrame {
     private void initComponents() {
 
         botonRegresarI = new javax.swing.JLabel();
+        reporte = new javax.swing.JLabel();
         txtBuscarI = new javax.swing.JTextField();
+        usuario = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         TablaInventario = new javax.swing.JTable();
         jLabel1 = new javax.swing.JLabel();
@@ -67,6 +81,18 @@ public class Inventario extends javax.swing.JFrame {
             }
         });
         getContentPane().add(botonRegresarI, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 40, 130, 40));
+
+        reporte.setBackground(new java.awt.Color(204, 204, 204));
+        reporte.setFont(new java.awt.Font("Georgia", 0, 14)); // NOI18N
+        reporte.setForeground(new java.awt.Color(255, 255, 255));
+        reporte.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/analitica.png"))); // NOI18N
+        reporte.setText("REPORTE");
+        reporte.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                reporteMouseClicked(evt);
+            }
+        });
+        getContentPane().add(reporte, new org.netbeans.lib.awtextra.AbsoluteConstraints(840, 50, 120, 40));
 
         txtBuscarI.setFont(new java.awt.Font("Georgia", 0, 14)); // NOI18N
         txtBuscarI.setForeground(new java.awt.Color(153, 153, 153));
@@ -87,6 +113,16 @@ public class Inventario extends javax.swing.JFrame {
             }
         });
         getContentPane().add(txtBuscarI, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 225, 240, 31));
+
+        usuario.setFont(new java.awt.Font("Georgia", 1, 18)); // NOI18N
+        usuario.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        getContentPane().add(usuario, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 660, 230, 20));
+
+        jLabel2.setFont(new java.awt.Font("Georgia", 0, 12)); // NOI18N
+        jLabel2.setForeground(new java.awt.Color(102, 102, 102));
+        jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel2.setText("Usuario");
+        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(470, 680, 70, -1));
 
         TablaInventario.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -116,7 +152,7 @@ public class Inventario extends javax.swing.JFrame {
         });
         jScrollPane1.setViewportView(TablaInventario);
 
-        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 280, 900, 390));
+        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 280, 900, 360));
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/Pantalla Inventario.png"))); // NOI18N
         getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
@@ -175,6 +211,23 @@ public class Inventario extends javax.swing.JFrame {
         this.dispose();
     }//GEN-LAST:event_botonRegresarIMouseClicked
 
+    private void reporteMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_reporteMouseClicked
+        
+        JasperReport reporte;
+        HashMap hm = new HashMap();
+        hm.put("Usuario", usuario.getText());
+        try{
+            Connection con = Conexion.getConexion();
+            reporte = JasperCompileManager.compileReport("src/Reportes/ReporteInventario.jrxml");
+            JasperPrint jp = JasperFillManager.fillReport(reporte, hm, con);
+            JasperViewer.viewReport(jp,true);
+            ReportView view= new ReportView(jp,false);
+            view.setVisible(true);
+        } catch (JRException ex) {
+            Logger.getLogger(Clientes.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_reporteMouseClicked
+
     /**
      * @param args the command line arguments
      */
@@ -214,11 +267,15 @@ public class Inventario extends javax.swing.JFrame {
     private javax.swing.JTable TablaInventario;
     private javax.swing.JLabel botonRegresarI;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JLabel reporte;
     private javax.swing.JTextField txtBuscarI;
+    private javax.swing.JLabel usuario;
     // End of variables declaration//GEN-END:variables
 
     private void cargartabla() {
+        String CargarT="Cargar tabla inventario";
         DefaultTableModel modeloTabla = (DefaultTableModel) TablaInventario.getModel();
         modeloTabla.setRowCount(0);
 
@@ -247,11 +304,14 @@ public class Inventario extends javax.swing.JFrame {
             }
 
         } catch (SQLException ex) {
+          lo.LogBitacora("Error: No se pudo cargar tabla inventario" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), inventario,CargarT);
+
             JOptionPane.showMessageDialog(null, ex.toString());
         }
     }
 
     void buscarData(String valor) {
+        String Buscar="Buscar inventario";
         String[] titulos = {"ID", "Nombre Producto", "Existencia Inicial", "Entradas", "Salidas", "Stock"};
         String[] registros = new String[13];
         String sql = "SELECT I.Id_inventario,P.Nombre_Producto,I.[Existencia Inicial],I.Entradas,I.Salidas,I.Stock\n"
@@ -281,6 +341,8 @@ public class Inventario extends javax.swing.JFrame {
             TablaInventario.setModel(model);
             // anchoColumnas();
         } catch (SQLException ex) {
+          lo.LogBitacora("Error: No se pudo buscar inventario " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), inventario,Buscar);
+
             Logger.getLogger(Clientes.class.getName()).log(Level.SEVERE, null, ex);
         }
     }

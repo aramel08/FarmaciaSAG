@@ -6,6 +6,7 @@
 package Formularios_SAG;
 
 import Conexion.Conexion;
+import Logs.log;
 import encriptacion.Encode;
 import java.awt.Image;
 import java.awt.Toolkit;
@@ -22,10 +23,13 @@ import javax.swing.JOptionPane;
  */
 public class LoginVendedores extends javax.swing.JFrame {
 
+    log lo = new log();
+    String LoginV = "Login Vendedor";
+
     /**
      * Creates new form LoginVendedores
      */
-    
+
     public LoginVendedores() {
         initComponents();
     }
@@ -95,6 +99,7 @@ public class LoginVendedores extends javax.swing.JFrame {
     public boolean resultado = false;
 
     public boolean validarVendedor() {
+        String validarV="Validar vendedor";
         Conexion cc = new Conexion();
         Connection cn = cc.getConexion();
         Encode encode = new Encode();
@@ -119,7 +124,7 @@ public class LoginVendedores extends javax.swing.JFrame {
                         txtContrasenaV.setText("");
 
                     } else if (encode.deecnode(secretKey, rs.getString("Contrasena")).equals(pass)) {
-                        boolean resultado = true;
+                        resultado = true;
                         Operaciones2 ad = new Operaciones2();
                         ad.setVisible(true);
                         this.dispose();
@@ -131,6 +136,8 @@ public class LoginVendedores extends javax.swing.JFrame {
                             pst.execute();
 
                         } catch (Exception e) {
+                           lo.LogBitacora("Error: No se pudo validar vendedor " + "Excepción: " + e + ". Origen: " + this.getClass().getSimpleName(), LoginV,validarV);
+
                             System.out.println(e.getMessage());
                         }
                     } else {
@@ -147,18 +154,22 @@ public class LoginVendedores extends javax.swing.JFrame {
                                 pst.execute();
 
                             } catch (Exception e) {
+                            lo.LogBitacora("Error: No se pudo establecer conexion " + "Excepción: " + e + ". Origen: " + this.getClass().getSimpleName(),LoginV,validarV);
+
                                 System.out.println(e.getMessage());
 
                             }
                         } else {
                             try {
-                                String sqlEstado = "UPDATE Empleados SET Intentos = ? WHERE Empleados.Usuario = ? ";
+                                String sqlEstado = "UPDATE Empleados SET Intentos =?  WHERE Empleados.Usuario = ? ";
                                 PreparedStatement pst = (PreparedStatement) cn.prepareStatement(sqlEstado);
                                 pst.setString(1, String.valueOf(intentos));
                                 pst.setString(2, vendedor);
                                 pst.execute();
 
                             } catch (Exception e) {
+                         lo.LogBitacora("Error: No se pudo estblecer conexion" + "Excepción: " + e + ". Origen: " + this.getClass().getSimpleName(), LoginV,validarV);
+
                                 System.out.println(e.getMessage());
                             }
                             JOptionPane.showMessageDialog(null, "Usuario o clave incorrecta, te quedan " + intentos + " intentos", "Advertencia", JOptionPane.WARNING_MESSAGE);
@@ -170,7 +181,13 @@ public class LoginVendedores extends javax.swing.JFrame {
                 }
 
             } catch (Exception e) {
+               lo.LogBitacora("Error: No se pudo estblecer conexion" + "Excepción: " + e + ". Origen: " + this.getClass().getSimpleName(), LoginV,validarV);
+
+                
+                
                 JOptionPane.showMessageDialog(null, "No se pudo establecer la conexión", "Error", JOptionPane.ERROR_MESSAGE);
+                 lo.LogBitacora("Error: No se pudo estblecer conexion" + "Excepción: " + e + ". Origen: " + this.getClass().getSimpleName(), LoginV,validarV);
+
                 System.out.println(e.getMessage());
                 txtUsuarioV.setText("");
                 txtContrasenaV.setText("");
@@ -238,7 +255,7 @@ public class LoginVendedores extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel BotonIngresar;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JPasswordField txtContrasenaV;
-    private javax.swing.JTextField txtUsuarioV;
+    public static javax.swing.JPasswordField txtContrasenaV;
+    public static javax.swing.JTextField txtUsuarioV;
     // End of variables declaration//GEN-END:variables
 }

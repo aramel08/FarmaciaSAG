@@ -7,6 +7,8 @@ package Formularios_SAG;
 
 import Conexion.Conexion;
 import static Formularios_SAG.Empleados.Id_emp;
+import Logs.log;
+import Reportes.ReportView;
 import java.awt.Color;
 import java.awt.Image;
 import java.awt.Toolkit;
@@ -17,12 +19,18 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
 
 /**
  *
@@ -30,23 +38,25 @@ import javax.swing.table.DefaultTableModel;
  */
 public class Proveedores extends javax.swing.JFrame {
 
+    log lo = new log();
+    String proveedores = "Proveedores";
+
     public static String Id_Proveedor = "0";
-    
+
     public Proveedores() {
         initComponents();
         cargartabla();
         Inhabillitar();
         txtId_Proveedor.setVisible(Boolean.FALSE);
-        
+        usuario.setText(Login.txtUsuario.getText());
+
     }
-      @Override
+
+    @Override
     public Image getIconImage() {
         Image retValue = Toolkit.getDefaultToolkit().getImage(ClassLoader.getSystemResource("componentes/LOGOSAG(2).png"));
         return retValue;
     }
-    
-
-  
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -75,7 +85,10 @@ public class Proveedores extends javax.swing.JFrame {
         TablaProveedor = new javax.swing.JTable();
         BotonActivoPro = new javax.swing.JRadioButton();
         BotonInactivoPro = new javax.swing.JRadioButton();
+        jLabel2 = new javax.swing.JLabel();
         txtId_Proveedor = new javax.swing.JLabel();
+        usuario = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
         BotonProducto_Proveedor = new javax.swing.JLabel();
         Proveedores = new javax.swing.JLabel();
 
@@ -334,7 +347,7 @@ public class Proveedores extends javax.swing.JFrame {
         });
         jScrollPane1.setViewportView(TablaProveedor);
 
-        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 270, 630, 400));
+        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 270, 630, 340));
 
         btnGroupProveedor.add(BotonActivoPro);
         BotonActivoPro.setFont(new java.awt.Font("Georgia", 1, 18)); // NOI18N
@@ -360,8 +373,30 @@ public class Proveedores extends javax.swing.JFrame {
         });
         getContentPane().add(BotonInactivoPro, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 220, -1, -1));
 
+        jLabel2.setBackground(new java.awt.Color(204, 204, 204));
+        jLabel2.setFont(new java.awt.Font("Georgia", 0, 14)); // NOI18N
+        jLabel2.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/analitica.png"))); // NOI18N
+        jLabel2.setText("REPORTE");
+        jLabel2.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jLabel2MouseClicked(evt);
+            }
+        });
+        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(810, 50, 120, 40));
+
         txtId_Proveedor.setEnabled(false);
         getContentPane().add(txtId_Proveedor, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 220, 80, 40));
+
+        usuario.setFont(new java.awt.Font("Georgia", 1, 18)); // NOI18N
+        usuario.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        getContentPane().add(usuario, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 630, 230, 20));
+
+        jLabel3.setFont(new java.awt.Font("Georgia", 0, 12)); // NOI18N
+        jLabel3.setForeground(new java.awt.Color(102, 102, 102));
+        jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel3.setText("Usuario");
+        getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 650, 70, -1));
 
         BotonProducto_Proveedor.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         BotonProducto_Proveedor.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -400,39 +435,56 @@ public class Proveedores extends javax.swing.JFrame {
         });
         this.dispose();
 
-                      
+
     }//GEN-LAST:event_BotonRegresarProMouseClicked
+    public boolean verificarDatosExistentes(String campo, String columna, String tabla, String mensaje) {
+        Conexion cc = new Conexion();
+        Connection cn = cc.getConexion();
+        boolean resultado = true;
+        String verificar = "Verificar";
+        String sql = "SELECT " + columna + " FROM " + tabla + " WHERE " + columna + " = '" + campo + "'";
+
+        try {
+            Statement st = cn.createStatement();
+            ResultSet rs = st.executeQuery(sql);
+
+            if (rs.next()) {
+                if (rs.getString(columna).equals(campo)) {
+                    JOptionPane.showMessageDialog(null, mensaje, "Error", JOptionPane.ERROR_MESSAGE);
+                    resultado = false;
+                }
+            }
+        } catch (Exception e) {
+            lo.LogBitacora("Error: No se pudo verificar el dato " + "Excepción: " + e + ". Origen: " + this.getClass().getSimpleName(), proveedores, verificar);
+            JOptionPane.showMessageDialog(null, "No se pudo verificar\n" + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+        }
+        return resultado;
+    }
 
     private void BotonAgregarProMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonAgregarProMouseClicked
-        Habilitar ();
+        Habilitar();
         BotonGuardarPro.isEnabled();
         BotonCancelarPro.isEnabled();
     }//GEN-LAST:event_BotonAgregarProMouseClicked
 
     private void BotonGuardarProMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonGuardarProMouseClicked
-        if (txtNombreEmpresaPro.getText().equals("Ingrese Nombre de la Empresa") && txtRTNPro.getText().equals("Ingrese RTN") && ComboCiudadPro.getSelectedIndex() == 0 
-                && txtDireccionPro.getText().equals("Ingrese Dirección") && txtTelefonoPro.getText().equals("Ingrese Teléfono"))  {
-            JOptionPane.showMessageDialog(null, "Debes llenar todos los campos", "Advertencia", JOptionPane.WARNING_MESSAGE);
+        String guardar = "BtnGuardar";
+        if (txtNombreEmpresaPro.getText().equals("Ingrese Nombre de la Empresa")) {
+            JOptionPane.showMessageDialog(null, "Debe ingresar un nombre de Empresa", "Advertencia", JOptionPane.WARNING_MESSAGE);
+        } else if (txtRTNPro.getText().equals("Ingrese RTN")) {
+            JOptionPane.showMessageDialog(null, "Debe ingresar un RTN", "Advertencia", JOptionPane.WARNING_MESSAGE);
+        } else if (ComboCiudadPro.getSelectedIndex() == 0) {
+            JOptionPane.showMessageDialog(null, "Seleccione una ciudad", "Advertencia", JOptionPane.WARNING_MESSAGE);
+        } else if (txtDireccionPro.getText().equals("Ingrese Dirección") || (txtDireccionPro.getText().equals(""))) {
+            JOptionPane.showMessageDialog(null, "Debe ingresar una direccion", "Advertencia", JOptionPane.WARNING_MESSAGE);
+        } else if (txtTelefonoPro.getText().equals("Ingrese Teléfono")) {
+            JOptionPane.showMessageDialog(null, "Debe ingresar un telefono", "Advertencia", JOptionPane.WARNING_MESSAGE);
         } else {
-            if (txtNombreEmpresaPro.getText().equals("Ingrese Nombre de la Empresa")) {
-                JOptionPane.showMessageDialog(null, "Debe ingresar un nombre de Empresa", "Advertencia", JOptionPane.WARNING_MESSAGE);
-            } else if (txtRTNPro.getText().equals("Ingrese RTN")) {
-                JOptionPane.showMessageDialog(null, "Debe ingresar un RTN", "Advertencia", JOptionPane.WARNING_MESSAGE);
-            } else if (ComboCiudadPro.getSelectedIndex() == 0) {
-                JOptionPane.showMessageDialog(null, "Seleccione una ciudad", "Advertencia", JOptionPane.WARNING_MESSAGE);
-            
-            } else if (txtDireccionPro.getText().equals("Ingrese Dirección")) {
-                JOptionPane.showMessageDialog(null, "Debe ingresar una direccion", "Advertencia", JOptionPane.WARNING_MESSAGE);
-            } else if (txtTelefonoPro.getText().equals("Ingrese Teléfono")) {
-                JOptionPane.showMessageDialog(null, "Debe ingresar un telefono", "Advertencia", JOptionPane.WARNING_MESSAGE);
-             
-                } else {
-       
             String NombreEm = txtNombreEmpresaPro.getText();
             String RTN = txtRTNPro.getText();
             String Ciudad = ComboCiudadPro.getSelectedItem().toString();
-            String Direccion  = txtDireccionPro.getText();
-            String Telefono = txtTelefonoPro.getText();        
+            String Direccion = txtDireccionPro.getText();
+            String Telefono = txtTelefonoPro.getText();
 
             try {
                 Connection con = Conexion.getConexion();
@@ -451,12 +503,15 @@ public class Proveedores extends javax.swing.JFrame {
                 Inhabillitar();
 
             } catch (SQLException ex) {
+                lo.LogBitacora("Error: No se pudo guardar el dato " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), proveedores, guardar);
                 JOptionPane.showMessageDialog(null, ex.toString());
             }
-        } }
+        }
+
     }//GEN-LAST:event_BotonGuardarProMouseClicked
 
     private void TablaProveedorMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_TablaProveedorMouseClicked
+        String tablap = "TablaProveedores";
         try {
             int fila = TablaProveedor.getSelectedRow();
             int id = Integer.parseInt(TablaProveedor.getValueAt(fila, 0).toString());
@@ -464,9 +519,9 @@ public class Proveedores extends javax.swing.JFrame {
             ResultSet rs;
             Connection con = Conexion.getConexion();
             ps = con.prepareStatement("Select P.Id_Proveedor,P.Nombre_Empresa,P.RTN,P.Ciudad,P.Direccion,P.Telefono,P.Id_Estado\n"
-                     + "From Proveedor as P\n"
-                    + "INNER JOIN Estado AS E ON E.Id_Estado = P.Id_Estado\n" 
-                     + "where P.Id_Proveedor=?\n"
+                    + "From Proveedor as P\n"
+                    + "INNER JOIN Estado AS E ON E.Id_Estado = P.Id_Estado\n"
+                    + "where P.Id_Proveedor=?\n"
                     + "Order By P.Id_Proveedor");
             ps.setInt(1, id);
             rs = ps.executeQuery();
@@ -478,30 +533,29 @@ public class Proveedores extends javax.swing.JFrame {
                 ComboCiudadPro.setSelectedItem(rs.getString("Ciudad"));
                 txtDireccionPro.setText(rs.getString("Direccion"));
                 txtTelefonoPro.setText(rs.getString("Telefono"));
-                
-                
-               
+
                 if (rs.getString("Id_Estado").equals("1")) {
                     BotonActivoPro.setSelected(true);
                 } else if (rs.getString("Id_Estado").equals("2")) {
                     BotonInactivoPro.setSelected(true);
-               
-            
-            }
-            Id_Proveedor = txtId_Proveedor.getText();
 
-            BotonActivoPro.setVisible(Boolean.TRUE);
-            BotonInactivoPro.setVisible(Boolean.TRUE);
-            //id = txtId_Proveedor.getText();
-            Habilitar();
+                }
+                Id_Proveedor = txtId_Proveedor.getText();
+
+                BotonActivoPro.setVisible(Boolean.TRUE);
+                BotonInactivoPro.setVisible(Boolean.TRUE);
+                //id = txtId_Proveedor.getText();
+                Habilitar();
             }
         } catch (SQLException ex) {
+            lo.LogBitacora("Error: No se pudo seleccionar la tabla" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), proveedores, tablap);
             JOptionPane.showMessageDialog(null, ex.toString());
         }
     }//GEN-LAST:event_TablaProveedorMouseClicked
 
     private void BotonEditarProMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonEditarProMouseClicked
-        if (txtNombreEmpresaPro.getText().equals("Ingrese Nombre de la Empresa") || txtRTNPro.getText().equals("Ingrese RTN")|| ComboCiudadPro.equals("Seleccione Ciudad") || txtDireccionPro.getText().equals("Ingrese Dirección")  || txtTelefonoPro.getText().equals("Ingrese Teléfono")) {
+        String editar = "BtnEditar";
+        if (txtNombreEmpresaPro.getText().equals("Ingrese Nombre de la Empresa") || txtRTNPro.getText().equals("Ingrese RTN") || ComboCiudadPro.equals("Seleccione Ciudad") || txtDireccionPro.getText().equals("Ingrese Dirección") || txtTelefonoPro.getText().equals("Ingrese Teléfono")) {
             JOptionPane.showMessageDialog(null, "No se puede Guardar datos vacios");
         } else {
             int IdProveedor = Integer.parseInt(txtId_Proveedor.getText());
@@ -510,37 +564,37 @@ public class Proveedores extends javax.swing.JFrame {
             String Ciudad = ComboCiudadPro.getSelectedItem().toString();
             String Direccion = txtDireccionPro.getText();
             String Telefono = txtTelefonoPro.getText();
-          
-            
+
             try {
                 Connection con = Conexion.getConexion();
                 PreparedStatement ps = con.prepareStatement("Update Proveedor set Nombre_Empresa=?, RTN=?,Ciudad=?,Direccion=?,Telefono=? Where Id_Proveedor=?");
                 ps.setString(1, NombreEmpresa);
                 ps.setString(2, RTN);
-                ps.setString(3,Ciudad);
+                ps.setString(3, Ciudad);
                 ps.setString(4, Direccion);
                 ps.setString(5, Telefono);
                 ps.setInt(6, IdProveedor);
-                
+
                 ps.executeUpdate();
                 JOptionPane.showMessageDialog(null, "Registro Actualizado");
-                
-                cargartabla();  
+
+                cargartabla();
                 Limpiar();
                 Inhabillitar();
 
             } catch (SQLException ex) {
+                lo.LogBitacora("Error: No se pudo editar el dato " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), proveedores, editar);
                 JOptionPane.showMessageDialog(null, ex.toString());
             }
         }
     }//GEN-LAST:event_BotonEditarProMouseClicked
 
     private void BotonCancelarProMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonCancelarProMouseClicked
-         Limpiar();
+        Limpiar();
         Inhabillitar();
         BotonEditarPro.setEnabled(Boolean.FALSE);
         BotonGuardarPro.setEnabled(Boolean.FALSE);
-    
+
     }//GEN-LAST:event_BotonCancelarProMouseClicked
 
     private void txtBuscarProMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txtBuscarProMouseClicked
@@ -548,13 +602,14 @@ public class Proveedores extends javax.swing.JFrame {
     }//GEN-LAST:event_txtBuscarProMouseClicked
 
     private void BotonActivoProActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BotonActivoProActionPerformed
-        int IdEmpleado = Integer.parseInt(txtId_Proveedor.getText());
-        
+
+        String IdEmpleado = txtId_Proveedor.getText();
+        String activo = "Activo";
         try {
             Connection con = Conexion.getConexion();
             PreparedStatement ps = con.prepareStatement("Update Proveedor set Id_Estado=? Where Id_Proveedor=?");
-            ps.setInt(1,1);
-            ps.setInt(2, IdEmpleado);
+            ps.setInt(1, 1);
+            ps.setString(2, IdEmpleado);
             ps.executeUpdate();
             JOptionPane.showMessageDialog(null, "Registro Habilitado");
             cargartabla();
@@ -564,18 +619,21 @@ public class Proveedores extends javax.swing.JFrame {
             Inhabillitar();
 
         } catch (SQLException ex) {
+            lo.LogBitacora("Error: No se pudo actualizar el dato " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), proveedores, activo);
             JOptionPane.showMessageDialog(null, ex.toString());
         }
     }//GEN-LAST:event_BotonActivoProActionPerformed
 
     private void BotonInactivoProActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BotonInactivoProActionPerformed
-        int IdEmpleado = Integer.parseInt(txtId_Proveedor.getText());
-        
+
+        String IdEmpleado = txtId_Proveedor.getText();
+        String inactivo = "Inactivo";
+
         try {
             Connection con = Conexion.getConexion();
             PreparedStatement ps = con.prepareStatement("Update Proveedor set Id_Estado=? Where Id_Proveedor=?");
             ps.setInt(1, 2);
-            ps.setInt(2, IdEmpleado);
+            ps.setString(2, IdEmpleado);
             ps.executeUpdate();
             JOptionPane.showMessageDialog(null, "Registro Inhabilitado");
             cargartabla();
@@ -585,6 +643,7 @@ public class Proveedores extends javax.swing.JFrame {
             Inhabillitar();
 
         } catch (SQLException ex) {
+            lo.LogBitacora("Error: No se pudo actualizar el dato " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), proveedores, inactivo);
             JOptionPane.showMessageDialog(null, ex.toString());
         }
     }//GEN-LAST:event_BotonInactivoProActionPerformed
@@ -599,34 +658,33 @@ public class Proveedores extends javax.swing.JFrame {
             if (!txtBuscarPro.getText().matches("^(?!.*([A-Za-zñÑáéíóúÁÉÍÓÚ\\s])\\1{2})[A-Za-zñÑáéíóúÁÉÍÓÚ\\s0-9]+$")) {
                 JOptionPane.showMessageDialog(null, "No repitas caracteres de forma incorrecta", "Advertencia", JOptionPane.WARNING_MESSAGE);
                 evt.consume();
-                
-                
+
             }
         }
     }//GEN-LAST:event_txtBuscarProKeyTyped
 
     private void txtNombreEmpresaProFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtNombreEmpresaProFocusGained
-       if (txtNombreEmpresaPro.getText().equals("Ingrese Nombre de la Empresa")) {
+        if (txtNombreEmpresaPro.getText().equals("Ingrese Nombre de la Empresa")) {
             txtNombreEmpresaPro.setText("");
             txtNombreEmpresaPro.setForeground(new Color(0, 0, 0));
         }
-       
+
     }//GEN-LAST:event_txtNombreEmpresaProFocusGained
 
     private void txtNombreEmpresaProFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtNombreEmpresaProFocusLost
-       if (txtNombreEmpresaPro.getText().equals("")) {
+        if (txtNombreEmpresaPro.getText().equals("")) {
             txtNombreEmpresaPro.setText("Ingrese Nombre de la Empresa");
             txtNombreEmpresaPro.setForeground(new Color(153, 153, 153));
-             } else if (txtNombreEmpresaPro.getText().length() < 10) {
+        } else if (txtNombreEmpresaPro.getText().length() < 10) {
             JOptionPane.showMessageDialog(null, "El nombre debe tener al menos 10 caracteres", "Advertencia", JOptionPane.WARNING_MESSAGE);
 
         }
-       
-       
+
+
     }//GEN-LAST:event_txtNombreEmpresaProFocusLost
 
     private void txtRTNProFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtRTNProFocusGained
-         if (txtRTNPro.getText().equals("Ingrese RTN")) {
+        if (txtRTNPro.getText().equals("Ingrese RTN")) {
             txtRTNPro.setText("");
             txtRTNPro.setForeground(new Color(0, 0, 0));
         }
@@ -636,20 +694,38 @@ public class Proveedores extends javax.swing.JFrame {
         if (txtRTNPro.getText().equals("")) {
             txtRTNPro.setText("Ingrese RTN");
             txtRTNPro.setForeground(new Color(153, 153, 153));
+        } else if (txtRTNPro.getText().length() < 14) {
+            JOptionPane.showMessageDialog(null, "El documento RTN debe contener 14 dígitos", "Advertencia", JOptionPane.WARNING_MESSAGE);
         }
-        
+        if (!txtRTNPro.getText().matches("(^[0]{1}[0-9]{13}$)|(^[1]{1}[0-9]{13}$)")) {
+            JOptionPane.showMessageDialog(null, "El número de RTN debe comenzar en 0 o en 1", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            /* txtRTNPro.setText("");
+            if (txtRTNPro.getText().equals("")) {
+                txtRTNPro.setText("Ingrese RTN");
+                txtRTNPro.setForeground(new Color(153, 153, 153));
+            }*/
+        } else {
+            verificarDatosExistentes(txtRTNPro.getText(), "RTN", "Proveedor", "No puedes utilizar el RTN de otro Proveedor");
+            /*txtRTNPro.setText("");
+            if (txtRTNPro.getText().equals("")) {
+                txtRTNPro.setText("Ingrese RTN");
+                txtRTNPro.setForeground(new Color(153, 153, 153));
+            }*/
+        }
+
+
     }//GEN-LAST:event_txtRTNProFocusLost
 
     private void txtDireccionProFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtDireccionProFocusGained
-       if (txtDireccionPro.getText().equals("Ingrese Dirección")) {
+        if (txtDireccionPro.getText().equals("Ingrese Dirección")) {
             txtDireccionPro.setText("");
             txtDireccionPro.setForeground(new Color(0, 0, 0));
         }
-       
+
     }//GEN-LAST:event_txtDireccionProFocusGained
 
     private void txtDireccionProActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtDireccionProActionPerformed
-       
+
     }//GEN-LAST:event_txtDireccionProActionPerformed
 
     private void txtDireccionProFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtDireccionProFocusLost
@@ -657,14 +733,14 @@ public class Proveedores extends javax.swing.JFrame {
             txtDireccionPro.setText("Ingrese Dirección");
             txtDireccionPro.setForeground(new Color(153, 153, 153));
         }
-        
+
         if (txtDireccionPro.getText().length() < 10) {
             JOptionPane.showMessageDialog(null, "La dirección debe contener al menos 10 caracteres", "Advertencia", JOptionPane.WARNING_MESSAGE);
         }
     }//GEN-LAST:event_txtDireccionProFocusLost
 
     private void txtTelefonoProFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtTelefonoProFocusGained
-       if (txtTelefonoPro.getText().equals("Ingrese Teléfono")) {
+        if (txtTelefonoPro.getText().equals("Ingrese Teléfono")) {
             txtTelefonoPro.setText("");
             txtTelefonoPro.setForeground(new Color(0, 0, 0));
         }
@@ -674,11 +750,12 @@ public class Proveedores extends javax.swing.JFrame {
         if (txtTelefonoPro.getText().equals("")) {
             txtTelefonoPro.setText("Ingrese Teléfono");
             txtTelefonoPro.setForeground(new Color(153, 153, 153));
-        }
-          else if (txtTelefonoPro.getText().length() < 8) {
+        } else if (txtTelefonoPro.getText().length() < 8) {
             JOptionPane.showMessageDialog(null, "El número de teléfono debe contener 8 dígitos", "Error", JOptionPane.ERROR_MESSAGE);
         } else if (!txtTelefonoPro.getText().matches("(^[9]{1}[0-9]{7}$)|(^[3]{1}[0-9]{7}$)|(^[7]{1}[0-9]{7}$)")) {
             JOptionPane.showMessageDialog(null, "El número de celular debe comenzar en 9, 3, 7 o 8", "Advertencia", JOptionPane.WARNING_MESSAGE);
+        } else {
+            verificarDatosExistentes(txtTelefonoPro.getText(), "Telefono", "Proveedor", "El  número de telefono ya existe");
         }
     }//GEN-LAST:event_txtTelefonoProFocusLost
 
@@ -712,7 +789,7 @@ public class Proveedores extends javax.swing.JFrame {
     }//GEN-LAST:event_txtRTNProKeyTyped
 
     private void txtNombreEmpresaProKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtNombreEmpresaProKeyTyped
-         if (txtNombreEmpresaPro.getText().length() > 30) {
+        if (txtNombreEmpresaPro.getText().length() > 30) {
             JOptionPane.showMessageDialog(null, "Alcanzaste el máximo de caracteres para este campo", "Advertencia", JOptionPane.WARNING_MESSAGE);
             evt.consume();
         } else if (txtNombreEmpresaPro.getText().length() > 0) {
@@ -751,7 +828,7 @@ public class Proveedores extends javax.swing.JFrame {
     }//GEN-LAST:event_txtNombreEmpresaProMousePressed
 
     private void txtRTNProMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txtRTNProMousePressed
-         if (txtRTNPro.isEnabled() == false) {
+        if (txtRTNPro.isEnabled() == false) {
 
             JOptionPane.showMessageDialog(null, "Dar Click en Agregar o Editar para utilizar el campo", "Advertencia", JOptionPane.WARNING_MESSAGE);
 
@@ -771,7 +848,7 @@ public class Proveedores extends javax.swing.JFrame {
     }//GEN-LAST:event_txtTelefonoProActionPerformed
 
     private void txtTelefonoProMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txtTelefonoProMousePressed
-         if (txtTelefonoPro.isEnabled() == false) {
+        if (txtTelefonoPro.isEnabled() == false) {
 
             JOptionPane.showMessageDialog(null, "Dar Click en Agregar o Editar para utilizar el campo", "Advertencia", JOptionPane.WARNING_MESSAGE);
 
@@ -795,6 +872,22 @@ public class Proveedores extends javax.swing.JFrame {
         });
         this.dispose();
     }//GEN-LAST:event_BotonContactoProMouseClicked
+
+    private void jLabel2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel2MouseClicked
+        JasperReport reporte;
+        HashMap hm = new HashMap();
+        hm.put("Usuario", usuario.getText());
+        try {
+            Connection con = Conexion.getConexion();
+            reporte = JasperCompileManager.compileReport("src/Reportes/ReporteProveedores.jrxml");
+            JasperPrint jp = JasperFillManager.fillReport(reporte, hm, con);
+            //JasperViewer.viewReport(jp,true);
+            ReportView view = new ReportView(jp, false);
+            view.setVisible(true);
+        } catch (JRException ex) {
+            Logger.getLogger(Clientes.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_jLabel2MouseClicked
 
     /**
      * @param args the command line arguments
@@ -846,6 +939,8 @@ public class Proveedores extends javax.swing.JFrame {
     private javax.swing.JTable TablaProveedor;
     private javax.swing.ButtonGroup btnGroupProveedor;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTextField txtBuscarPro;
     private javax.swing.JTextField txtDireccionPro;
@@ -853,15 +948,16 @@ public class Proveedores extends javax.swing.JFrame {
     private javax.swing.JTextField txtNombreEmpresaPro;
     private javax.swing.JTextField txtRTNPro;
     private javax.swing.JTextField txtTelefonoPro;
+    private javax.swing.JLabel usuario;
     // End of variables declaration//GEN-END:variables
 
     private void Habilitar() {
-       txtNombreEmpresaPro.enable(Boolean.TRUE);
+        txtNombreEmpresaPro.enable(Boolean.TRUE);
         txtRTNPro.enable(Boolean.TRUE);
         ComboCiudadPro.enable(Boolean.TRUE);
         txtDireccionPro.enable(Boolean.TRUE);
         txtTelefonoPro.enable(Boolean.TRUE);
-        
+
     }
 
     private void cargartabla() {
@@ -872,12 +968,13 @@ public class Proveedores extends javax.swing.JFrame {
         ResultSet rs;
         ResultSetMetaData rsmd;
         int columnas;
+        String cargart="CargarTabla";
 
         try {
             Connection con = Conexion.getConexion();
             ps = con.prepareStatement("Select P.Id_Proveedor,P.Nombre_Empresa,P.RTN,P.Ciudad,P.Direccion,P.Telefono,E.Estado\n"
                     + "From Proveedor as P\n"
-                    + "INNER JOIN Estado AS E ON E.Id_Estado = P.Id_Estado\n"  
+                    + "INNER JOIN Estado AS E ON E.Id_Estado = P.Id_Estado\n"
                     + "Order By P.Id_Proveedor");
             rs = ps.executeQuery();
             rsmd = rs.getMetaData();
@@ -892,13 +989,14 @@ public class Proveedores extends javax.swing.JFrame {
             }
 
         } catch (SQLException ex) {
+            lo.LogBitacora("Error: No se pudo cargar la tabla " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), proveedores, cargart);
             JOptionPane.showMessageDialog(null, ex.toString());
         }
 
     }
 
     private void Limpiar() {
-       txtNombreEmpresaPro.setText("");
+        txtNombreEmpresaPro.setText("");
         if (txtNombreEmpresaPro.getText().equals("")) {
             txtNombreEmpresaPro.setText("Ingrese Nombre de la Empresa");
             txtNombreEmpresaPro.setForeground(new Color(153, 153, 153));
@@ -908,39 +1006,39 @@ public class Proveedores extends javax.swing.JFrame {
             txtRTNPro.setText("Ingrese RTN");
             txtRTNPro.setForeground(new Color(153, 153, 153));
         }
-         txtDireccionPro.setText("");
+        txtDireccionPro.setText("");
         if (txtDireccionPro.getText().equals("")) {
             txtDireccionPro.setText("Ingrese Dirección");
             txtDireccionPro.setForeground(new Color(153, 153, 153));
-            
-             }
-         txtTelefonoPro.setText("");
+
+        }
+        txtTelefonoPro.setText("");
         if (txtTelefonoPro.getText().equals("")) {
             txtTelefonoPro.setText("Ingrese Teléfono");
             txtTelefonoPro.setForeground(new Color(153, 153, 153));
-          }
+        }
 
         ComboCiudadPro.setSelectedIndex(0);
-        
+
     }
 
     private void Inhabillitar() {
-       
+
         txtNombreEmpresaPro.enable(Boolean.FALSE);
         txtRTNPro.enable(Boolean.FALSE);
         ComboCiudadPro.enable(Boolean.FALSE);
         txtDireccionPro.enable(Boolean.FALSE);
         txtTelefonoPro.enable(Boolean.FALSE);
-        
-    
+
     }
 
     private void buscarData(String valor) {
+        String buscar ="Buscar";
         String[] titulos = {"ID", "Nombre Empresa", "RTN", "Ciudad", "Direccion", "Telefono", "Estado"};
         String[] registros = new String[13];
         String sql = "Select P.Id_Proveedor,P.Nombre_Empresa,P.RTN,P.Ciudad,P.Direccion,P.Telefono,E.Estado\n"
                 + "From Proveedor as P\n"
-                + "INNER JOIN Estado AS E ON E.Id_Estado = P.Id_Estado\n"  
+                + "INNER JOIN Estado AS E ON E.Id_Estado = P.Id_Estado\n"
                 + "WHERE CONCAT (P.Id_Proveedor, ' ', P.Nombre_Empresa, ' ', P.RTN) LIKE '%" + valor + "%'\n"
                 + "ORDER BY P.Id_Proveedor";
 
@@ -966,12 +1064,13 @@ public class Proveedores extends javax.swing.JFrame {
             TablaProveedor.setModel(model);
             // anchoColumnas();
         } catch (SQLException ex) {
+            lo.LogBitacora("Error: No se pudo buscar el dato " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), proveedores, buscar);
             Logger.getLogger(Clientes.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 
     private void validarNumerosLetras(KeyEvent e) {
-       if (e.getKeyChar() >= 33 && e.getKeyChar() <= 47
+        if (e.getKeyChar() >= 33 && e.getKeyChar() <= 47
                 || e.getKeyChar() >= 58 && e.getKeyChar() <= 64
                 || e.getKeyChar() >= 91 && e.getKeyChar() <= 96
                 || e.getKeyChar() >= 123 && e.getKeyChar() <= 129
@@ -984,12 +1083,13 @@ public class Proveedores extends javax.swing.JFrame {
     }
 
     private void validarNumeros(KeyEvent e) {
-          if (e.getKeyChar() >= 33 && e.getKeyChar() <= 47
+        if (e.getKeyChar() >= 33 && e.getKeyChar() <= 47
                 || e.getKeyChar() >= 58 && e.getKeyChar() <= 238) {
             e.consume();
             JOptionPane.showMessageDialog(null, "Este campo solo admite números", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
+
     public boolean validarNumCelular(String cadena) {
         String patron = "^[23789]\\d{7}$";
         Pattern patt = Pattern.compile(patron);
@@ -999,8 +1099,6 @@ public class Proveedores extends javax.swing.JFrame {
         } else {
             return false;
         }
-   
- }
-     }
-    
 
+    }
+}

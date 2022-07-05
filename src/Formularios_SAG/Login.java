@@ -1,6 +1,7 @@
 package Formularios_SAG;
 
 import Conexion.Conexion;
+import Logs.log;
 import encriptacion.Encode;
 import java.awt.Image;
 import java.awt.Toolkit;
@@ -8,6 +9,7 @@ import java.awt.event.KeyEvent;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import javax.swing.JOptionPane;
 
@@ -16,6 +18,9 @@ import javax.swing.JOptionPane;
  * @author Allisson Castro
  */
 public class Login extends javax.swing.JFrame {
+
+    log lo = new log();
+    String login = "Login";
 
     public Login() {
         initComponents();
@@ -113,13 +118,14 @@ public class Login extends javax.swing.JFrame {
     public boolean resultado = false;
 
     public boolean validarAdministradores() {
-       /* Conexion cc = new Conexion();
+        Conexion cc = new Conexion();
         Connection cn = cc.getConexion();
         Encode encode = new Encode();
         String secretKey = "farmaciaSAG";
         String admin = txtUsuario.getText();
         String pass = String.valueOf(txtContrasena.getPassword());
         String sql = "SELECT * FROM Usuario WHERE Nombre = '" + admin + "'";
+        String validar = "Validar";
 
         if (txtUsuario.getText().isEmpty() && txtContrasena.getText().isEmpty() || txtUsuario.getText().isEmpty() || txtContrasena.getText().isEmpty()) {
             JOptionPane.showMessageDialog(null, "Debes escribir un usuario y una contraseña", "Advertencia", JOptionPane.WARNING_MESSAGE);
@@ -149,6 +155,7 @@ public class Login extends javax.swing.JFrame {
                             pst.execute();
 
                         } catch (Exception e) {
+                            lo.LogBitacora("Error: No se pudieron actualizar los intentos. " + "Excepción: " + e + ". Origen: " + this.getClass().getSimpleName(), login, validar);
                             System.out.println(e.getMessage());
                         }
                     } else {
@@ -165,8 +172,8 @@ public class Login extends javax.swing.JFrame {
                                 pst.execute();
 
                             } catch (Exception e) {
+                                lo.LogBitacora("No se pudieron restar los intentos " + e.getMessage(), login, validar);
                                 System.out.println(e.getMessage());
-
                             }
                         } else {
                             try {
@@ -177,6 +184,8 @@ public class Login extends javax.swing.JFrame {
                                 pst.execute();
 
                             } catch (Exception e) {
+                                lo.LogBitacora("Usuario o clave incorrecta  " + e +
+                                " . Origen: " + this.getClass().getSimpleName(), login, validar);
                                 System.out.println(e.getMessage());
                             }
                             JOptionPane.showMessageDialog(null, "Usuario o clave incorrecta, te quedan " + intentos + " intentos", "Advertencia", JOptionPane.WARNING_MESSAGE);
@@ -187,25 +196,22 @@ public class Login extends javax.swing.JFrame {
                     JOptionPane.showMessageDialog(null, "Asegurate de usar un usuario y una contraseña correctos", "Advertencia", JOptionPane.WARNING_MESSAGE);
                 }
 
-            } catch (Exception e) {
-                JOptionPane.showMessageDialog(null, "No se pudo establecer la conexión", "Error", JOptionPane.ERROR_MESSAGE);
+            } catch (SQLException e) {
+                JOptionPane.showMessageDialog(null, "No se pudo establecer la conexión con la base de datos", "Error", JOptionPane.ERROR_MESSAGE);
+                lo.LogBitacora("Error: No se pudo establecer la conexión con la base de datos. " + "Excepción: " + e, login, validar);
                 System.out.println(e.getMessage());
                 txtUsuario.setText("");
                 txtContrasena.setText("");
             }
-        }*/
-       resultado = true;
-                        MenuPrincipal ad = new MenuPrincipal();
-                        ad.setVisible(true);
-                        this.dispose();
+        }
         return resultado;
     }
 
     private void botonInicioMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_botonInicioMouseClicked
-        //validarAdministradores();
-        MenuPrincipal ad = new MenuPrincipal();
+        validarAdministradores();
+        /*MenuPrincipal ad = new MenuPrincipal();
         ad.setVisible(true);
-        this.dispose();
+        this.dispose();*/
     }//GEN-LAST:event_botonInicioMouseClicked
 
     private void txtUsuarioFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtUsuarioFocusGained
@@ -266,7 +272,7 @@ public class Login extends javax.swing.JFrame {
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel botonInicio;
     private javax.swing.JLabel cover;
-    private javax.swing.JPasswordField txtContrasena;
-    private javax.swing.JTextField txtUsuario;
+    public static javax.swing.JPasswordField txtContrasena;
+    public static javax.swing.JTextField txtUsuario;
     // End of variables declaration//GEN-END:variables
 }

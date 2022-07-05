@@ -6,6 +6,8 @@
 package Formularios_SAG;
 
 import Conexion.Conexion;
+import Logs.log;
+import Reportes.ReportView;
 import java.awt.Color;
 import java.awt.Image;
 import java.awt.Toolkit;
@@ -18,11 +20,18 @@ import java.sql.Statement;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.view.JasperViewer;
 
 /**
  *
@@ -33,10 +42,14 @@ public class Productos extends javax.swing.JFrame {
     /**
      * Creates new form Productos
      */
+    log lo = new log();
+    String producto = "Productos";
+
     public static String Id_Producto = "0";
 
     public Productos() {
         initComponents();
+        usuario.setText(Login.txtUsuario.getText());
         Productos.CargarCategoria c = new Productos.CargarCategoria();
         Productos.CargarPresentacion pr = new Productos.CargarPresentacion();
         Productos.CargarImpuesto cim = new Productos.CargarImpuesto();
@@ -65,9 +78,11 @@ public class Productos extends javax.swing.JFrame {
         return retValue;
     }
 
-    void verificarDatosExistentes(String campo, String columna, String tabla, String mensaje) {
+    public boolean verificarDatosExistentes(String campo, String columna, String tabla, String mensaje) {
         Conexion cc = new Conexion();
         Connection cn = cc.getConexion();
+        boolean resultado = true;
+        String verificar = "Verificar";
         String sql = "SELECT " + columna + " FROM " + tabla + " WHERE " + columna + " = '" + campo + "'";
 
         try {
@@ -77,11 +92,14 @@ public class Productos extends javax.swing.JFrame {
             if (rs.next()) {
                 if (rs.getString(columna).equals(campo)) {
                     JOptionPane.showMessageDialog(null, mensaje, "Error", JOptionPane.ERROR_MESSAGE);
+                    resultado = false;
                 }
             }
         } catch (Exception e) {
+            lo.LogBitacora("Error: No se pudo verificar el dato " + "Excepción: " + e + ". Origen: " + this.getClass().getSimpleName(), producto, verificar);
             JOptionPane.showMessageDialog(null, "No se pudo verificar\n" + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
+        return resultado;
     }
 
     @SuppressWarnings("unchecked")
@@ -109,7 +127,11 @@ public class Productos extends javax.swing.JFrame {
         txtBuscarP = new javax.swing.JTextField();
         BotonActivoP = new javax.swing.JRadioButton();
         txtFechaVencimientoP = new com.toedter.calendar.JDateChooser();
+        jLabel1 = new javax.swing.JLabel();
         txtIDP = new javax.swing.JLabel();
+        usuario = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        reporte = new javax.swing.JLabel();
         BotonInactivoP = new javax.swing.JRadioButton();
         TablaP = new javax.swing.JScrollPane();
         tablaP = new javax.swing.JTable();
@@ -199,7 +221,7 @@ public class Productos extends javax.swing.JFrame {
                 txtNombrePKeyTyped(evt);
             }
         });
-        getContentPane().add(txtNombreP, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 280, 200, 30));
+        getContentPane().add(txtNombreP, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 275, 190, 30));
 
         txtDescripcionP.setFont(new java.awt.Font("Georgia", 0, 14)); // NOI18N
         txtDescripcionP.setForeground(new java.awt.Color(153, 153, 153));
@@ -224,7 +246,7 @@ public class Productos extends javax.swing.JFrame {
                 txtDescripcionPKeyTyped(evt);
             }
         });
-        getContentPane().add(txtDescripcionP, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 320, 200, 30));
+        getContentPane().add(txtDescripcionP, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 320, 190, 30));
 
         txtUnidadP.setFont(new java.awt.Font("Georgia", 0, 14)); // NOI18N
         txtUnidadP.setForeground(new java.awt.Color(153, 153, 153));
@@ -254,7 +276,7 @@ public class Productos extends javax.swing.JFrame {
                 txtUnidadPKeyTyped(evt);
             }
         });
-        getContentPane().add(txtUnidadP, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 460, 200, 30));
+        getContentPane().add(txtUnidadP, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 460, 190, 30));
 
         ComboCategoriaP.setFont(new java.awt.Font("Georgia", 1, 14)); // NOI18N
         ComboCategoriaP.setForeground(new java.awt.Color(153, 153, 153));
@@ -290,7 +312,7 @@ public class Productos extends javax.swing.JFrame {
                 ComboImpMousePressed(evt);
             }
         });
-        getContentPane().add(ComboImp, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 690, 190, 30));
+        getContentPane().add(ComboImp, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 685, 190, 30));
 
         ComboPresentacionP.setFont(new java.awt.Font("Georgia", 1, 14)); // NOI18N
         ComboPresentacionP.setForeground(new java.awt.Color(153, 153, 153));
@@ -327,7 +349,7 @@ public class Productos extends javax.swing.JFrame {
                 txtTamañosPKeyTyped(evt);
             }
         });
-        getContentPane().add(txtTamañosP, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 510, 200, 30));
+        getContentPane().add(txtTamañosP, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 505, 190, 30));
 
         txtLoteP.setFont(new java.awt.Font("Georgia", 0, 14)); // NOI18N
         txtLoteP.setForeground(new java.awt.Color(153, 153, 153));
@@ -357,7 +379,7 @@ public class Productos extends javax.swing.JFrame {
                 txtLotePKeyTyped(evt);
             }
         });
-        getContentPane().add(txtLoteP, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 550, 200, 30));
+        getContentPane().add(txtLoteP, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 550, 190, 30));
 
         txtPrecioHistorico.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         txtPrecioHistorico.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -390,7 +412,7 @@ public class Productos extends javax.swing.JFrame {
                 txtPrecioPKeyTyped(evt);
             }
         });
-        getContentPane().add(txtPrecioP, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 640, 200, 30));
+        getContentPane().add(txtPrecioP, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 640, 190, 30));
 
         txtBuscarP.setFont(new java.awt.Font("Georgia", 0, 14)); // NOI18N
         txtBuscarP.setText("Buscar Por ID,Nombre o Estado");
@@ -414,7 +436,7 @@ public class Productos extends javax.swing.JFrame {
                 txtBuscarPKeyTyped(evt);
             }
         });
-        getContentPane().add(txtBuscarP, new org.netbeans.lib.awtextra.AbsoluteConstraints(670, 230, 240, 30));
+        getContentPane().add(txtBuscarP, new org.netbeans.lib.awtextra.AbsoluteConstraints(670, 225, 240, 30));
 
         GrupoProductos.add(BotonActivoP);
         BotonActivoP.setText("Activo");
@@ -434,8 +456,35 @@ public class Productos extends javax.swing.JFrame {
                 txtFechaVencimientoPMousePressed(evt);
             }
         });
-        getContentPane().add(txtFechaVencimientoP, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 600, 200, 20));
+        getContentPane().add(txtFechaVencimientoP, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 606, 186, 20));
+
+        jLabel1.setFont(new java.awt.Font("Georgia", 1, 12)); // NOI18N
+        jLabel1.setForeground(new java.awt.Color(153, 153, 153));
+        jLabel1.setText("Fecha Vencimiento");
+        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 594, 180, 15));
         getContentPane().add(txtIDP, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 210, 100, 20));
+
+        usuario.setFont(new java.awt.Font("Georgia", 1, 18)); // NOI18N
+        usuario.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        getContentPane().add(usuario, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 720, 230, 20));
+
+        jLabel3.setFont(new java.awt.Font("Georgia", 0, 12)); // NOI18N
+        jLabel3.setForeground(new java.awt.Color(102, 102, 102));
+        jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel3.setText("Usuario");
+        getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 740, 70, -1));
+
+        reporte.setBackground(new java.awt.Color(204, 204, 204));
+        reporte.setFont(new java.awt.Font("Georgia", 0, 14)); // NOI18N
+        reporte.setForeground(new java.awt.Color(255, 255, 255));
+        reporte.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/analitica.png"))); // NOI18N
+        reporte.setText("REPORTE");
+        reporte.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                reporteMouseClicked(evt);
+            }
+        });
+        getContentPane().add(reporte, new org.netbeans.lib.awtextra.AbsoluteConstraints(840, 50, 120, 40));
 
         GrupoProductos.add(BotonInactivoP);
         BotonInactivoP.setText("Inactivo");
@@ -513,48 +562,81 @@ public class Productos extends javax.swing.JFrame {
     }//GEN-LAST:event_txtUnidadPActionPerformed
 
     private void botonEditarPMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_botonEditarPMouseClicked
-        int Id = Integer.parseInt(txtIDP.getText());
-        String Nombre = txtNombreP.getText();
-        String Descripcion = txtDescripcionP.getText();
-        int Categoria = ComboCategoriaP.getSelectedIndex();
-        int Presentacion = ComboPresentacionP.getSelectedIndex();
-        String Unidades = txtUnidadP.getText();
-        String Tamaño = txtTamañosP.getText();
-        String Lote = txtLoteP.getText();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        String FechaV = sdf.format(txtFechaVencimientoP.getDate());
-        String Precio = txtPrecioP.getText();
-        int desc = ComboDesc.getSelectedIndex();
-        int impu = ComboImp.getSelectedIndex();
+        String editar = "BtnEditar";
+        if (txtNombreP.getText().equals("Ingrese Nombre Producto") && txtDescripcionP.getText().equals("Ingrese Descripción Producto") && ComboCategoriaP.getSelectedIndex() == 0 && ComboPresentacionP.getSelectedIndex() == 0
+                && txtUnidadP.getText().equals("Ingrese Unidades Producto") && txtTamañosP.getText().equals("Ingrese Tamaño Producto") && txtLoteP.getText().equals("Ingrese Lote Producto") && txtFechaVencimientoP.getDate().equals("") && txtPrecioP.getText().equals("Ingrese Precio Producto")
+                && ComboImp.getSelectedIndex() == 0 && ComboDesc.getSelectedIndex() == 0) {
+            JOptionPane.showMessageDialog(null, "Debes llenar todos los campos", "Advertencia", JOptionPane.WARNING_MESSAGE);
+        } else {
+            if (txtNombreP.getText().equals("Ingrese Nombre Producto")) {
+                JOptionPane.showMessageDialog(null, "Debe ingresar un nombre al producto", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            } else if (txtDescripcionP.getText().equals("Ingrese Descripción Producto")) {
+                JOptionPane.showMessageDialog(null, "Debe ingresar una descripción", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            } else if (ComboCategoriaP.getSelectedIndex() == 0) {
+                JOptionPane.showMessageDialog(null, "Seleccione la categoria", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            } else if (ComboPresentacionP.getSelectedIndex() == 0) {
+                JOptionPane.showMessageDialog(null, "Seleccione la presentación", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            } else if (txtUnidadP.getText().equals("Ingrese Unidades Producto")) {
+                JOptionPane.showMessageDialog(null, "Debe ingresar una unidad", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            } else if (txtTamañosP.getText().equals("Ingrese Tamaño Producto")) {
+                JOptionPane.showMessageDialog(null, "Debe ingresar un tamaño", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            } else if (txtLoteP.getText().equals("Ingrese Lote Producto")) {
+                JOptionPane.showMessageDialog(null, "Debe ingresar un lote", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            } else if (txtFechaVencimientoP.getDate().equals("")) {
+                JOptionPane.showMessageDialog(null, "Debe ingresar la fecha de vencimiento", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            } else if (txtPrecioP.getText().equals("Ingrese Precio Producto")) {
+                JOptionPane.showMessageDialog(null, "Debe ingresar un precio", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            } else if (ComboImp.getSelectedIndex() == 0) {
+                JOptionPane.showMessageDialog(null, "Debe Seleccionar un Impuesto", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            } else if (ComboDesc.getSelectedIndex() == 0) {
+                JOptionPane.showMessageDialog(null, "Debe Seleccionar un Descuento", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            } else {
+                int Id = Integer.parseInt(txtIDP.getText());
+                String Nombre = txtNombreP.getText();
+                String Descripcion = txtDescripcionP.getText();
+                int Categoria = ComboCategoriaP.getSelectedIndex();
+                int Presentacion = ComboPresentacionP.getSelectedIndex();
+                String Unidades = txtUnidadP.getText();
+                String Tamaño = txtTamañosP.getText();
+                String Lote = txtLoteP.getText();
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                String FechaV = sdf.format(txtFechaVencimientoP.getDate());
+                String Precio = txtPrecioP.getText();
+                int desc = ComboDesc.getSelectedIndex();
+                int impu = ComboImp.getSelectedIndex();
 
-        try {
-            Connection con = Conexion.getConexion();
-            PreparedStatement ps = con.prepareStatement("Update Productos set Nombre_Producto=?,Descripcion=?,Id_Categoria=?,Id_Presentacion=?, Lote=?,Fecha_Vencimiento=?,Unidades=?,Tamaño=?,Precio=?, Id_Descuento=?,Id_Impuesto=? Where Id_Producto=?");
-            ps.setString(1, Nombre);
-            ps.setString(2, Descripcion);
-            ps.setInt(3, Categoria);
-            ps.setInt(4, Presentacion);
-            ps.setString(7, Unidades);
-            ps.setString(8, Tamaño);
-            ps.setString(5, Lote);
-            ps.setString(6, FechaV);
-            ps.setString(9, Precio);
-            ps.setInt(10, desc);
-            ps.setInt(11, impu);
-            ps.setInt(12, Id);
-            ps.executeUpdate();
-            JOptionPane.showMessageDialog(null, "Registro Actualizado");
-            cargartabla();
-            Limpiar();
-            Inhabillitar();
-            //txtEstadoC.setVisible(Boolean.FALSE);
+                try {
+                    Connection con = Conexion.getConexion();
+                    PreparedStatement ps = con.prepareStatement("Update Productos set Nombre_Producto=?,Descripcion=?,Id_Categoria=?,Id_Presentacion=?, Lote=?,Fecha_Vencimiento=?,Unidades=?,Tamaño=?,Precio=?, Id_Descuento=?,Id_Impuesto=? Where Id_Producto=?");
+                    ps.setString(1, Nombre);
+                    ps.setString(2, Descripcion);
+                    ps.setInt(3, Categoria);
+                    ps.setInt(4, Presentacion);
+                    ps.setString(7, Unidades);
+                    ps.setString(8, Tamaño);
+                    ps.setString(5, Lote);
+                    ps.setString(6, FechaV);
+                    ps.setString(9, Precio);
+                    ps.setInt(10, desc);
+                    ps.setInt(11, impu);
+                    ps.setInt(12, Id);
+                    ps.executeUpdate();
+                    JOptionPane.showMessageDialog(null, "Registro Actualizado");
+                    cargartabla();
+                    Limpiar();
+                    Inhabillitar();
+                    //txtEstadoC.setVisible(Boolean.FALSE);
 
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(null, ex.toString());
+                } catch (SQLException ex) {
+                    lo.LogBitacora("Error: No se pudo editar el dato " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), producto, editar);
+                    JOptionPane.showMessageDialog(null, ex.toString());
+                }
+            }
         }
     }//GEN-LAST:event_botonEditarPMouseClicked
 
     private void botonGuardarPMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_botonGuardarPMouseClicked
+        String guardar = "BtnGuardar";
         if (txtNombreP.getText().equals("Ingrese Nombre Producto") && txtDescripcionP.getText().equals("Ingrese Descripción Producto") && ComboCategoriaP.getSelectedIndex() == 0 && ComboPresentacionP.getSelectedIndex() == 0
                 && txtUnidadP.getText().equals("Ingrese Unidades Producto") && txtTamañosP.getText().equals("Ingrese Tamaño Producto") && txtLoteP.getText().equals("Ingrese Lote Producto") && txtFechaVencimientoP.getDate().equals("") && txtPrecioP.getText().equals("Ingrese Precio Producto")
                 && ComboImp.getSelectedIndex() == 0 && ComboDesc.getSelectedIndex() == 0) {
@@ -618,6 +700,7 @@ public class Productos extends javax.swing.JFrame {
                     Inhabillitar();
 
                 } catch (SQLException ex) {
+                    lo.LogBitacora("Error: No se pudo guardar el dato " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), producto, guardar);
                     JOptionPane.showMessageDialog(null, ex.toString());
                 }
             }
@@ -632,6 +715,7 @@ public class Productos extends javax.swing.JFrame {
         ResultSet rs;
         ResultSetMetaData rsmd;
         int columnas;
+        String cargart = "CargarTabla";
 
         try {
             Connection con = Conexion.getConexion();
@@ -656,6 +740,7 @@ public class Productos extends javax.swing.JFrame {
             }
 
         } catch (SQLException ex) {
+            lo.LogBitacora("Error: No se pudo vcargar la tabla " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), producto, cargart);
             JOptionPane.showMessageDialog(null, ex.toString());
         }
 
@@ -670,12 +755,12 @@ public class Productos extends javax.swing.JFrame {
         }
         txtDescripcionP.setText("");
         if (txtDescripcionP.getText().equals("")) {
-            txtDescripcionP.setText("Ingrese Descripcion Producto");
+            txtDescripcionP.setText("Ingrese Descripción Producto");
             txtDescripcionP.setForeground(new Color(153, 153, 153));
         }
         txtUnidadP.setText("");
         if (txtUnidadP.getText().equals("")) {
-            txtUnidadP.setText("Ingrese Unidad Producto");
+            txtUnidadP.setText("Ingrese Unidades Producto");
             txtUnidadP.setForeground(new Color(153, 153, 153));
         }
         txtTamañosP.setText("");
@@ -691,7 +776,7 @@ public class Productos extends javax.swing.JFrame {
 
         txtPrecioP.setText("");
         if (txtPrecioP.getText().equals("")) {
-            txtPrecioP.setText("Ingrese Precio");
+            txtPrecioP.setText("Ingrese Precio Producto");
             txtPrecioP.setForeground(new Color(153, 153, 153));
         }
         ComboCategoriaP.setSelectedIndex(0);
@@ -713,13 +798,14 @@ public class Productos extends javax.swing.JFrame {
     }//GEN-LAST:event_botonGuardarPMouseClicked
 
     private void tablaPMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tablaPMouseClicked
+        String tablap = "TablaProducto";
         try {
             int fila = tablaP.getSelectedRow();
             int id = Integer.parseInt(tablaP.getValueAt(fila, 0).toString());
             PreparedStatement ps;
             ResultSet rs;
             Connection con = Conexion.getConexion();
-            ps = con.prepareStatement("Select P.Nombre_Producto, P.Descripcion, C.Categoria, PR.Presentacion,P.Unidades, P.Tamaño, P.Lote, P.Fecha_Vencimiento, P.Precio,TI.ISV,DP.Descripcion ,E.Estado\n"
+            ps = con.prepareStatement("Select P.Id_Producto,P.Nombre_Producto, P.Descripcion, C.Categoria, PR.Presentacion,P.Unidades, P.Tamaño, P.Lote, P.Fecha_Vencimiento, P.Precio,TI.ISV,DP.Descripcion as Descri ,E.Estado\n"
                     + "From Productos as P\n"
                     + "Inner Join Categorias as C On P.Id_Categoria=C.Id_Categoria\n"
                     + "Inner Join Presentacion as PR ON P.Id_Presentacion=PR.Id_Presentacion\n"
@@ -734,16 +820,18 @@ public class Productos extends javax.swing.JFrame {
             while (rs.next()) {
                 txtIDP.setText(String.valueOf(id));
                 txtNombreP.setText(rs.getString("Nombre_Producto"));
+                ComboDesc.setSelectedItem(rs.getString("Descri"));
                 txtDescripcionP.setText(rs.getString("Descripcion"));
                 ComboCategoriaP.setSelectedItem(rs.getString("Categoria"));
                 ComboImp.setSelectedItem(rs.getString("ISV"));
-                ComboDesc.setSelectedItem(rs.getString("Descripcion"));
+
                 ComboPresentacionP.setSelectedItem(rs.getString("Presentacion"));
                 txtLoteP.setText(rs.getString("Lote"));
                 txtFechaVencimientoP.setDate(rs.getDate("Fecha_Vencimiento"));
                 txtUnidadP.setText(rs.getString("Unidades"));
                 txtTamañosP.setText(rs.getString("Tamaño"));
                 txtPrecioP.setText(rs.getString("Precio"));
+                //combo
                 if (rs.getString("Estado").equals("Activo")) {
                     BotonActivoP.setSelected(true);
                 } else if (rs.getString("Estado").equals("Inactivo")) {
@@ -757,6 +845,7 @@ public class Productos extends javax.swing.JFrame {
             Id_Producto = txtIDP.getText();
             System.out.println(Id_Producto);
         } catch (SQLException ex) {
+            lo.LogBitacora("Error: No se pudo seleccionar la tabla " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), producto, tablap);
             JOptionPane.showMessageDialog(null, ex.toString());
         }
 
@@ -773,13 +862,15 @@ public class Productos extends javax.swing.JFrame {
     }//GEN-LAST:event_botonCancelarPMouseClicked
 
     private void BotonActivoPActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BotonActivoPActionPerformed
-        int Id = Integer.parseInt(txtIDP.getText());
+
+        String Id = txtIDP.getText();
+        String activo = "BtnActivo";
 
         try {
             Connection con = Conexion.getConexion();
             PreparedStatement ps = con.prepareStatement("Update Productos set Id_Estado=? Where Id_Producto=?");
             ps.setInt(1, 2);
-            ps.setInt(2, Id);
+            ps.setString(2, Id);
             ps.executeUpdate();
             JOptionPane.showMessageDialog(null, "Registro Habilitado");
             cargartabla();
@@ -790,18 +881,20 @@ public class Productos extends javax.swing.JFrame {
             BotonInactivoP.setVisible(Boolean.FALSE);
 
         } catch (SQLException ex) {
+            lo.LogBitacora("Error: No se pudo guardar el dato " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), producto, activo);
             JOptionPane.showMessageDialog(null, ex.toString());
         }
     }//GEN-LAST:event_BotonActivoPActionPerformed
 
     private void BotonInactivoPActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BotonInactivoPActionPerformed
-        int Id = Integer.parseInt(txtIDP.getText());
 
+        String Id = txtIDP.getText();
+        String inactivo="BtnInactivo";
         try {
             Connection con = Conexion.getConexion();
             PreparedStatement ps = con.prepareStatement("Update Productos set Id_Estado=? Where Id_Producto=?");
             ps.setInt(1, 1);
-            ps.setInt(2, Id);
+            ps.setString(2, Id);
             ps.executeUpdate();
             JOptionPane.showMessageDialog(null, "Registro Inhabilitado");
             cargartabla();
@@ -812,6 +905,7 @@ public class Productos extends javax.swing.JFrame {
             BotonInactivoP.setVisible(Boolean.FALSE);
 
         } catch (SQLException ex) {
+            lo.LogBitacora("Error: No se pudo guardar el dato " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), producto,inactivo);
             JOptionPane.showMessageDialog(null, ex.toString());
         }
 
@@ -821,14 +915,15 @@ public class Productos extends javax.swing.JFrame {
         if (txtNombreP.getText().equals("")) {
             txtNombreP.setText("Ingrese Nombre Producto");
             txtNombreP.setForeground(new Color(153, 153, 153));
-        } else if (!txtNombreP.getText().isEmpty()) {
             if (!txtNombreP.getText().matches("^[A-Z-ÁÉÍÓÚÑ]{1}[a-z-áéíóúñ]+$")) {
-                JOptionPane.showMessageDialog(null, "Debes escribir un nombre de producto comenzando en mayúscula. No utilice espacios", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Debes escribir un nombre de producto comenzando en mayúscula.", "Error", JOptionPane.ERROR_MESSAGE);
             } else {
                 verificarDatosExistentes(txtNombreP.getText(), "Nombre_Producto", "Productos", "Este medicamento ya existe en la base de datos");
             }
+
+        }
     }//GEN-LAST:event_txtNombrePFocusLost
-    }
+
     private void txtDescripcionPFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtDescripcionPFocusGained
         if (txtDescripcionP.getText().equals("Ingrese Descripción Producto")) {
             txtDescripcionP.setText("");
@@ -936,8 +1031,8 @@ public class Productos extends javax.swing.JFrame {
     }//GEN-LAST:event_txtNombrePMousePressed
 
     private void txtNombrePKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtNombrePKeyTyped
-        if (txtNombreP.getText().length() > 20) {
-            JOptionPane.showMessageDialog(null, "Alcanzaste el máximo de caracteres para este campo", "Advertencia", JOptionPane.WARNING_MESSAGE);
+        if (txtNombreP.getText().length() > 50) {
+            JOptionPane.showMessageDialog(null, "El máximo es de 50 caracteres para este campo", "Advertencia", JOptionPane.WARNING_MESSAGE);
             evt.consume();
         } else if (txtNombreP.getText().length() > 0) {
             if (!txtNombreP.getText().matches("^(?!.*([A-Za-zñÑáéíóúÁÉÍÓÚ\\s])\\1{2})[A-Za-zñÑáéíóúÁÉÍÓÚ\\s0-9]+$")) {
@@ -1030,8 +1125,8 @@ public class Productos extends javax.swing.JFrame {
 
     private void txtTamañosPKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtTamañosPKeyTyped
         validarNumerosLetras(evt);
-        if (txtTamañosP.getText().length() > 10) {
-            JOptionPane.showMessageDialog(null, "Alcanzaste el máximo de caracteres para este campo", "Advertencia", JOptionPane.WARNING_MESSAGE);
+        if (txtTamañosP.getText().length() > 15) {
+            JOptionPane.showMessageDialog(null, "El máximo es de 15 caracteres para este campo", "Advertencia", JOptionPane.WARNING_MESSAGE);
             evt.consume();
         } else if (txtTamañosP.getText().length() > 0) {
             if (!txtTamañosP.getText().matches("^(?!.*([A-Za-zñÑáéíóúÁÉÍÓÚ\\s])\\1{2})[A-Za-zñÑáéíóúÁÉÍÓÚ\\s0-9]+$")) {
@@ -1042,8 +1137,8 @@ public class Productos extends javax.swing.JFrame {
     }//GEN-LAST:event_txtTamañosPKeyTyped
 
     private void txtDescripcionPKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtDescripcionPKeyTyped
-        if (txtDescripcionP.getText().length() > 49) {
-            JOptionPane.showMessageDialog(null, "Alcanzaste el máximo de caracteres para este campo", "Advertencia", JOptionPane.WARNING_MESSAGE);
+        if (txtDescripcionP.getText().length() > 50) {
+            JOptionPane.showMessageDialog(null, "El máximo es de 50 caracteres para este campo", "Advertencia", JOptionPane.WARNING_MESSAGE);
             evt.consume();
         } else if (txtDescripcionP.getText().length() > 0) {
             if (!txtDescripcionP.getText().matches("^(?!.*([A-Za-zñÑáéíóúÁÉÍÓÚ\\s])\\1{2})[A-Za-zñÑáéíóúÁÉÍÓÚ\\s0-9]+$")) {
@@ -1056,7 +1151,7 @@ public class Productos extends javax.swing.JFrame {
     private void txtLotePKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtLotePKeyTyped
         validarNumerosLetras(evt);
         if (txtLoteP.getText().length() > 20) {
-            JOptionPane.showMessageDialog(null, "Alcanzaste el máximo de caracteres para este campo", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "El máximo es de 20 caracteres para este campo", "Error", JOptionPane.ERROR_MESSAGE);
             evt.consume();
         }
 
@@ -1111,6 +1206,22 @@ public class Productos extends javax.swing.JFrame {
     private void ComboImpMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ComboImpMousePressed
         // TODO add your handling code here:
     }//GEN-LAST:event_ComboImpMousePressed
+
+    private void reporteMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_reporteMouseClicked
+        JasperReport reporte;
+        HashMap hm = new HashMap();
+        hm.put("Usuario", usuario.getText());
+        try {
+            Connection con = Conexion.getConexion();
+            reporte = JasperCompileManager.compileReport("src/Reportes/ReporteProductos.jrxml");
+            JasperPrint jp = JasperFillManager.fillReport(reporte, hm, con);
+            JasperViewer.viewReport(jp, true);
+            ReportView view = new ReportView(jp, false);
+            view.setVisible(true);
+        } catch (JRException ex) {
+            Logger.getLogger(Clientes.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_reporteMouseClicked
 
     public void validarNumerosLetras(java.awt.event.KeyEvent e) {
         if (e.getKeyChar() >= 33 && e.getKeyChar() <= 47
@@ -1170,6 +1281,9 @@ public class Productos extends javax.swing.JFrame {
     private javax.swing.JLabel botonGuardarP;
     private javax.swing.JLabel botonRegresarP;
     private javax.swing.JLabel botonRestringirP;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel reporte;
     private javax.swing.JTable tablaP;
     private javax.swing.JTextField txtBuscarP;
     private javax.swing.JTextField txtDescripcionP;
@@ -1181,6 +1295,7 @@ public class Productos extends javax.swing.JFrame {
     private javax.swing.JTextField txtPrecioP;
     private javax.swing.JTextField txtTamañosP;
     private javax.swing.JTextField txtUnidadP;
+    private javax.swing.JLabel usuario;
     // End of variables declaration//GEN-END:variables
 
     private void Habillitar() {
@@ -1199,6 +1314,7 @@ public class Productos extends javax.swing.JFrame {
     public class CargarCategoria {
 
         public DefaultComboBoxModel getvalues() {
+            String cargarc="CargarCategoria";
 
             DefaultComboBoxModel modelo = new DefaultComboBoxModel();
             try {
@@ -1213,6 +1329,7 @@ public class Productos extends javax.swing.JFrame {
                 con.close();
                 rs.close();
             } catch (Exception e) {
+                 lo.LogBitacora("Error: No se pudo cargar la categoria " + "Excepción: " + e + ". Origen: " + this.getClass().getSimpleName(), producto,cargarc);
                 System.out.println(e);
             }
             return modelo;
@@ -1222,6 +1339,7 @@ public class Productos extends javax.swing.JFrame {
     public class CargarPresentacion {
 
         public DefaultComboBoxModel getvalues() {
+            String cargarp ="CargarPresentacion";
 
             DefaultComboBoxModel modelo = new DefaultComboBoxModel();
             try {
@@ -1236,6 +1354,7 @@ public class Productos extends javax.swing.JFrame {
                 con.close();
                 rs.close();
             } catch (Exception e) {
+                 lo.LogBitacora("Error: No se pudo cargar la presentacion " + "Excepción: " + e + ". Origen: " + this.getClass().getSimpleName(),producto,cargarp);
                 System.out.println(e);
             }
             return modelo;
@@ -1243,9 +1362,10 @@ public class Productos extends javax.swing.JFrame {
     }
 
     void buscarData(String valor) {
+        String buscar ="Buscar";
         String[] titulos = {"ID Producto", "Nombre Producto", "Descripción", "Categoría Producto", "Presentación Producto", "Unidades", "Tamaño", "Lote ", "Fecha Vencimiento", "Precio", "Impuesto", "Descuento", "IdEstado"};
         String[] registros = new String[13];
-        String sql = "Select P.Id_Producto,P.Nombre_Producto, P.Descripcion, C.Categoria, PR.Presentacion,P.Unidades, P.Tamaño, P.Lote, P.Fecha_Vencimiento, P.Precio,TI.ISV,DP.Descripcion ,E.Estado\n"
+        String sql = "Select P.Id_Producto,P.Nombre_Producto, P.Descripcion, C.Categoria, PR.Presentacion,P.Unidades, P.Tamaño, P.Lote, P.Fecha_Vencimiento, P.Precio,TI.ISV,DP.Descripcion as Descri ,E.Estado\n"
                 + "From Productos as P\n"
                 + "Inner Join Categorias as C On P.Id_Categoria=C.Id_Categoria\n"
                 + "Inner Join Presentacion as PR ON P.Id_Presentacion=PR.Id_Presentacion\n"
@@ -1269,20 +1389,21 @@ public class Productos extends javax.swing.JFrame {
                 registros[2] = rs.getString("Descripcion");
                 registros[3] = rs.getString("Categoria");
                 registros[4] = rs.getString("Presentacion");
-                registros[5] = rs.getString("Lote");
-                registros[6] = rs.getString("Fecha_Vencimiento");
-                registros[7] = rs.getString("Estado");
-                registros[8] = rs.getString("Unidades");
-                registros[9] = rs.getString("Tamaño");
-                registros[10] = rs.getString("Precio");
-                registros[11] = rs.getString("ISV");
-                registros[12] = rs.getString("Descripcion");
+                registros[7] = rs.getString("Lote");
+                registros[8] = rs.getString("Fecha_Vencimiento");
+                registros[12] = rs.getString("Estado");
+                registros[5] = rs.getString("Unidades");
+                registros[6] = rs.getString("Tamaño");
+                registros[9] = rs.getString("Precio");
+                registros[10] = rs.getString("ISV");
+                registros[11] = rs.getString("Descri");
                 model.addRow(registros);
             }
 
             tablaP.setModel(model);
             // anchoColumnas();
         } catch (SQLException ex) {
+             lo.LogBitacora("Error: No se pudo buscar el dato " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(),producto,buscar);
             Logger.getLogger(Clientes.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -1294,6 +1415,7 @@ public class Productos extends javax.swing.JFrame {
     public class CargarImpuesto {
 
         public DefaultComboBoxModel getvalues() {
+            String cargarI ="CargarImpuesto";
 
             DefaultComboBoxModel modelo = new DefaultComboBoxModel();
             try {
@@ -1308,6 +1430,7 @@ public class Productos extends javax.swing.JFrame {
                 con.close();
                 rs.close();
             } catch (Exception e) {
+                 lo.LogBitacora("Error: No se pudo cargar el impuesto " + "Excepción: " + e + ". Origen: " + this.getClass().getSimpleName(), producto,cargarI);
                 System.out.println(e);
             }
             return modelo;
@@ -1317,6 +1440,7 @@ public class Productos extends javax.swing.JFrame {
     public class CargarDescuento {
 
         public DefaultComboBoxModel getvalues() {
+            String cargarD="CargarDescuento";
 
             DefaultComboBoxModel modelo = new DefaultComboBoxModel();
             try {
@@ -1331,6 +1455,7 @@ public class Productos extends javax.swing.JFrame {
                 con.close();
                 rs.close();
             } catch (Exception e) {
+                 lo.LogBitacora("Error: No se pudo cargar el descuento " + "Excepción: " + e + ". Origen: " + this.getClass().getSimpleName(), producto,cargarD);
                 System.out.println(e);
             }
             return modelo;

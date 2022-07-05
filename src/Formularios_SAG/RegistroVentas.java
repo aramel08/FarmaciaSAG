@@ -6,14 +6,28 @@
 package Formularios_SAG;
 
 import Conexion.Conexion;
+import Logs.log;
+import Reportes.ReportView;
+import java.awt.Color;
+import java.awt.Image;
+import java.awt.Toolkit;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
 
 /**
  *
@@ -21,11 +35,15 @@ import javax.swing.table.TableColumnModel;
  */
 public class RegistroVentas extends javax.swing.JFrame {
 
+    log lo = new log();
+    String RegistroV = "Registro Ventas";
+
     /**
      * Creates new form RegistroVentas
      */
     public RegistroVentas() {
         initComponents();
+        usuario.setText(Login.txtUsuario.getText());
         anchoColumnas();
         cargartabla();
     }
@@ -60,16 +78,39 @@ public class RegistroVentas extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        reporte = new javax.swing.JLabel();
         txtRegresarV = new javax.swing.JLabel();
         barraEmpleado = new javax.swing.JScrollPane();
         TablaDEVenta = new javax.swing.JTable();
         barraEmpleado1 = new javax.swing.JScrollPane();
         TablaDTV = new javax.swing.JTable();
+        usuario = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
         txtBuscarV = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setIconImage(getIconImage());
+        setUndecorated(true);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
+
+        reporte.setBackground(new java.awt.Color(204, 204, 204));
+        reporte.setFont(new java.awt.Font("Georgia", 0, 14)); // NOI18N
+        reporte.setForeground(new java.awt.Color(255, 255, 255));
+        reporte.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/analitica.png"))); // NOI18N
+        reporte.setText("REPORTE");
+        reporte.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                reporteMouseClicked(evt);
+            }
+        });
+        getContentPane().add(reporte, new org.netbeans.lib.awtextra.AbsoluteConstraints(1040, 60, 120, 40));
+
+        txtRegresarV.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                txtRegresarVMouseClicked(evt);
+            }
+        });
         getContentPane().add(txtRegresarV, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 56, 160, 40));
 
         TablaDEVenta.setFont(new java.awt.Font("Georgia", 0, 18)); // NOI18N
@@ -150,18 +191,59 @@ public class RegistroVentas extends javax.swing.JFrame {
 
         getContentPane().add(barraEmpleado1, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 470, 1110, 160));
 
+        usuario.setFont(new java.awt.Font("Georgia", 1, 18)); // NOI18N
+        usuario.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        getContentPane().add(usuario, new org.netbeans.lib.awtextra.AbsoluteConstraints(510, 680, 230, 20));
+
+        jLabel2.setFont(new java.awt.Font("Georgia", 0, 12)); // NOI18N
+        jLabel2.setForeground(new java.awt.Color(102, 102, 102));
+        jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel2.setText("Usuario");
+        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(590, 700, 70, -1));
+
         txtBuscarV.setFont(new java.awt.Font("Georgia", 0, 14)); // NOI18N
         txtBuscarV.setForeground(new java.awt.Color(153, 153, 153));
-        txtBuscarV.setText("Buscar");
-        getContentPane().add(txtBuscarV, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 145, 290, 35));
+        txtBuscarV.setText("Buscar por Número de Factura o Fecha");
+        txtBuscarV.setBorder(null);
+        txtBuscarV.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                txtBuscarVFocusGained(evt);
+            }
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                txtBuscarVFocusLost(evt);
+            }
+        });
+        txtBuscarV.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtBuscarVActionPerformed(evt);
+            }
+        });
+        txtBuscarV.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtBuscarVKeyTyped(evt);
+            }
+        });
+        getContentPane().add(txtBuscarV, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 150, 300, 30));
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/Pantalla Ventas.png"))); // NOI18N
         getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
-
+@Override
+    public Image getIconImage() {
+        Image retValue = Toolkit.getDefaultToolkit().getImage(ClassLoader.getSystemResource("componentes/LOGOSAG(2).png"));
+        return retValue;
+    }
     private void TablaDEVentaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_TablaDEVentaMouseClicked
+        String TablaV="Tabla venta";
+        ReporteVenta RP = new ReporteVenta();
+        {
+            RP.setVisible(true);
+            //dispose();
+
+        }
+
         barraEmpleado1.setVisible(true);
         TablaDTV.setVisible(true);
         DefaultTableModel modeloTabla = (DefaultTableModel) TablaDTV.getModel();
@@ -197,6 +279,8 @@ public class RegistroVentas extends javax.swing.JFrame {
                 modeloTabla.addRow(fila);
             }
         } catch (SQLException ex) {
+          lo.LogBitacora("Error: No se cargar tabla de registro venta" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), RegistroV, TablaV);
+
             JOptionPane.showMessageDialog(null, ex.toString());
         }
 
@@ -205,6 +289,55 @@ public class RegistroVentas extends javax.swing.JFrame {
     private void TablaDTVMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_TablaDTVMouseClicked
 
     }//GEN-LAST:event_TablaDTVMouseClicked
+
+    private void txtRegresarVMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txtRegresarVMouseClicked
+        // TODO add your handling code here:
+        java.awt.EventQueue.invokeLater(new Runnable() {
+            public void run() {
+                new MenuPrincipal().setVisible(true);
+            }
+        });
+        this.dispose();
+    }//GEN-LAST:event_txtRegresarVMouseClicked
+
+    private void txtBuscarVActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtBuscarVActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtBuscarVActionPerformed
+
+    private void txtBuscarVFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtBuscarVFocusGained
+        // TODO add your handling code here: 
+        if (txtBuscarV.getText().equals("Buscar por Número de Factura o Fecha")) {
+            txtBuscarV.setText("");
+            txtBuscarV.setForeground(new Color(0, 0, 0));
+        }
+    }//GEN-LAST:event_txtBuscarVFocusGained
+
+    private void txtBuscarVFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtBuscarVFocusLost
+        if (txtBuscarV.getText().equals("")) {
+            txtBuscarV.setText("Buscar por Número de Factura o Fecha");
+            txtBuscarV.setForeground(new Color(153, 153, 153));
+        }
+    }//GEN-LAST:event_txtBuscarVFocusLost
+
+    private void txtBuscarVKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtBuscarVKeyTyped
+        buscarData(txtBuscarV.getText());
+    }//GEN-LAST:event_txtBuscarVKeyTyped
+
+    private void reporteMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_reporteMouseClicked
+        JasperReport reporte;
+        HashMap hm = new HashMap();
+        hm.put("Usuario", usuario.getText());
+        try {
+            Connection con = Conexion.getConexion();
+            reporte = JasperCompileManager.compileReport("src/Reportes/ReporteVentas.jrxml");
+            JasperPrint jp = JasperFillManager.fillReport(reporte, hm, con);
+            //JasperViewer.viewReport(jp,true);
+            ReportView view = new ReportView(jp, false);
+            view.setVisible(true);
+        } catch (JRException ex) {
+            Logger.getLogger(Clientes.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_reporteMouseClicked
 
     /**
      * @param args the command line arguments
@@ -242,16 +375,20 @@ public class RegistroVentas extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JTable TablaDEVenta;
+    public static javax.swing.JTable TablaDEVenta;
     private javax.swing.JTable TablaDTV;
     private javax.swing.JScrollPane barraEmpleado;
     private javax.swing.JScrollPane barraEmpleado1;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel reporte;
     private javax.swing.JTextField txtBuscarV;
     private javax.swing.JLabel txtRegresarV;
+    private javax.swing.JLabel usuario;
     // End of variables declaration//GEN-END:variables
 
     private void cargartabla() {
+        String CargarTabla="Cargar Tabla registros venta";
         DefaultTableModel modeloTabla = (DefaultTableModel) TablaDEVenta.getModel();
         modeloTabla.setRowCount(0);
         PreparedStatement ps;
@@ -261,13 +398,13 @@ public class RegistroVentas extends javax.swing.JFrame {
 
         try {
             Connection con = Conexion.getConexion();
-            ps = con.prepareStatement("Select F.Id_Factura, F.Num_Factura,F.Fecha_Factura,PF.CAI,Concat(C.Nombre_Cliente,' ',C.Apellido_Cliente)AS NombreC,E.NombreE, TP.Tipo_Pago\n"
+            ps = con.prepareStatement("Select Distinct F.Id_Factura, F.Num_Factura,F.Fecha_Factura,PF.CAI,Concat(C.Nombre_Cliente,' ',C.Apellido_Cliente)AS NombreC,E.NombreE, TP.Tipo_Pago\n"
                     + "from Factura as F\n"
-                    + "Inner Join Cliente as C on F.Id_Cliente=F.Id_Cliente\n"
-                    + "Inner Join Parametro_Factura as PF ON F.Id_Tipo_Pago=PF.Id_Parametro_Factura\n"
-                    + "Inner Join Descuento_Factura as DF ON F.Id_Factura=DF.Id_Factura\n"
+                    + "Inner Join Cliente as C on F.Id_Cliente=C.Id_Cliente\n"
+                    + "Inner Join Parametro_Factura as PF ON F.Id_Parametro=PF.Id_Parametro_Factura\n"
                     + "Inner Join Tipo_Pago AS TP ON F.Id_Tipo_Pago=TP.Id_Tipo_Pago\n"
                     + "Inner Join Empleados as E ON F.Id_Empleado =E.Id_Empleado\n"
+                    + "Where F.Id_Factura!=1\n"
                     + "Order by F.Id_Factura");
             rs = ps.executeQuery();
             rsmd = rs.getMetaData();
@@ -283,9 +420,52 @@ public class RegistroVentas extends javax.swing.JFrame {
             }
 
         } catch (SQLException ex) {
+            lo.LogBitacora("Error: No se cargar tabla" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), RegistroV, CargarTabla);
+
             JOptionPane.showMessageDialog(null, ex.toString());
         }
 
     }
 
+    void buscarData(String valor) {
+        String BuscarDatos="Buscar datos de registros";
+        String[] titulos = {"ID", "Numero", "Fecha", "Cai", "Nombre", "Empleado", "Tipo de Pago"};
+        String[] registros = new String[13];
+        String sql = "Select Distinct F.Id_Factura, F.Num_Factura,F.Fecha_Factura,PF.CAI,Concat(C.Nombre_Cliente,' ',C.Apellido_Cliente)AS NombreC,E.NombreE, TP.Tipo_Pago\n"
+                + "from Factura as F\n"
+                + "Inner Join Cliente as C on F.Id_Cliente=C.Id_Cliente\n"
+                + "Inner Join Parametro_Factura as PF ON F.Id_Parametro=PF.Id_Parametro_Factura\n"
+                + "Inner Join Tipo_Pago AS TP ON F.Id_Tipo_Pago=TP.Id_Tipo_Pago\n"
+                + "Inner Join Empleados as E ON F.Id_Empleado =E.Id_Empleado\n"
+                + "Where CONCAT (F.Num_Factura, ' ', F.Fecha_Factura) LIKE '%" + valor + "%'\n"
+                + "Order by F.Id_Factura";
+
+        DefaultTableModel model = new DefaultTableModel(null, titulos);
+        Connection con = Conexion.getConexion();
+
+        try {
+
+            Statement st = con.createStatement();
+            ResultSet rs = st.executeQuery(sql);
+
+            while (rs.next()) {
+                registros[0] = rs.getString("Id_Factura");
+                registros[1] = rs.getString("Num_Factura");
+                registros[2] = rs.getString("Fecha_Factura");
+                registros[3] = rs.getString("CAI");
+                registros[4] = rs.getString("NombreC");
+                registros[5] = rs.getString("NombreE");
+                registros[6] = rs.getString("Tipo_Pago");
+
+                model.addRow(registros);
+            }
+
+            TablaDEVenta.setModel(model);
+            anchoColumnas();
+        } catch (SQLException ex) {
+         lo.LogBitacora("Error: No se pudo buscar datos de registros" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), RegistroV, BuscarDatos);
+
+            Logger.getLogger(Sucursales.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
 }

@@ -7,6 +7,8 @@ package Formularios_SAG;
 
 import Conexion.Conexion;
 import static Formularios_SAG.Proveedores.Id_Proveedor;
+import Logs.log;
+import Reportes.ReportView;
 import java.awt.Color;
 import java.awt.Image;
 import java.awt.Toolkit;
@@ -17,11 +19,18 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.view.JasperViewer;
 
 /**
  *
@@ -32,16 +41,19 @@ public class Producto_Proveedor extends javax.swing.JFrame {
     /**
      * Creates new form Producto_Proveedor
      */
+    log lo = new log();
+    String productop = "Producto Proveedor";
+
     public Producto_Proveedor() {
         initComponents();
+        usuario.setText(Login.txtUsuario.getText());
         CargarP PP = new Producto_Proveedor.CargarP();
         ComboIdProductoPP.setModel(PP.getvalues());
         CargarPro Pro = new Producto_Proveedor.CargarPro();
         ComboIdProveedorPP.setModel(Pro.getvalues());
         cargartabla();
         Inhabillitar();
-        
-       
+
     }
 
     @Override
@@ -49,6 +61,7 @@ public class Producto_Proveedor extends javax.swing.JFrame {
         Image retValue = Toolkit.getDefaultToolkit().getImage(ClassLoader.getSystemResource("componentes/LOGOSAG(2).png"));
         return retValue;
     }
+
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
@@ -67,6 +80,9 @@ public class Producto_Proveedor extends javax.swing.JFrame {
         txtProductoPro = new javax.swing.JLabel();
         BotonActivoPP = new javax.swing.JRadioButton();
         BotonInactivoPP = new javax.swing.JRadioButton();
+        reporte = new javax.swing.JLabel();
+        usuario = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         TablaProductoProveedor = new javax.swing.JTable();
         jLabel1 = new javax.swing.JLabel();
@@ -190,6 +206,28 @@ public class Producto_Proveedor extends javax.swing.JFrame {
         });
         getContentPane().add(BotonInactivoPP, new org.netbeans.lib.awtextra.AbsoluteConstraints(510, 200, -1, -1));
 
+        reporte.setBackground(new java.awt.Color(204, 204, 204));
+        reporte.setFont(new java.awt.Font("Georgia", 0, 14)); // NOI18N
+        reporte.setForeground(new java.awt.Color(255, 255, 255));
+        reporte.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/analitica.png"))); // NOI18N
+        reporte.setText("REPORTE");
+        reporte.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                reporteMouseClicked(evt);
+            }
+        });
+        getContentPane().add(reporte, new org.netbeans.lib.awtextra.AbsoluteConstraints(780, 50, 120, 40));
+
+        usuario.setFont(new java.awt.Font("Georgia", 1, 18)); // NOI18N
+        usuario.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        getContentPane().add(usuario, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 490, 230, 20));
+
+        jLabel3.setFont(new java.awt.Font("Georgia", 0, 12)); // NOI18N
+        jLabel3.setForeground(new java.awt.Color(102, 102, 102));
+        jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel3.setText("Usuario");
+        getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 510, 70, -1));
+
         TablaProductoProveedor.setFont(new java.awt.Font("Georgia", 0, 12)); // NOI18N
         TablaProductoProveedor.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
@@ -224,7 +262,7 @@ public class Producto_Proveedor extends javax.swing.JFrame {
         });
         jScrollPane1.setViewportView(TablaProductoProveedor);
 
-        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 250, 530, 280));
+        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 250, 530, 220));
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/Pantalla Producto Proveedor.png"))); // NOI18N
         jLabel1.setText("jLabel1");
@@ -235,13 +273,14 @@ public class Producto_Proveedor extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void BotonActivoPPActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BotonActivoPPActionPerformed
-        int IdPP = Integer.parseInt(txtProductoPro.getText());
-        
+        String IdPP = txtProductoPro.getText();
+        String activo = "BtnActivo";
+
         try {
             Connection con = Conexion.getConexion();
             PreparedStatement ps = con.prepareStatement("Update Producto_Proveedor set Id_Estado=? Where Id_Producto_Proveedor=?");
-            ps.setInt(1,1);
-            ps.setInt(2, IdPP);
+            ps.setInt(1, 1);
+            ps.setString(2, IdPP);
             ps.executeUpdate();
             JOptionPane.showMessageDialog(null, "Registro Habilitado");
             cargartabla();
@@ -251,18 +290,21 @@ public class Producto_Proveedor extends javax.swing.JFrame {
             Inhabillitar();
 
         } catch (SQLException ex) {
+            lo.LogBitacora("Error: No se pudo actualizar el estado " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), productop, activo);
             JOptionPane.showMessageDialog(null, ex.toString());
         }
     }//GEN-LAST:event_BotonActivoPPActionPerformed
 
     private void BotonInactivoPPActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BotonInactivoPPActionPerformed
-       int IdPP = Integer.parseInt(txtProductoPro.getText());
-        
+
+        String IdPP = txtProductoPro.getText();
+        String inactivo = "BtnInactivo";
+
         try {
             Connection con = Conexion.getConexion();
             PreparedStatement ps = con.prepareStatement("Update Producto_Proveedor set Id_Estado=? Where Id_Producto_Proveedor=?");
             ps.setInt(1, 2);
-            ps.setInt(2, IdPP);
+            ps.setString(2, IdPP);
             ps.executeUpdate();
             JOptionPane.showMessageDialog(null, "Registro Inhabilitado");
             cargartabla();
@@ -272,6 +314,7 @@ public class Producto_Proveedor extends javax.swing.JFrame {
             Inhabillitar();
 
         } catch (SQLException ex) {
+            lo.LogBitacora("Error: No se pudo actualizar el estado " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), productop, inactivo);
             JOptionPane.showMessageDialog(null, ex.toString());
         }
     }//GEN-LAST:event_BotonInactivoPPActionPerformed
@@ -290,14 +333,15 @@ public class Producto_Proveedor extends javax.swing.JFrame {
     }//GEN-LAST:event_BotonRegresarPPMouseClicked
 
     private void BotonAgregarPPMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonAgregarPPMouseClicked
-       Habilitar ();
-       
+        Habilitar();
+
     }//GEN-LAST:event_BotonAgregarPPMouseClicked
 
     private void BotonGuardarPPMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonGuardarPPMouseClicked
-         ObtenerIDPro();
-         ObtenerIDProduct();
-        if ( ComboIdProductoPP.equals("Seleccione Producto...") || ComboIdProveedorPP.equals("Seleccione Proveedor...")) {
+        ObtenerIDPro();
+        ObtenerIDProduct();
+        String guardar = "Btnguardar";
+        if (ComboIdProductoPP.equals("Seleccione Producto...") || ComboIdProveedorPP.equals("Seleccione Proveedor...")) {
             JOptionPane.showMessageDialog(null, "No se puede Guardar datos vacios");
         } else {
             int Producto = Integer.parseInt(txtProducto.getText());
@@ -313,11 +357,12 @@ public class Producto_Proveedor extends javax.swing.JFrame {
 
                 JOptionPane.showMessageDialog(null, "Registro guardado");
                 cargartabla();
-                
+
                 //Limpiar();
                 Inhabillitar();
 
             } catch (SQLException ex) {
+                lo.LogBitacora("Error: No se pudo guardar el dato " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), productop, guardar);
                 JOptionPane.showMessageDialog(null, ex.toString());
             }
         }
@@ -325,38 +370,39 @@ public class Producto_Proveedor extends javax.swing.JFrame {
 
     private void BotonEditarPPMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonEditarPPMouseClicked
         ObtenerIDPro();
-         ObtenerIDProduct();
-        if ( ComboIdProductoPP.equals("Seleccione Producto...") || ComboIdProveedorPP.equals("Seleccione Proveedor...")) {
+        ObtenerIDProduct();
+        String editar = "BtnEditar";
+        if (ComboIdProductoPP.equals("Seleccione Producto...") || ComboIdProveedorPP.equals("Seleccione Proveedor...")) {
             JOptionPane.showMessageDialog(null, "No se puede Guardar datos vacios");
         } else {
             int Producto = Integer.parseInt(txtProducto.getText());
             int Proveedor = Integer.parseInt(txtProveedor.getText());
             int Produ_Prov = Integer.parseInt(txtProductoPro.getText());
-             
-        try {
+
+            try {
                 Connection con = Conexion.getConexion();
-                PreparedStatement ps = con.prepareStatement ("Update Producto_Proveedor set  Id_Producto=?,Id_Proveedor=? Where Id_Producto_Proveedor=?");
+                PreparedStatement ps = con.prepareStatement("Update Producto_Proveedor set  Id_Producto=?,Id_Proveedor=? Where Id_Producto_Proveedor=?");
                 ps.setInt(1, Producto);
                 ps.setInt(2, Proveedor);
-                ps.setInt(3,Produ_Prov);
+                ps.setInt(3, Produ_Prov);
                 ps.executeUpdate();
 
                 JOptionPane.showMessageDialog(null, "Registro Actualizado");
                 cargartabla();
-                
+
                 //Limpiar();
                 Inhabillitar();
 
             } catch (SQLException ex) {
+                lo.LogBitacora("Error: No se pudo editar el dato " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), productop, editar);
                 JOptionPane.showMessageDialog(null, ex.toString());
             }
-        
-        
-        } 
+
+        }
     }//GEN-LAST:event_BotonEditarPPMouseClicked
 
     private void TablaProductoProveedorMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_TablaProductoProveedorMouseClicked
-       
+        String tablap = "TablaProducto";
         try {
             int fila = TablaProductoProveedor.getSelectedRow();
             int id = Integer.parseInt(TablaProductoProveedor.getValueAt(fila, 0).toString());
@@ -377,25 +423,19 @@ public class Producto_Proveedor extends javax.swing.JFrame {
                 txtProductoPro.setText(String.valueOf(id));
                 ComboIdProductoPP.setSelectedItem(rs.getString("Nombre_Producto"));
                 ComboIdProveedorPP.setSelectedItem(rs.getString("Nombre_Empresa"));
-               
-                
-                
-               
-                //if (rs.getString("Id_Estado").equals("1")) {
-                   // BotonActivoPro.setSelected(true);
-                //} else if (rs.getString("Id_Estado").equals("2")) {
-                   // BotonInactivoPro.setSelected(true);
-               
-            
-            //}
-           
 
-            //BotonActivoPro.setVisible(Boolean.TRUE);
-            //BotonInactivoPro.setVisible(Boolean.TRUE);
-            //id = txtId_Proveedor.getText();
-            Habilitar();
+                //if (rs.getString("Id_Estado").equals("1")) {
+                // BotonActivoPro.setSelected(true);
+                //} else if (rs.getString("Id_Estado").equals("2")) {
+                // BotonInactivoPro.setSelected(true);
+                //}
+                //BotonActivoPro.setVisible(Boolean.TRUE);
+                //BotonInactivoPro.setVisible(Boolean.TRUE);
+                //id = txtId_Proveedor.getText();
+                Habilitar();
             }
         } catch (SQLException ex) {
+            lo.LogBitacora("Error: No se pudo seleccionar la tabla " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), productop, tablap);
             JOptionPane.showMessageDialog(null, ex.toString());
         }
     }//GEN-LAST:event_TablaProductoProveedorMouseClicked
@@ -410,8 +450,7 @@ public class Producto_Proveedor extends javax.swing.JFrame {
             if (!txtBuscarPP.getText().matches("^(?!.*([A-Za-zñÑáéíóúÁÉÍÓÚ\\s])\\1{2})[A-Za-zñÑáéíóúÁÉÍÓÚ\\s0-9]+$")) {
                 JOptionPane.showMessageDialog(null, "No repitas caracteres de forma incorrecta", "Advertencia", JOptionPane.WARNING_MESSAGE);
                 evt.consume();
-                
-                
+
             }
         }
     }//GEN-LAST:event_txtBuscarPPKeyTyped
@@ -431,7 +470,7 @@ public class Producto_Proveedor extends javax.swing.JFrame {
     }//GEN-LAST:event_txtBuscarPPFocusGained
 
     private void txtBuscarPPFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtBuscarPPFocusLost
-         if (txtBuscarPP.getText().equals("")) {
+        if (txtBuscarPP.getText().equals("")) {
             txtBuscarPP.setText("Buscar Por Producto o Proveedor");
             txtBuscarPP.setForeground(new Color(153, 153, 153));
         }
@@ -446,7 +485,7 @@ public class Producto_Proveedor extends javax.swing.JFrame {
     }//GEN-LAST:event_ComboIdProductoPPMousePressed
 
     private void ComboIdProveedorPPMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ComboIdProveedorPPMousePressed
-         if (ComboIdProveedorPP.isEnabled() == false) {
+        if (ComboIdProveedorPP.isEnabled() == false) {
 
             JOptionPane.showMessageDialog(null, "Dar Click en Agregar o Editar para utilizar el campo", "Advertencia", JOptionPane.WARNING_MESSAGE);
 
@@ -454,13 +493,29 @@ public class Producto_Proveedor extends javax.swing.JFrame {
     }//GEN-LAST:event_ComboIdProveedorPPMousePressed
 
     private void ComboIdProductoPPMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ComboIdProductoPPMouseClicked
-         if (ComboIdProductoPP.isEnabled() == false) {
+        if (ComboIdProductoPP.isEnabled() == false) {
 
             JOptionPane.showMessageDialog(null, "Dar Click en Agregar o Editar para utilizar el campo", "Advertencia", JOptionPane.WARNING_MESSAGE);
 
         }
     }//GEN-LAST:event_ComboIdProductoPPMouseClicked
- 
+
+    private void reporteMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_reporteMouseClicked
+        JasperReport reporte;
+        HashMap hm = new HashMap();
+        hm.put("Usuario", usuario.getText());
+        try {
+            Connection con = Conexion.getConexion();
+            reporte = JasperCompileManager.compileReport("src/Reportes/ReporteproductoProveedor.jrxml");
+            JasperPrint jp = JasperFillManager.fillReport(reporte, hm, con);
+            JasperViewer.viewReport(jp, true);
+            ReportView view = new ReportView(jp, false);
+            view.setVisible(true);
+        } catch (JRException ex) {
+            Logger.getLogger(Clientes.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_reporteMouseClicked
+
     /**
      * @param args the command line arguments
      */
@@ -509,11 +564,14 @@ public class Producto_Proveedor extends javax.swing.JFrame {
     private javax.swing.JTable TablaProductoProveedor;
     private javax.swing.ButtonGroup buttonGroupPP;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JLabel reporte;
     private javax.swing.JTextField txtBuscarPP;
     private javax.swing.JLabel txtProducto;
     private javax.swing.JLabel txtProductoPro;
     private javax.swing.JLabel txtProveedor;
+    private javax.swing.JLabel usuario;
     // End of variables declaration//GEN-END:variables
 
     private void Habilitar() {
@@ -529,6 +587,7 @@ public class Producto_Proveedor extends javax.swing.JFrame {
         ResultSet rs;
         ResultSetMetaData rsmd;
         int columnas;
+        String cargart = "CargarTabla";
 
         try {
             Connection con = Conexion.getConexion();
@@ -538,7 +597,7 @@ public class Producto_Proveedor extends javax.swing.JFrame {
                     + "INNER JOIN Proveedor AS PV ON PP.Id_Proveedor = PV.Id_Proveedor\n"
                     + "INNER JOIN Estado AS E ON PP.Id_Estado = E.Id_Estado\n"
                     + "Order By PP.Id_Producto_Proveedor");
-            
+
             rs = ps.executeQuery();
             rsmd = rs.getMetaData();
             columnas = rsmd.getColumnCount();
@@ -552,13 +611,14 @@ public class Producto_Proveedor extends javax.swing.JFrame {
             }
 
         } catch (SQLException ex) {
+            lo.LogBitacora("Error: No se pudo cargar la tabla" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), productop, cargart);
             JOptionPane.showMessageDialog(null, ex.toString());
         }
     }
 
     private void Inhabillitar() {
-       ComboIdProductoPP.enable(Boolean.FALSE);
-       ComboIdProveedorPP.enable(Boolean.FALSE);
+        ComboIdProductoPP.enable(Boolean.FALSE);
+        ComboIdProveedorPP.enable(Boolean.FALSE);
     }
 
     private void validarNumerosLetras(KeyEvent e) {
@@ -578,10 +638,11 @@ public class Producto_Proveedor extends javax.swing.JFrame {
         ComboIdProductoPP.setSelectedIndex(0);
         ComboIdProveedorPP.setSelectedIndex(0);
     }
-     public class CargarP {
+
+    public class CargarP {
 
         public DefaultComboBoxModel getvalues() {
-
+            String cargarp = "CargarProducto";
             DefaultComboBoxModel modelo = new DefaultComboBoxModel();
             try {
                 Connection con = Conexion.getConexion();
@@ -595,12 +656,16 @@ public class Producto_Proveedor extends javax.swing.JFrame {
                 con.close();
                 rs.close();
             } catch (Exception e) {
+                lo.LogBitacora("Error: No se pudo cargar el producto" + "Excepción: " + e + ". Origen: " + this.getClass().getSimpleName(), productop, cargarp);
                 System.out.println(e);
             }
             return modelo;
         }
-     }
-        public class CargarPro {
+    }
+
+    public class CargarPro {
+
+        String cargarpro = "CargarProveedor";
 
         public DefaultComboBoxModel getvalues() {
 
@@ -617,60 +682,60 @@ public class Producto_Proveedor extends javax.swing.JFrame {
                 con.close();
                 rs.close();
             } catch (Exception e) {
+                lo.LogBitacora("Error: No se pudo cargar el proveedor " + "Excepción: " + e + ". Origen: " + this.getClass().getSimpleName(), productop, cargarpro);
                 System.out.println(e);
             }
             return modelo;
-         } 
-        } 
-        public void ObtenerIDPro(){
-        String Nombre=ComboIdProveedorPP.getSelectedItem().toString();
-        try {
-                ResultSet rs;
-                Connection con = Conexion.getConexion();
-                PreparedStatement ps = con.prepareStatement("Select Id_Proveedor From Proveedor Where Nombre_Empresa=?");
-                ps.setString(1, Nombre);
-                rs = ps.executeQuery();
-                
-               while (rs.next()) {
-                txtProveedor.setText(rs.getString("Id_Proveedor"));
-               }
-                
-
-            } catch (SQLException ex) {
-                JOptionPane.showMessageDialog(null, ex.toString());
-            } }
-        
-        
-        public void ObtenerIDProduct(){
-        String Nombre=ComboIdProductoPP.getSelectedItem().toString();
-        try {
-                ResultSet rs;
-                Connection con = Conexion.getConexion();
-                PreparedStatement ps = con.prepareStatement("Select Id_Producto From Productos Where Nombre_Producto=?");
-                ps.setString(1, Nombre);
-                rs = ps.executeQuery();
-                
-               while (rs.next()) {
-                txtProducto.setText(rs.getString("Id_Producto"));
-               }
-                
-
-            } catch (SQLException ex) {
-                JOptionPane.showMessageDialog(null, ex.toString());
-            }
+        }
     }
-        void buscarData(String valor) {
-        String[] titulos = {"ID-Producto-Proveedor", "Producto", "Proveedor","Estado"};
+
+    public void ObtenerIDPro() {
+        String Nombre = ComboIdProveedorPP.getSelectedItem().toString();
+        try {
+            ResultSet rs;
+            Connection con = Conexion.getConexion();
+            PreparedStatement ps = con.prepareStatement("Select Id_Proveedor From Proveedor Where Nombre_Empresa=?");
+            ps.setString(1, Nombre);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                txtProveedor.setText(rs.getString("Id_Proveedor"));
+            }
+
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null, ex.toString());
+        }
+    }
+
+    public void ObtenerIDProduct() {
+        String Nombre = ComboIdProductoPP.getSelectedItem().toString();
+        try {
+            ResultSet rs;
+            Connection con = Conexion.getConexion();
+            PreparedStatement ps = con.prepareStatement("Select Id_Producto From Productos Where Nombre_Producto=?");
+            ps.setString(1, Nombre);
+            rs = ps.executeQuery();
+
+            while (rs.next()) {
+                txtProducto.setText(rs.getString("Id_Producto"));
+            }
+
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null, ex.toString());
+        }
+    }
+
+    void buscarData(String valor) {
+        String buscar = "Buscar";
+        String[] titulos = {"ID-Producto-Proveedor", "Producto", "Proveedor", "Estado"};
         String[] registros = new String[13];
         String sql = "Select PP.Id_Producto_Proveedor, PV.Nombre_Empresa, PR.Nombre_Producto, E.Estado \n"
-                    + "From Producto_Proveedor as PP\n"
-                    + "INNER JOIN Productos AS PR ON PP.Id_Producto = PR.Id_Producto\n"
-                    + "INNER JOIN Proveedor AS PV ON PP.Id_Proveedor = PV.Id_Proveedor\n"
-                    + "INNER JOIN Estado AS E ON PP.Id_Estado = E.Id_Estado\n"
-                    + "WHERE CONCAT (PV.Nombre_Empresa, ' ', PR.Nombre_Producto) LIKE '%" + valor + "%'\n"
-                    + "ORDER BY PP.Id_Producto_Proveedor";
-            
-                
+                + "From Producto_Proveedor as PP\n"
+                + "INNER JOIN Productos AS PR ON PP.Id_Producto = PR.Id_Producto\n"
+                + "INNER JOIN Proveedor AS PV ON PP.Id_Proveedor = PV.Id_Proveedor\n"
+                + "INNER JOIN Estado AS E ON PP.Id_Estado = E.Id_Estado\n"
+                + "WHERE CONCAT (PV.Nombre_Empresa, ' ', PR.Nombre_Producto) LIKE '%" + valor + "%'\n"
+                + "ORDER BY PP.Id_Producto_Proveedor";
 
         DefaultTableModel model = new DefaultTableModel(null, titulos);
         Connection con = Conexion.getConexion();
@@ -691,9 +756,9 @@ public class Producto_Proveedor extends javax.swing.JFrame {
             TablaProductoProveedor.setModel(model);
             // anchoColumnas();
         } catch (SQLException ex) {
+            lo.LogBitacora("Error: No se pudo buscar el dato " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(),productop,buscar);
             Logger.getLogger(Clientes.class.getName()).log(Level.SEVERE, null, ex);
         }
-        
-     }
-}
 
+    }
+}

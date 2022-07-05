@@ -2,6 +2,8 @@ package Formularios_SAG;
 
 import Conexion.Conexion;
 import static Formularios_SAG.Proveedores.Id_Proveedor;
+import Logs.log;
+import Reportes.ReportView;
 import java.awt.Color;
 import java.awt.Image;
 import java.awt.Toolkit;
@@ -12,10 +14,18 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.view.JasperViewer;
+import org.bouncycastle.jcajce.provider.digest.GOST3411;
 
 /*
  * To change this license header, choose License Headers in Project Properties.
@@ -28,6 +38,9 @@ import javax.swing.table.DefaultTableModel;
  */
 public class Almacen extends javax.swing.JFrame {
 
+    log lo = new log();
+    String almacen = "Almacen";
+
     /**
      * Creates new form Almace
      */
@@ -35,8 +48,10 @@ public class Almacen extends javax.swing.JFrame {
         initComponents();
         cargartabla();
         Inhabillitar();
-        
+        usuario.setText(Login.txtUsuario.getText());
+
     }
+
     @Override
     public Image getIconImage() {
         Image retValue = Toolkit.getDefaultToolkit().getImage(ClassLoader.getSystemResource("componentes/LOGOSAG(2).png"));
@@ -68,8 +83,11 @@ public class Almacen extends javax.swing.JFrame {
         txtCapMin = new javax.swing.JTextField();
         txtCapOpt = new javax.swing.JTextField();
         txtCapActual = new javax.swing.JTextField();
+        reporte = new javax.swing.JLabel();
         txtEstante = new javax.swing.JTextField();
         botonDetalleAlmacen = new javax.swing.JLabel();
+        usuario = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
         txtBuscarAl = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
 
@@ -89,7 +107,7 @@ public class Almacen extends javax.swing.JFrame {
                 BotonActivoAlActionPerformed(evt);
             }
         });
-        getContentPane().add(BotonActivoAl, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 240, -1, -1));
+        getContentPane().add(BotonActivoAl, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 290, -1, -1));
 
         buttonGroupAlmacen.add(BotonInactivoAl);
         BotonInactivoAl.setFont(new java.awt.Font("Georgia", 1, 18)); // NOI18N
@@ -102,7 +120,7 @@ public class Almacen extends javax.swing.JFrame {
                 BotonInactivoAlActionPerformed(evt);
             }
         });
-        getContentPane().add(BotonInactivoAl, new org.netbeans.lib.awtextra.AbsoluteConstraints(510, 240, -1, -1));
+        getContentPane().add(BotonInactivoAl, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 290, -1, -1));
 
         TablaAlmacen.setFont(new java.awt.Font("Georgia", 0, 12)); // NOI18N
         TablaAlmacen.setModel(new javax.swing.table.DefaultTableModel(
@@ -139,7 +157,7 @@ public class Almacen extends javax.swing.JFrame {
         });
         jScrollPane1.setViewportView(TablaAlmacen);
 
-        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 280, 550, 260));
+        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 340, 670, 260));
         getContentPane().add(txtIdAlmacen, new org.netbeans.lib.awtextra.AbsoluteConstraints(90, 210, 50, 20));
 
         botonRegresarAL.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
@@ -148,7 +166,7 @@ public class Almacen extends javax.swing.JFrame {
                 botonRegresarALMouseClicked(evt);
             }
         });
-        getContentPane().add(botonRegresarAL, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 30, 100, 30));
+        getContentPane().add(botonRegresarAL, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 50, 130, 40));
 
         botonAgregarAL.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         botonAgregarAL.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -156,7 +174,7 @@ public class Almacen extends javax.swing.JFrame {
                 botonAgregarALMouseClicked(evt);
             }
         });
-        getContentPane().add(botonAgregarAL, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 120, 110, 30));
+        getContentPane().add(botonAgregarAL, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 150, 130, 40));
 
         botonEditarAL.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         botonEditarAL.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -164,7 +182,7 @@ public class Almacen extends javax.swing.JFrame {
                 botonEditarALMouseClicked(evt);
             }
         });
-        getContentPane().add(botonEditarAL, new org.netbeans.lib.awtextra.AbsoluteConstraints(430, 120, 120, 30));
+        getContentPane().add(botonEditarAL, new org.netbeans.lib.awtextra.AbsoluteConstraints(470, 150, 130, 40));
 
         botonGuardarAL.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         botonGuardarAL.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -172,7 +190,7 @@ public class Almacen extends javax.swing.JFrame {
                 botonGuardarALMouseClicked(evt);
             }
         });
-        getContentPane().add(botonGuardarAL, new org.netbeans.lib.awtextra.AbsoluteConstraints(590, 120, 110, 30));
+        getContentPane().add(botonGuardarAL, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 150, 120, 30));
 
         botonCancelarAL.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         botonCancelarAL.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -180,7 +198,7 @@ public class Almacen extends javax.swing.JFrame {
                 botonCancelarALMouseClicked(evt);
             }
         });
-        getContentPane().add(botonCancelarAL, new org.netbeans.lib.awtextra.AbsoluteConstraints(740, 120, 110, 30));
+        getContentPane().add(botonCancelarAL, new org.netbeans.lib.awtextra.AbsoluteConstraints(800, 150, 130, 40));
 
         txtUbicacion.setBackground(new java.awt.Color(240, 240, 240));
         txtUbicacion.setFont(new java.awt.Font("Georgia", 0, 12)); // NOI18N
@@ -211,8 +229,11 @@ public class Almacen extends javax.swing.JFrame {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 txtUbicacionKeyPressed(evt);
             }
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtUbicacionKeyTyped(evt);
+            }
         });
-        getContentPane().add(txtUbicacion, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 280, 170, 28));
+        getContentPane().add(txtUbicacion, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 330, 170, 28));
 
         txtCapMaxima.setBackground(new java.awt.Color(240, 240, 240));
         txtCapMaxima.setFont(new java.awt.Font("Georgia", 0, 12)); // NOI18N
@@ -238,11 +259,14 @@ public class Almacen extends javax.swing.JFrame {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 txtCapMaximaKeyPressed(evt);
             }
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                txtCapMaximaKeyReleased(evt);
+            }
             public void keyTyped(java.awt.event.KeyEvent evt) {
                 txtCapMaximaKeyTyped(evt);
             }
         });
-        getContentPane().add(txtCapMaxima, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 325, 170, 26));
+        getContentPane().add(txtCapMaxima, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 380, 170, 26));
 
         txtCapMin.setBackground(new java.awt.Color(240, 240, 240));
         txtCapMin.setFont(new java.awt.Font("Georgia", 0, 12)); // NOI18N
@@ -265,11 +289,14 @@ public class Almacen extends javax.swing.JFrame {
             }
         });
         txtCapMin.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                txtCapMinKeyReleased(evt);
+            }
             public void keyTyped(java.awt.event.KeyEvent evt) {
                 txtCapMinKeyTyped(evt);
             }
         });
-        getContentPane().add(txtCapMin, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 368, 170, 26));
+        getContentPane().add(txtCapMin, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 420, 170, 26));
 
         txtCapOpt.setBackground(new java.awt.Color(240, 240, 240));
         txtCapOpt.setFont(new java.awt.Font("Georgia", 0, 12)); // NOI18N
@@ -292,11 +319,14 @@ public class Almacen extends javax.swing.JFrame {
             }
         });
         txtCapOpt.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                txtCapOptKeyReleased(evt);
+            }
             public void keyTyped(java.awt.event.KeyEvent evt) {
                 txtCapOptKeyTyped(evt);
             }
         });
-        getContentPane().add(txtCapOpt, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 412, 170, 26));
+        getContentPane().add(txtCapOpt, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 470, 170, 26));
 
         txtCapActual.setBackground(new java.awt.Color(240, 240, 240));
         txtCapActual.setFont(new java.awt.Font("Georgia", 0, 12)); // NOI18N
@@ -319,11 +349,26 @@ public class Almacen extends javax.swing.JFrame {
             }
         });
         txtCapActual.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                txtCapActualKeyReleased(evt);
+            }
             public void keyTyped(java.awt.event.KeyEvent evt) {
                 txtCapActualKeyTyped(evt);
             }
         });
-        getContentPane().add(txtCapActual, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 458, 170, 26));
+        getContentPane().add(txtCapActual, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 520, 170, 26));
+
+        reporte.setBackground(new java.awt.Color(204, 204, 204));
+        reporte.setFont(new java.awt.Font("Georgia", 0, 14)); // NOI18N
+        reporte.setForeground(new java.awt.Color(255, 255, 255));
+        reporte.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/analitica.png"))); // NOI18N
+        reporte.setText("REPORTE");
+        reporte.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                reporteMouseClicked(evt);
+            }
+        });
+        getContentPane().add(reporte, new org.netbeans.lib.awtextra.AbsoluteConstraints(840, 50, 120, 40));
 
         txtEstante.setBackground(new java.awt.Color(240, 240, 240));
         txtEstante.setFont(new java.awt.Font("Georgia", 0, 12)); // NOI18N
@@ -350,7 +395,7 @@ public class Almacen extends javax.swing.JFrame {
                 txtEstanteKeyTyped(evt);
             }
         });
-        getContentPane().add(txtEstante, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 503, 170, 28));
+        getContentPane().add(txtEstante, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 570, 170, 28));
 
         botonDetalleAlmacen.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         botonDetalleAlmacen.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -358,7 +403,17 @@ public class Almacen extends javax.swing.JFrame {
                 botonDetalleAlmacenMouseClicked(evt);
             }
         });
-        getContentPane().add(botonDetalleAlmacen, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 200, 120, 30));
+        getContentPane().add(botonDetalleAlmacen, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 230, 140, 40));
+
+        usuario.setFont(new java.awt.Font("Georgia", 1, 18)); // NOI18N
+        usuario.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        getContentPane().add(usuario, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 680, 230, 20));
+
+        jLabel2.setFont(new java.awt.Font("Georgia", 0, 12)); // NOI18N
+        jLabel2.setForeground(new java.awt.Color(102, 102, 102));
+        jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel2.setText("Usuario");
+        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 700, 70, -1));
 
         txtBuscarAl.setBackground(new java.awt.Color(240, 240, 240));
         txtBuscarAl.setFont(new java.awt.Font("Georgia", 0, 12)); // NOI18N
@@ -380,24 +435,25 @@ public class Almacen extends javax.swing.JFrame {
                 txtBuscarAlKeyTyped(evt);
             }
         });
-        getContentPane().add(txtBuscarAl, new org.netbeans.lib.awtextra.AbsoluteConstraints(627, 197, 220, 28));
+        getContentPane().add(txtBuscarAl, new org.netbeans.lib.awtextra.AbsoluteConstraints(690, 240, 230, 20));
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/Pantalla Almacen.png"))); // NOI18N
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/Pantalla Almacen_1.png"))); // NOI18N
         jLabel1.setText("jLabel1");
-        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 900, 620));
+        getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 980, 720));
 
         pack();
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void BotonActivoAlActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BotonActivoAlActionPerformed
-         int IdAlmacen = Integer.parseInt(txtIdAlmacen.getText());
-        
+        String IdAlmacen = txtIdAlmacen.getText();
+        String activo = "BtnActivo";
+
         try {
             Connection con = Conexion.getConexion();
             PreparedStatement ps = con.prepareStatement("Update Almacen set Id_Estado=? Where Id_Almacen=?");
-            ps.setInt(1,1);
-            ps.setInt(2, IdAlmacen);
+            ps.setInt(1, 1);
+            ps.setString(2, IdAlmacen);
             ps.executeUpdate();
             JOptionPane.showMessageDialog(null, "Registro Habilitado");
             cargartabla();
@@ -407,18 +463,20 @@ public class Almacen extends javax.swing.JFrame {
             Inhabillitar();
 
         } catch (SQLException ex) {
+            lo.LogBitacora("Error: No se pudo actualizar el estado " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), almacen, activo);
             JOptionPane.showMessageDialog(null, ex.toString());
+
         }
     }//GEN-LAST:event_BotonActivoAlActionPerformed
 
     private void BotonInactivoAlActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BotonInactivoAlActionPerformed
-        int IdAlmacen = Integer.parseInt(txtIdAlmacen.getText());
-        
+        String IdAlmacen = txtIdAlmacen.getText();
+        String Inactivo = "BtnInactivo";
         try {
             Connection con = Conexion.getConexion();
-            PreparedStatement ps = con.prepareStatement("Update Almacen set Id_Estado=? Where Id_Almacen=?");
-            ps.setInt(1,2);
-            ps.setInt(2, IdAlmacen);
+            PreparedStatement ps = con.prepareStatement("Update Almacen set Id_Estado=? Where Id_Almacen=");
+            ps.setInt(1, 2);
+            ps.setString(2, IdAlmacen);
             ps.executeUpdate();
             JOptionPane.showMessageDialog(null, "Registro Inhabilitado");
             cargartabla();
@@ -428,6 +486,7 @@ public class Almacen extends javax.swing.JFrame {
             Inhabillitar();
 
         } catch (SQLException ex) {
+            lo.LogBitacora("Error: No se pudo actualizar el estado " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), almacen, Inactivo);
             JOptionPane.showMessageDialog(null, ex.toString());
         }
     }//GEN-LAST:event_BotonInactivoAlActionPerformed
@@ -443,9 +502,11 @@ public class Almacen extends javax.swing.JFrame {
     }//GEN-LAST:event_botonAgregarALMouseClicked
 
     private void botonEditarALMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_botonEditarALMouseClicked
+        String editar = "BtnEditar";
         if (txtUbicacion.getText().equals("Ingrese Ubicación") || txtCapMaxima.getText().equals("Ingrese Capacidad Maxima ") || txtCapMin.getText().equals("Ingrese Capacidad Minima") || txtCapOpt.getText().equals("Ingrese Capacidad Optima") || txtCapOpt.getText().equals("Ingrese Capacidad Actual")
                 || txtEstante.getText().equals("Ingrese Número Estante")) {
             JOptionPane.showMessageDialog(null, "No se puede Guardar datos vacios");
+
         } else {
             int IdAlmacen = Integer.parseInt(txtIdAlmacen.getText());
             String Ubicacion = txtUbicacion.getText();
@@ -457,7 +518,7 @@ public class Almacen extends javax.swing.JFrame {
 
             try {
                 Connection con = Conexion.getConexion();
-                PreparedStatement ps = con.prepareStatement("Update Almacen set Ubicacion=?, Capacidad_Minima=?,Capacidad_Maxima=?,Capacidad_Optima=?,Capacidad_Actual=?,Num_Estante=? Where Id_Almacen=?");
+                PreparedStatement ps = con.prepareStatement("Update Almacen set Ubicacion=, Capacidad_Minima=?,Capacidad_Maxima=?,Capacidad_Optima=?,Capacidad_Actual=?,Num_Estante=? Where Id_Almacen=?");
                 ps.setString(1, Ubicacion);
                 ps.setString(2, CapacidadM);
                 ps.setString(3, CapacidadMin);
@@ -473,13 +534,15 @@ public class Almacen extends javax.swing.JFrame {
                 Limpiar();
                 Inhabillitar();
 
-            } catch (SQLException ex) {
+            } catch (Exception ex) {
+                lo.LogBitacora("Error: No se pudo actualizar el registro " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), almacen, editar);
                 JOptionPane.showMessageDialog(null, ex.toString());
             }
         }
     }//GEN-LAST:event_botonEditarALMouseClicked
 
     private void botonGuardarALMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_botonGuardarALMouseClicked
+        String guardar = "BtnGuardar";
         if (txtUbicacion.getText().equals("Ingrese Ubicación") && txtCapMaxima.getText().equals("Ingrese Capacidad Maxima")
                 && txtCapMin.getText().equals("Ingrese Capacidad Minima") && txtCapOpt.getText().equals("Ingrese Capacidad Optima") && txtCapActual.getText().equals("Ingrese Capacidad Actual") && txtEstante.getText().equals("Ingrese Número Estante")) {
             JOptionPane.showMessageDialog(null, "Debes llenar todos los campos", "Advertencia", JOptionPane.WARNING_MESSAGE);
@@ -525,6 +588,7 @@ public class Almacen extends javax.swing.JFrame {
                     Inhabillitar();
 
                 } catch (SQLException ex) {
+                    lo.LogBitacora("Error: No se pudo guardar el registro " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), almacen, guardar);
                     JOptionPane.showMessageDialog(null, ex.toString());
                 }
             }
@@ -532,7 +596,9 @@ public class Almacen extends javax.swing.JFrame {
     }//GEN-LAST:event_botonGuardarALMouseClicked
 
     private void TablaAlmacenMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_TablaAlmacenMouseClicked
-       try {
+        String tablaAl = "TablaAlmacen";
+
+        try {
             int fila = TablaAlmacen.getSelectedRow();
             int id = Integer.parseInt(TablaAlmacen.getValueAt(fila, 0).toString());
             PreparedStatement ps;
@@ -543,7 +609,7 @@ public class Almacen extends javax.swing.JFrame {
                     + "INNER JOIN Estado AS E ON A.Id_Estado = E.Id_Estado\n"
                     + "where A.Id_Almacen=?\n"
                     + "Order By A.Id_Almacen");
-                    
+
             ps.setInt(1, id);
             rs = ps.executeQuery();
 
@@ -551,36 +617,34 @@ public class Almacen extends javax.swing.JFrame {
                 txtIdAlmacen.setText(String.valueOf(id));
                 txtUbicacion.setText(rs.getString("Ubicacion"));
                 txtCapMaxima.setText(rs.getString("Capacidad_Maxima"));
-                
+
                 txtCapMin.setText(rs.getString("Capacidad_Minima"));
                 txtCapOpt.setText(rs.getString("Capacidad_Optima"));
                 txtCapActual.setText(rs.getString("Capacidad_Actual"));
                 txtEstante.setText(rs.getString("Num_Estante"));
-                
-                
-               
+
                 if (rs.getString("Estado").equals("Activo")) {
                     BotonActivoAl.setSelected(true);
                 } else if (rs.getString("Estado").equals("Inactivo")) {
                     BotonInactivoAl.setSelected(true);
-               
-            
-            }
-            Id_Proveedor = txtIdAlmacen.getText();
 
-            BotonActivoAl.setVisible(Boolean.TRUE);
-            BotonInactivoAl.setVisible(Boolean.TRUE);
-            //id = txtId_Proveedor.getText();
-            Habilitar();
+                }
+                Id_Proveedor = txtIdAlmacen.getText();
+
+                BotonActivoAl.setVisible(Boolean.TRUE);
+                BotonInactivoAl.setVisible(Boolean.TRUE);
+                //id = txtId_Proveedor.getText();
+                Habilitar();
             }
         } catch (SQLException ex) {
+            lo.LogBitacora("Error: No se pudo seleccionar el registro " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), almacen, tablaAl);
             JOptionPane.showMessageDialog(null, ex.toString());
         }
     }//GEN-LAST:event_TablaAlmacenMouseClicked
 
     private void txtBuscarAlKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtBuscarAlKeyTyped
-         buscarData(txtBuscarAl.getText());
-       // validarNumerosLetras(evt);
+        buscarData(txtBuscarAl.getText());
+        // validarNumerosLetras(evt);
         if (txtBuscarAl.getText().length() > 15) {
             JOptionPane.showMessageDialog(null, "Alcanzaste el máximo de caracteres para este campo", "Advertencia", JOptionPane.WARNING_MESSAGE);
             evt.consume();
@@ -588,8 +652,7 @@ public class Almacen extends javax.swing.JFrame {
             if (!txtBuscarAl.getText().matches("^(?!.*([A-Za-zñÑáéíóúÁÉÍÓÚ\\s])\\1{2})[A-Za-zñÑáéíóúÁÉÍÓÚ\\s0-9]+$")) {
                 JOptionPane.showMessageDialog(null, "No repitas caracteres de forma incorrecta", "Advertencia", JOptionPane.WARNING_MESSAGE);
                 evt.consume();
-                
-                
+
             }
         }
     }//GEN-LAST:event_txtBuscarAlKeyTyped
@@ -602,7 +665,7 @@ public class Almacen extends javax.swing.JFrame {
     }//GEN-LAST:event_botonCancelarALMouseClicked
 
     private void txtUbicacionFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtUbicacionFocusGained
-       if (txtUbicacion.getText().equals("Ingrese Ubicación")) {
+        if (txtUbicacion.getText().equals("Ingrese Ubicación")) {
             txtUbicacion.setText("");
             txtUbicacion.setForeground(new Color(0, 0, 0));
         }
@@ -618,7 +681,7 @@ public class Almacen extends javax.swing.JFrame {
     }//GEN-LAST:event_botonRegresarALMouseClicked
 
     private void txtCapMinFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtCapMinFocusGained
-         if (txtCapMin.getText().equals("Ingrese Capacidad Mínima")) {
+        if (txtCapMin.getText().equals("Ingrese Capacidad Mínima")) {
             txtCapMin.setText("");
             txtCapMin.setForeground(new Color(0, 0, 0));
         }
@@ -632,28 +695,33 @@ public class Almacen extends javax.swing.JFrame {
     }//GEN-LAST:event_txtCapMinFocusLost
 
     private void txtCapMaximaFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtCapMaximaFocusGained
-       if (txtCapMaxima.getText().equals("Ingrese Capacidad Máxima")) {
+        if (txtCapMaxima.getText().equals("Ingrese Capacidad Máxima")) {
             txtCapMaxima.setText("");
             txtCapMaxima.setForeground(new Color(0, 0, 0));
         }
     }//GEN-LAST:event_txtCapMaximaFocusGained
 
     private void txtCapMaximaFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtCapMaximaFocusLost
-       if (txtCapMaxima.getText().equals("")) {
+        if (txtCapMaxima.getText().equals("")) {
             txtCapMaxima.setText("Ingrese Capacidad Máxima");
             txtCapMaxima.setForeground(new Color(153, 153, 153));
         }
     }//GEN-LAST:event_txtCapMaximaFocusLost
 
     private void txtUbicacionFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtUbicacionFocusLost
-         if (txtUbicacion.getText().equals("")) {
+        if (txtUbicacion.getText().equals("")) {
             txtUbicacion.setText("Ingrese Ubicación");
             txtUbicacion.setForeground(new Color(153, 153, 153));
+        } else if (!txtUbicacion.getText().isEmpty()) {
+            if (!txtUbicacion.getText().matches("^[A-Z-ÁÉÍÓÚÑ]{1}[a-z-áéíóúñ]+$")) {
+                JOptionPane.showMessageDialog(null, "Debes escribir un nombre comenzando en mayúscula. No utilice espacios", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+
         }
     }//GEN-LAST:event_txtUbicacionFocusLost
 
     private void botonDetalleAlmacenMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_botonDetalleAlmacenMouseClicked
-         java.awt.EventQueue.invokeLater(new Runnable() {
+        java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new DetalleAlmacen().setVisible(true);
             }
@@ -662,7 +730,7 @@ public class Almacen extends javax.swing.JFrame {
     }//GEN-LAST:event_botonDetalleAlmacenMouseClicked
 
     private void txtCapOptFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtCapOptFocusGained
-      if (txtCapOpt.getText().equals("Ingrese Capacidad Optima")) {
+        if (txtCapOpt.getText().equals("Ingrese Capacidad Optima")) {
             txtCapOpt.setText("");
             txtCapOpt.setForeground(new Color(0, 0, 0));
         }
@@ -690,21 +758,21 @@ public class Almacen extends javax.swing.JFrame {
     }//GEN-LAST:event_txtCapActualFocusLost
 
     private void txtEstanteFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtEstanteFocusGained
-       if (txtEstante.getText().equals("Ingrese Número Estante")) {
+        if (txtEstante.getText().equals("Ingrese Número Estante")) {
             txtEstante.setText("");
             txtEstante.setForeground(new Color(0, 0, 0));
         }
     }//GEN-LAST:event_txtEstanteFocusGained
 
     private void txtEstanteFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtEstanteFocusLost
-       if (txtEstante.getText().equals("")) {
+        if (txtEstante.getText().equals("")) {
             txtEstante.setText("Ingrese Número Estante");
             txtEstante.setForeground(new Color(153, 153, 153));
         }
     }//GEN-LAST:event_txtEstanteFocusLost
 
     private void txtBuscarAlFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtBuscarAlFocusGained
-         if (txtBuscarAl.getText().equals("Buscar ID y Ubicación")) {
+        if (txtBuscarAl.getText().equals("Buscar ID y Ubicación")) {
             txtBuscarAl.setText("");
             txtBuscarAl.setForeground(new Color(0, 0, 0));
         }
@@ -718,7 +786,7 @@ public class Almacen extends javax.swing.JFrame {
     }//GEN-LAST:event_txtBuscarAlFocusLost
 
     private void txtUbicacionKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtUbicacionKeyPressed
-       
+
     }//GEN-LAST:event_txtUbicacionKeyPressed
 
     private void txtCapMaximaMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txtCapMaximaMousePressed
@@ -730,12 +798,12 @@ public class Almacen extends javax.swing.JFrame {
     }//GEN-LAST:event_txtCapMaximaMousePressed
 
     private void txtCapMaximaKeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtCapMaximaKeyPressed
-        
-        
+
+
     }//GEN-LAST:event_txtCapMaximaKeyPressed
 
     private void txtCapMinMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txtCapMinMousePressed
-       if (txtCapMin.isEnabled() == false) {
+        if (txtCapMin.isEnabled() == false) {
 
             JOptionPane.showMessageDialog(null, "Dar Click en Agregar o Editar para utilizar el campo", "Advertencia", JOptionPane.WARNING_MESSAGE);
 
@@ -743,12 +811,12 @@ public class Almacen extends javax.swing.JFrame {
     }//GEN-LAST:event_txtCapMinMousePressed
 
     private void txtCapOptMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txtCapOptMousePressed
-       if (txtCapOpt.isEnabled() == false) {
+        if (txtCapOpt.isEnabled() == false) {
 
             JOptionPane.showMessageDialog(null, "Dar Click en Agregar o Editar para utilizar el campo", "Advertencia", JOptionPane.WARNING_MESSAGE);
 
         }
-       
+
     }//GEN-LAST:event_txtCapOptMousePressed
 
     private void txtCapActualMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txtCapActualMousePressed
@@ -757,7 +825,7 @@ public class Almacen extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, "Dar Click en Agregar o Editar para utilizar el campo", "Advertencia", JOptionPane.WARNING_MESSAGE);
 
         }
-        
+
     }//GEN-LAST:event_txtCapActualMousePressed
 
     private void txtEstanteMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txtEstanteMousePressed
@@ -784,7 +852,7 @@ public class Almacen extends javax.swing.JFrame {
     }//GEN-LAST:event_txtCapMaximaKeyTyped
 
     private void txtCapMinKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtCapMinKeyTyped
-       validarNumeros(evt);
+        validarNumeros(evt);
         if (txtCapMin.getText().length() > 3) {
             evt.consume();
         }
@@ -798,7 +866,7 @@ public class Almacen extends javax.swing.JFrame {
     }//GEN-LAST:event_txtCapOptKeyTyped
 
     private void txtCapActualKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtCapActualKeyTyped
-       validarNumeros(evt);
+        validarNumeros(evt);
         if (txtCapActual.getText().length() > 3) {
             evt.consume();
         }
@@ -810,10 +878,83 @@ public class Almacen extends javax.swing.JFrame {
             evt.consume();
         }
     }//GEN-LAST:event_txtEstanteKeyTyped
- 
-    
-    
-    
+
+    private void txtUbicacionKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtUbicacionKeyTyped
+        validarNumerosLetras(evt);
+
+        if (txtUbicacion.getText().length() > 20) {
+            JOptionPane.showMessageDialog(null, "El máximo es de 20 caracteres para este campo", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            evt.consume();
+        } else if (txtUbicacion.getText().length() > 0) {
+            if (!txtUbicacion.getText().matches("^(?!.*([A-Za-zñÑáéíóúÁÉÍÓÚ\\s])\\1{2})[A-Za-zñÑáéíóúÁÉÍÓÚ\\s]+$")) {
+                JOptionPane.showMessageDialog(null, "No repitas caracteres de forma incorrecta", "Error", JOptionPane.ERROR_MESSAGE);
+                evt.consume();
+            }
+        }
+
+
+    }//GEN-LAST:event_txtUbicacionKeyTyped
+
+    private void txtCapMaximaKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtCapMaximaKeyReleased
+
+        if (Integer.parseInt(txtCapMaxima.getText()) < 100) {
+            JOptionPane.showMessageDialog(null, "La capacidad máxima no puede ser menor a 100", "Advertencia", JOptionPane.WARNING_MESSAGE);
+
+        } else if (Integer.parseInt(txtCapMaxima.getText()) > 10000) {
+            JOptionPane.showMessageDialog(null, "La capacidad  máxima no puede ser mayor a 10,000", "Advertencia", JOptionPane.WARNING_MESSAGE);
+
+        }
+    }//GEN-LAST:event_txtCapMaximaKeyReleased
+
+    private void txtCapMinKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtCapMinKeyReleased
+
+        if (txtCapMaxima.getText().equals("Ingrese Capacidad Máxima")) {
+            JOptionPane.showMessageDialog(null, "Debe Ingresar Capacidad Maxima para ingresar la mínima", "Advertencia", JOptionPane.WARNING_MESSAGE);
+        } else if (Integer.parseInt(txtCapMin.getText()) > Integer.parseInt(txtCapMaxima.getText())) {
+            JOptionPane.showMessageDialog(null, "La capacidad  minima no puede ser mayor a la capacidad  Maxima", "Advertencia", JOptionPane.WARNING_MESSAGE);
+
+        } else if (Integer.parseInt(txtCapMin.getText()) < 10) {
+            JOptionPane.showMessageDialog(null, "La capacidad  minima no puede ser menor a 10", "Advertencia", JOptionPane.WARNING_MESSAGE);
+
+        }
+    }//GEN-LAST:event_txtCapMinKeyReleased
+
+    private void txtCapActualKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtCapActualKeyReleased
+        if (Integer.parseInt(txtCapActual.getText()) > Integer.parseInt(txtCapMaxima.getText())) {
+            JOptionPane.showMessageDialog(null, "La capacidad actual no puede ser mayor a la capacidad  Máxima", "Advertencia", JOptionPane.WARNING_MESSAGE);
+
+        } else if (Integer.parseInt(txtCapActual.getText()) < Integer.parseInt(txtCapMin.getText())) {
+            JOptionPane.showMessageDialog(null, "La capacidad actual no puede ser menor a la capacidad mínima", "Advertencia", JOptionPane.WARNING_MESSAGE);
+
+        }
+    }//GEN-LAST:event_txtCapActualKeyReleased
+
+    private void txtCapOptKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtCapOptKeyReleased
+        if (Integer.parseInt(txtCapOpt.getText()) > Integer.parseInt(txtCapMaxima.getText())) {
+            JOptionPane.showMessageDialog(null, "La capacidad optima no puede ser mayor a la capacidad  Máxima", "Advertencia", JOptionPane.WARNING_MESSAGE);
+
+        } else if (Integer.parseInt(txtCapOpt.getText()) < Integer.parseInt(txtCapMin.getText())) {
+            JOptionPane.showMessageDialog(null, "La capacidad optima no puede ser menor a la capacidad mínima", "Advertencia", JOptionPane.WARNING_MESSAGE);
+
+        }
+    }//GEN-LAST:event_txtCapOptKeyReleased
+
+    private void reporteMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_reporteMouseClicked
+        JasperReport reporte;
+        HashMap hm = new HashMap();
+        hm.put("Usuario", usuario.getText());
+        try {
+            Connection con = Conexion.getConexion();
+            reporte = JasperCompileManager.compileReport("src/Reportes/ReporteAlmacen.jrxml");
+            JasperPrint jp = JasperFillManager.fillReport(reporte, hm, con);
+            JasperViewer.viewReport(jp, true);
+            ReportView view = new ReportView(jp, false);
+            
+            view.setVisible(true);
+        } catch (JRException ex) {
+            Logger.getLogger(Clientes.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_reporteMouseClicked
 
     /**
      * @param args the command line arguments
@@ -863,7 +1004,9 @@ public class Almacen extends javax.swing.JFrame {
     private javax.swing.JLabel botonRegresarAL;
     private javax.swing.ButtonGroup buttonGroupAlmacen;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JLabel reporte;
     private javax.swing.JTextField txtBuscarAl;
     private javax.swing.JTextField txtCapActual;
     private javax.swing.JTextField txtCapMaxima;
@@ -872,6 +1015,7 @@ public class Almacen extends javax.swing.JFrame {
     private javax.swing.JTextField txtEstante;
     private javax.swing.JLabel txtIdAlmacen;
     private javax.swing.JTextField txtUbicacion;
+    private javax.swing.JLabel usuario;
     // End of variables declaration//GEN-END:variables
 
     private void Habilitar() {
@@ -884,6 +1028,7 @@ public class Almacen extends javax.swing.JFrame {
     }
 
     private void cargartabla() {
+        String cargarT = "BtnCargar";
         DefaultTableModel modeloTabla = (DefaultTableModel) TablaAlmacen.getModel();
         modeloTabla.setRowCount(0);
 
@@ -911,6 +1056,7 @@ public class Almacen extends javax.swing.JFrame {
             }
 
         } catch (SQLException ex) {
+            lo.LogBitacora("Error: No se pudo actualizar la tabla " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), almacen, cargarT);
             JOptionPane.showMessageDialog(null, ex.toString());
         }
 
@@ -924,12 +1070,12 @@ public class Almacen extends javax.swing.JFrame {
         }
         txtCapMaxima.setText("");
         if (txtCapMaxima.getText().equals("")) {
-            txtCapMaxima.setText("Ingrese Capacidad Maxima");
+            txtCapMaxima.setText("Ingrese Capacidad Máxima");
             txtCapMaxima.setForeground(new Color(153, 153, 153));
         }
         txtCapMin.setText("");
         if (txtCapMin.getText().equals("")) {
-            txtCapMin.setText("Ingrese Capacidad Minima");
+            txtCapMin.setText("Ingrese Capacidad Mínima");
             txtCapMin.setForeground(new Color(153, 153, 153));
 
         }
@@ -961,6 +1107,7 @@ public class Almacen extends javax.swing.JFrame {
     }
 
     private void buscarData(String valor) {
+        String buscarD = "BtnBuscar";
         String[] titulos = {"ID", "Ubicacion", "Cap.Maxima", "Cap.Minima", "Cap.Optima", "Cap.Actual", "Estante", "Estado"};
         String[] registros = new String[13];
         String sql = "Select A.Id_Almacen,A.Ubicacion,A.Capacidad_Maxima,A.Capacidad_Minima,A.Capacidad_Optima,A.Capacidad_Actual,A.Num_Estante,E.Estado\n"
@@ -993,18 +1140,29 @@ public class Almacen extends javax.swing.JFrame {
             // anchoColumnas();
         } catch (SQLException ex) {
             Logger.getLogger(Clientes.class.getName()).log(Level.SEVERE, null, ex);
+            lo.LogBitacora("Error: No se pudo buscar el registro " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), almacen, buscarD);
         }
     }
 
-   private void validarNumeros(KeyEvent e) {
+    private void validarNumeros(KeyEvent e) {
         if (e.getKeyChar() >= 33 && e.getKeyChar() <= 47
-               || e.getKeyChar() >= 58 && e.getKeyChar() <= 238) {
+                || e.getKeyChar() >= 58 && e.getKeyChar() <= 238) {
             e.consume();
-           JOptionPane.showMessageDialog(null, "Este campo solo admite números", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Este campo solo admite números", "Error", JOptionPane.ERROR_MESSAGE);
         }
-        
-    } }
-    
-       
-       
 
+    }
+
+    public void validarNumerosLetras(java.awt.event.KeyEvent e) {
+        if (e.getKeyChar() >= 33 && e.getKeyChar() <= 47
+                || e.getKeyChar() >= 58 && e.getKeyChar() <= 64
+                || e.getKeyChar() >= 91 && e.getKeyChar() <= 96
+                || e.getKeyChar() >= 123 && e.getKeyChar() <= 129
+                || e.getKeyChar() >= 145 && e.getKeyChar() <= 159
+                || e.getKeyChar() >= 164 && e.getKeyChar() <= 238) {
+
+            e.consume();
+            JOptionPane.showMessageDialog(null, "Este campo no acepta caracteres especiales, no puede ser solo númerico", "Advertencia", JOptionPane.WARNING_MESSAGE);
+        }
+    }
+}

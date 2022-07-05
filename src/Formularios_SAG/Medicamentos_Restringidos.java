@@ -7,6 +7,8 @@ package Formularios_SAG;
 
 import Conexion.Conexion;
 import static Formularios_SAG.Proveedores.Id_Proveedor;
+import Logs.log;
+import Reportes.ReportView;
 import java.awt.Color;
 import java.awt.Image;
 import java.awt.Toolkit;
@@ -17,17 +19,25 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.view.JasperViewer;
 
 /**
  *
  * @author carba
  */
 public class Medicamentos_Restringidos extends javax.swing.JFrame {
+    log lo = new log();
+    String MedicamentoR = "Medicamentos restriguidos";
 
     /**
      * Creates new form Medicamentos_Restringidos
@@ -36,10 +46,14 @@ public class Medicamentos_Restringidos extends javax.swing.JFrame {
         initComponents();
         cargartabla();
         Inhabillitar();
+        usuario.setText(Login.txtUsuario.getText());
         CargarProducto p = new Medicamentos_Restringidos.CargarProducto();
         comboProducto.setModel(p.getvalues());
         CargarRestriccion r = new Medicamentos_Restringidos.CargarRestriccion();
         comboRestriccion.setModel(r.getvalues());
+        txtId_Restriccion.setVisible(Boolean.FALSE);
+        txtIdProducto.setVisible(Boolean.FALSE);
+        txtIdMR.setVisible(Boolean.FALSE);
     }
      @Override
     public Image getIconImage() {
@@ -70,6 +84,9 @@ public class Medicamentos_Restringidos extends javax.swing.JFrame {
         txtIdMR = new javax.swing.JLabel();
         txtDescripcionMR = new javax.swing.JTextField();
         txtIdProducto = new javax.swing.JLabel();
+        usuario = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        reporte = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         TablaMedicamentoRestri = new javax.swing.JTable();
         jLabel1 = new javax.swing.JLabel();
@@ -201,6 +218,28 @@ public class Medicamentos_Restringidos extends javax.swing.JFrame {
         getContentPane().add(txtDescripcionMR, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 438, 180, 27));
         getContentPane().add(txtIdProducto, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 270, 60, 20));
 
+        usuario.setFont(new java.awt.Font("Georgia", 1, 18)); // NOI18N
+        usuario.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        getContentPane().add(usuario, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 470, 230, 20));
+
+        jLabel3.setFont(new java.awt.Font("Georgia", 0, 12)); // NOI18N
+        jLabel3.setForeground(new java.awt.Color(102, 102, 102));
+        jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel3.setText("Usuario");
+        getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 490, 70, -1));
+
+        reporte.setBackground(new java.awt.Color(204, 204, 204));
+        reporte.setFont(new java.awt.Font("Georgia", 0, 14)); // NOI18N
+        reporte.setForeground(new java.awt.Color(255, 255, 255));
+        reporte.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/analitica.png"))); // NOI18N
+        reporte.setText("REPORTE");
+        reporte.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                reporteMouseClicked(evt);
+            }
+        });
+        getContentPane().add(reporte, new org.netbeans.lib.awtextra.AbsoluteConstraints(780, 50, 120, 40));
+
         TablaMedicamentoRestri.setModel(new javax.swing.table.DefaultTableModel(
             new Object [][] {
                 {null, null, null, null},
@@ -234,7 +273,7 @@ public class Medicamentos_Restringidos extends javax.swing.JFrame {
         });
         jScrollPane1.setViewportView(TablaMedicamentoRestri);
 
-        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 240, 520, 270));
+        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 240, 520, 210));
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/Pantalla restricciones.png"))); // NOI18N
         getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, 521));
@@ -267,6 +306,7 @@ public class Medicamentos_Restringidos extends javax.swing.JFrame {
     }//GEN-LAST:event_txtDescripcionMRActionPerformed
 
     private void botonGuardarMRMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_botonGuardarMRMouseClicked
+        String Guardar="Guardar medicamento";
         ObtenerIDRestriccion();
          ObtenerIDProducto();
          if ( comboRestriccion.getSelectedIndex() == 0  && comboProducto.getSelectedIndex() == 0 && txtDescripcionMR.getText().equals("Ingrese Descripción") )  {
@@ -291,12 +331,15 @@ public class Medicamentos_Restringidos extends javax.swing.JFrame {
                 Inhabillitar();
 
             } catch (SQLException ex) {
+           lo.LogBitacora("Error: No se pudo guardar medicamento " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), MedicamentoR,Guardar);
+
                 JOptionPane.showMessageDialog(null, ex.toString());
             }
         }
     }//GEN-LAST:event_botonGuardarMRMouseClicked
 
     private void botonEditarMRMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_botonEditarMRMouseClicked
+       String EditarM="Editar medicamento Restringuido";
         ObtenerIDProducto();
         ObtenerIDRestriccion();
         if (comboRestriccion.equals("Seleccione Restricción") || comboProducto.equals("Seleccione Producto")  || txtDescripcionMR.getText().equals("Ingrese Descripción")) {
@@ -325,6 +368,8 @@ public class Medicamentos_Restringidos extends javax.swing.JFrame {
                 Inhabillitar();
 
             } catch (SQLException ex) {
+              lo.LogBitacora("Error: No se pudo editar medicamento " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), MedicamentoR,EditarM);
+
                 JOptionPane.showMessageDialog(null, ex.toString());
             }
         }
@@ -339,7 +384,8 @@ public class Medicamentos_Restringidos extends javax.swing.JFrame {
     }//GEN-LAST:event_botonCancelarMRMouseClicked
 
     private void TablaMedicamentoRestriMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_TablaMedicamentoRestriMouseClicked
-       try {
+       String TablaMR="Tabla medicamento Restringuido";
+        try {
             int fila = TablaMedicamentoRestri.getSelectedRow();
             int id = Integer.parseInt(TablaMedicamentoRestri.getValueAt(fila, 0).toString());
             PreparedStatement ps;
@@ -365,6 +411,8 @@ public class Medicamentos_Restringidos extends javax.swing.JFrame {
             Habilitar();
             }
         } catch (SQLException ex) {
+             lo.LogBitacora("Error: No se pudo guardar medicamento " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), MedicamentoR,TablaMR);
+
             JOptionPane.showMessageDialog(null, ex.toString());
         }
     }//GEN-LAST:event_TablaMedicamentoRestriMouseClicked
@@ -451,11 +499,26 @@ public class Medicamentos_Restringidos extends javax.swing.JFrame {
             if (!txtDescripcionMR.getText().matches("^(?!.*([A-Za-zñÑáéíóúÁÉÍÓÚ\\s])\\1{2})[A-Za-zñÑáéíóúÁÉÍÓÚ\\s0-9]+$")) {
                 JOptionPane.showMessageDialog(null, "No repitas caracteres de forma incorrecta", "Advertencia", JOptionPane.WARNING_MESSAGE);
                 evt.consume();
-                
-                
+                              
             }
         }
     }//GEN-LAST:event_txtDescripcionMRKeyTyped
+
+    private void reporteMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_reporteMouseClicked
+        net.sf.jasperreports.engine.JasperReport reporte;
+        HashMap hm = new HashMap();
+        hm.put("Usuario", usuario.getText());
+        try {
+            Connection con = Conexion.getConexion();
+            reporte = JasperCompileManager.compileReport("src/Reportes/ReporteMR.jrxml");
+            JasperPrint jp = JasperFillManager.fillReport(reporte, hm, con);
+            JasperViewer.viewReport(jp, true);
+            ReportView view = new ReportView(jp, false);
+            view.setVisible(true);
+        } catch (JRException ex) {
+            Logger.getLogger(Clientes.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_reporteMouseClicked
 
     /**
      * @param args the command line arguments
@@ -503,12 +566,15 @@ public class Medicamentos_Restringidos extends javax.swing.JFrame {
     private javax.swing.JComboBox<String> comboProducto;
     private javax.swing.JComboBox<String> comboRestriccion;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JLabel reporte;
     private javax.swing.JTextField txtBuscarMR;
     private javax.swing.JTextField txtDescripcionMR;
     private javax.swing.JLabel txtIdMR;
     private javax.swing.JLabel txtIdProducto;
     private javax.swing.JLabel txtId_Restriccion;
+    private javax.swing.JLabel usuario;
     // End of variables declaration//GEN-END:variables
 
     private void Habilitar() {
@@ -521,7 +587,7 @@ public class Medicamentos_Restringidos extends javax.swing.JFrame {
       public class CargarProducto {
 
         public DefaultComboBoxModel getvalues() {
-
+              String CargarMR="Cargar medicamento Restringuido";
             DefaultComboBoxModel modelo = new DefaultComboBoxModel();
             try {
                 Connection con = Conexion.getConexion();
@@ -535,6 +601,8 @@ public class Medicamentos_Restringidos extends javax.swing.JFrame {
                 con.close();
                 rs.close();
             } catch (Exception e) {
+             lo.LogBitacora("Error: No se pudo cargar medicamento restringuido " + "Excepción: " + e + ". Origen: " + this.getClass().getSimpleName(), MedicamentoR,CargarMR);
+
                 System.out.println(e);
             }
             return modelo;
@@ -543,7 +611,7 @@ public class Medicamentos_Restringidos extends javax.swing.JFrame {
        public class CargarRestriccion {
 
         public DefaultComboBoxModel getvalues() {
-
+              String CargarRestriccion="Cargar restriccion de medicamento";
             DefaultComboBoxModel modelo = new DefaultComboBoxModel();
             try {
                 Connection con = Conexion.getConexion();
@@ -557,6 +625,8 @@ public class Medicamentos_Restringidos extends javax.swing.JFrame {
                 con.close();
                 rs.close();
             } catch (Exception e) {
+              lo.LogBitacora("Error: No se pudo cargar la restriccion " + "Excepción: " + e + ". Origen: " + this.getClass().getSimpleName(), MedicamentoR,CargarRestriccion);
+
                 System.out.println(e);
             }
             return modelo;
@@ -602,6 +672,7 @@ public class Medicamentos_Restringidos extends javax.swing.JFrame {
     }
 
     private void cargartabla() {
+        String CargarTablaMR="Cargar tabla medicamento restringuido";
         DefaultTableModel modeloTabla = (DefaultTableModel) TablaMedicamentoRestri.getModel();
         modeloTabla.setRowCount(0);
 
@@ -630,6 +701,8 @@ public class Medicamentos_Restringidos extends javax.swing.JFrame {
             }
 
         } catch (SQLException ex) {
+           lo.LogBitacora("Error: No se pudo cargar tabla  " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), MedicamentoR,CargarTablaMR);
+
             JOptionPane.showMessageDialog(null, ex.toString());
         }
 
@@ -655,7 +728,8 @@ public class Medicamentos_Restringidos extends javax.swing.JFrame {
         }}
     
    private void buscarData(String valor) {
-        String[] titulos = {"Id Restricción", "Restricción", "Producto", "Descipcion"};
+        String BuscarDato="Buscar medicamento R";
+       String[] titulos = {"Id Restricción", "Restricción", "Producto", "Descipcion"};
         String[] registros = new String[13];
         String sql = "Select MR.Id_MR,P.Nombre_Producto,RMM.Restriccion,MR.Descripcion\n"
                 + "From Medicamentos_Restringuidos as MR\n"
@@ -686,6 +760,8 @@ public class Medicamentos_Restringidos extends javax.swing.JFrame {
             TablaMedicamentoRestri.setModel(model);
             // anchoColumnas();
         } catch (SQLException ex) {
+         lo.LogBitacora("Error: No se pudo buscar medicamento " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), MedicamentoR,BuscarDato);
+
             Logger.getLogger(Clientes.class.getName()).log(Level.SEVERE, null, ex);
         }
          

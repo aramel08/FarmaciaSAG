@@ -6,6 +6,8 @@
 package Formularios_SAG;
 
 import Conexion.Conexion;
+import Logs.log;
+import Reportes.ReportView;
 import com.sun.corba.se.impl.orbutil.CorbaResourceUtil;
 import java.awt.Color;
 import java.awt.Image;
@@ -16,6 +18,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
@@ -24,6 +27,12 @@ import javax.swing.BorderFactory;
 import javax.swing.JOptionPane;
 import javax.swing.border.Border;
 import javax.swing.table.DefaultTableModel;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.view.JasperViewer;
 
 /**
  *
@@ -34,6 +43,9 @@ public class Sucursales extends javax.swing.JFrame {
     /**
      * Creates new form Sucursales
      */
+    log lo = new log();
+    String sucursales = "Sucursales";
+
     @Override
     public Image getIconImage() {
         Image retValue = Toolkit.getDefaultToolkit().getImage(ClassLoader.getSystemResource("componentes/LOGOSAG(2).png"));
@@ -42,17 +54,18 @@ public class Sucursales extends javax.swing.JFrame {
 
     public Sucursales() {
         initComponents();
-
+        usuario.setText(Login.txtUsuario.getText());
         cargartabla();
         txtIdS.setVisible(Boolean.FALSE);
         BotonActivoS.setVisible(Boolean.FALSE);
         BotonInactivoS.setVisible(Boolean.FALSE);
-        txtEstadoS.setVisible(Boolean.FALSE);
     }
 
-    void verificarDatosExistentes(String campo, String columna, String tabla, String mensaje) {
+    boolean verificarDatosExistentes(String campo, String columna, String tabla, String mensaje) {
         Conexion cc = new Conexion();
         Connection cn = cc.getConexion();
+        boolean resultado = true;
+        String verificar = "Verificar";
         String sql = "SELECT " + columna + " FROM " + tabla + " WHERE " + columna + " = '" + campo + "'";
 
         try {
@@ -62,11 +75,15 @@ public class Sucursales extends javax.swing.JFrame {
             if (rs.next()) {
                 if (rs.getString(columna).equals(campo)) {
                     JOptionPane.showMessageDialog(null, mensaje, "Error", JOptionPane.ERROR_MESSAGE);
+                    resultado = false;
                 }
             }
         } catch (Exception e) {
+            lo.LogBitacora("Error: No se pudo verificar el dato " + "Excepción: " + e + ". Origen: " + this.getClass().getSimpleName(), sucursales, verificar);
             JOptionPane.showMessageDialog(null, "No se pudo verificar\n" + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
+        return resultado;
+
     }
 
     /**
@@ -92,10 +109,12 @@ public class Sucursales extends javax.swing.JFrame {
         txtDireccionS = new javax.swing.JTextField();
         botonCiudadS = new javax.swing.JComboBox<>();
         txtTelefonoS = new javax.swing.JTextField();
+        reporte = new javax.swing.JLabel();
         botonSalirS = new javax.swing.JLabel();
         txtIdS = new javax.swing.JLabel();
+        usuario = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
         botonRegresarS = new javax.swing.JLabel();
-        txtEstadoS = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         tablasucursal = new javax.swing.JTable();
         BotonCajaS = new javax.swing.JLabel();
@@ -146,7 +165,7 @@ public class Sucursales extends javax.swing.JFrame {
                 botonEditarSMouseClicked(evt);
             }
         });
-        getContentPane().add(botonEditarS, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 150, 130, 30));
+        getContentPane().add(botonEditarS, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 140, 140, 50));
 
         botonGerenciaS.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         botonGerenciaS.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -191,7 +210,7 @@ public class Sucursales extends javax.swing.JFrame {
                 botonGuardarSMouseClicked(evt);
             }
         });
-        getContentPane().add(botonGuardarS, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 650, 100, 40));
+        getContentPane().add(botonGuardarS, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 630, 90, 30));
 
         botonCancelarS.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         botonCancelarS.setEnabled(false);
@@ -319,10 +338,32 @@ public class Sucursales extends javax.swing.JFrame {
             }
         });
         getContentPane().add(txtTelefonoS, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 556, 200, 30));
+
+        reporte.setBackground(new java.awt.Color(204, 204, 204));
+        reporte.setFont(new java.awt.Font("Georgia", 0, 14)); // NOI18N
+        reporte.setForeground(new java.awt.Color(255, 255, 255));
+        reporte.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/analitica.png"))); // NOI18N
+        reporte.setText("REPORTE");
+        reporte.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                reporteMouseClicked(evt);
+            }
+        });
+        getContentPane().add(reporte, new org.netbeans.lib.awtextra.AbsoluteConstraints(840, 50, 120, 40));
         getContentPane().add(botonSalirS, new org.netbeans.lib.awtextra.AbsoluteConstraints(1290, 530, 90, 40));
 
         txtIdS.setEnabled(false);
         getContentPane().add(txtIdS, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 310, 90, 20));
+
+        usuario.setFont(new java.awt.Font("Georgia", 1, 18)); // NOI18N
+        usuario.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        getContentPane().add(usuario, new org.netbeans.lib.awtextra.AbsoluteConstraints(400, 680, 230, 20));
+
+        jLabel3.setFont(new java.awt.Font("Georgia", 0, 12)); // NOI18N
+        jLabel3.setForeground(new java.awt.Color(102, 102, 102));
+        jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel3.setText("Usuario");
+        getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 700, 70, -1));
 
         botonRegresarS.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         botonRegresarS.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -330,11 +371,7 @@ public class Sucursales extends javax.swing.JFrame {
                 botonRegresarSMouseClicked(evt);
             }
         });
-        getContentPane().add(botonRegresarS, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 50, 140, 50));
-
-        txtEstadoS.setFont(new java.awt.Font("Georgia", 1, 18)); // NOI18N
-        txtEstadoS.setText("Estado");
-        getContentPane().add(txtEstadoS, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 250, 70, 30));
+        getContentPane().add(botonRegresarS, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 50, 130, 30));
 
         tablasucursal.setFont(new java.awt.Font("Georgia", 0, 18)); // NOI18N
         tablasucursal.setModel(new javax.swing.table.DefaultTableModel(
@@ -426,7 +463,7 @@ public class Sucursales extends javax.swing.JFrame {
     }//GEN-LAST:event_botonAgregarSMouseClicked
 
     private void botonEditarSMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_botonEditarSMouseClicked
-
+        String editar = "BtnEditar";
         if (txtNombreS.getText().equals("Ingrese Nombre Sucursal") || txtTelefonoS.getText().equals("Ingrese Teléfono") || txtDireccionS.getText().equals("Ingrese Dirección")) {
             JOptionPane.showMessageDialog(null, "No se puede Actualizar datos vacios");
         } else {
@@ -437,20 +474,19 @@ public class Sucursales extends javax.swing.JFrame {
             String Telefono = txtTelefonoS.getText();
             String Estado = "";
 
-            if (BotonActivoS.isSelected() == true) {
+            /*if (BotonActivoS.isSelected() == true) {
                 Estado = "Activo";
             } else if (BotonInactivoS.isSelected() == true) {
                 Estado = "Inactivo";
-            }
+            }*/
             try {
                 Connection con = Conexion.getConexion();
-                PreparedStatement ps = con.prepareStatement("Update Sucursal set Nombre=?, Ciudad=?, Direccion=?, Telefono=?, estado=? where Id_Sucursal =?");
+                PreparedStatement ps = con.prepareStatement("Update Sucursal set Nombre=?, Ciudad=?, Direccion=?, Telefono=? where Id_Sucursal =?");
                 ps.setString(1, Nombre);
                 ps.setString(2, Ciudad);
                 ps.setString(3, Direccion);
                 ps.setInt(4, Integer.valueOf(Telefono));
-                ps.setString(5, Estado);
-                ps.setInt(6, Id);
+                ps.setInt(5, Id);
                 ps.executeUpdate();
                 JOptionPane.showMessageDialog(null, "Registro Actualizado");
                 cargartabla();
@@ -458,6 +494,7 @@ public class Sucursales extends javax.swing.JFrame {
                 Inhabillitar();
 
             } catch (SQLException ex) {
+                lo.LogBitacora("Error: No se pudo editar el dato " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), sucursales, editar);
                 JOptionPane.showMessageDialog(null, ex.toString());
             }
         }
@@ -474,14 +511,13 @@ public class Sucursales extends javax.swing.JFrame {
     }//GEN-LAST:event_botonGerenciaSMouseClicked
 
     private void BotonActivoSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BotonActivoSActionPerformed
-        String Estado = "Activo";
-        int Id = Integer.parseInt(txtIdS.getText());
+        String activo = "BtnActivo";
+        String Id = txtIdS.getText();
         try {
             Connection con = Conexion.getConexion();
-            PreparedStatement ps = con.prepareStatement("Update  Sucursal set estado=? where Id_Sucursal=?");
-
-            ps.setString(1, Estado);
-            ps.setInt(2, Id);
+            PreparedStatement ps = con.prepareStatement("Update  Sucursal set Id_Estado=? where Id_Sucursal=?");
+            ps.setInt(1, 1);
+            ps.setString(2, Id);
             ps.executeUpdate();
             JOptionPane.showMessageDialog(null, "Registro Habilitado");
             cargartabla();
@@ -489,19 +525,19 @@ public class Sucursales extends javax.swing.JFrame {
             Inhabillitar();
 
         } catch (SQLException ex) {
+            lo.LogBitacora("Error: No se pudo actualizar el dato " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), sucursales, activo);
             JOptionPane.showMessageDialog(null, ex.toString());
         }
     }//GEN-LAST:event_BotonActivoSActionPerformed
 
     private void BotonInactivoSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BotonInactivoSActionPerformed
-        String Estado = "Inactivo";
-        int Id = Integer.parseInt(txtIdS.getText());
+        String inactivo = "BtnInactivo";
+        String Id = txtIdS.getText();
         try {
             Connection con = Conexion.getConexion();
-            PreparedStatement ps = con.prepareStatement("Update  Sucursal set estado=? where Id_Sucursal=?");
-
-            ps.setString(1, Estado);
-            ps.setInt(2, Id);
+            PreparedStatement ps = con.prepareStatement("Update  Sucursal set Id_Estado=? where Id_Sucursal=?");
+            ps.setInt(1, 2);
+            ps.setString(2, Id);
             ps.executeUpdate();
             JOptionPane.showMessageDialog(null, "Registro inhabilitao");
             cargartabla();
@@ -509,19 +545,26 @@ public class Sucursales extends javax.swing.JFrame {
             Inhabillitar();
 
         } catch (SQLException ex) {
+            lo.LogBitacora("Error: No se pudo actualizar el dato " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), sucursales, inactivo);
             JOptionPane.showMessageDialog(null, ex.toString());
         }
     }//GEN-LAST:event_BotonInactivoSActionPerformed
 
     private void botonGuardarSMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_botonGuardarSMouseClicked
         // TODO add your handling code here:
-
+        String guardar = "BtnGuardar";
         String Nombre = txtNombreS.getText();
         String Ciudad = botonCiudadS.getSelectedItem().toString();
         String Direccion = txtDireccionS.getText();
         String Telefono = txtTelefonoS.getText();
-        if (txtNombreS.getText().equals("") || txtTelefonoS.getText().equals("") || txtDireccionS.getText().equals("")) {
-            JOptionPane.showMessageDialog(null, "No se puede Guardar datos vacios");
+        if (txtNombreS.getText().equals("Ingrese Nombre Sucursal")) {
+            JOptionPane.showMessageDialog(null, "Debe Ingresar Nombre Sucursal");
+        } else if (botonCiudadS.getSelectedIndex() == 0) {
+            JOptionPane.showMessageDialog(null, "Debe Ingresar Ciudad");
+        } else if (txtDireccionS.getText().equals("Ingrese Dirección")) {
+            JOptionPane.showMessageDialog(null, "Debe Ingresar Dirección");
+        } else if (txtTelefonoS.getText().equals("Ingrese Teléfono")) {
+            JOptionPane.showMessageDialog(null, "Debe Ingresar Teléfono");
         } else {
             try {
                 Connection con = Conexion.getConexion();
@@ -539,6 +582,7 @@ public class Sucursales extends javax.swing.JFrame {
                 botonGuardarS.setEnabled(Boolean.FALSE);
                 botonCancelarS.setEnabled(Boolean.FALSE);
             } catch (SQLException ex) {
+                lo.LogBitacora("Error: No se pudo guardar el dato " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), sucursales, guardar);
                 JOptionPane.showMessageDialog(null, ex.toString());
             }
 
@@ -549,13 +593,14 @@ public class Sucursales extends javax.swing.JFrame {
 
     private void tablasucursalMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tablasucursalMouseClicked
         // TODO add your handling code here:
+        String tablas = "TablaSucursales";
         try {
             int fila = tablasucursal.getSelectedRow();
             int id = Integer.parseInt(tablasucursal.getValueAt(fila, 0).toString());
             PreparedStatement ps;
             ResultSet rs;
             Connection con = Conexion.getConexion();
-            ps = con.prepareStatement("SELECT  Nombre, Ciudad, Direccion, Telefono, estado FROM Sucursal WHERE Id_Sucursal=?");
+            ps = con.prepareStatement("SELECT  Nombre, Ciudad, Direccion, Telefono, Id_Estado FROM Sucursal WHERE Id_Sucursal=?");
             ps.setInt(1, id);
             rs = ps.executeQuery();
 
@@ -565,9 +610,9 @@ public class Sucursales extends javax.swing.JFrame {
                 botonCiudadS.setSelectedItem(rs.getString("Ciudad"));
                 txtDireccionS.setText(rs.getString("Direccion"));
                 txtTelefonoS.setText(rs.getString("Telefono"));
-                if (rs.getString("estado").equals("Activo")) {
+                if (rs.getString("Id_Estado").equals("1")) {
                     BotonActivoS.setSelected(true);
-                } else if (rs.getString("estado").equals("Inactivo")) {
+                } else if (rs.getString("Id_Estado").equals("2")) {
                     BotonInactivoS.setSelected(true);
                 }
             }
@@ -579,6 +624,7 @@ public class Sucursales extends javax.swing.JFrame {
             botonGuardarS.enable(Boolean.FALSE);
             Habillitar();
         } catch (SQLException ex) {
+            lo.LogBitacora("Error: No se pudo seleccionar la tabla " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), sucursales, tablas);
             JOptionPane.showMessageDialog(null, ex.toString());
         }
 
@@ -648,7 +694,7 @@ public class Sucursales extends javax.swing.JFrame {
         buscarData(txtBuscarS.getText());
         validarNumerosLetras(evt);
         if (txtBuscarS.getText().length() > 15) {
-            JOptionPane.showMessageDialog(null, "Alcanzaste el máximo de caracteres para este campo", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(null, "El máximo es de 15 caracteres para este campo", "Advertencia", JOptionPane.WARNING_MESSAGE);
             evt.consume();
         } else if (txtBuscarS.getText().length() > 0) {
             if (!txtBuscarS.getText().matches("^(?!.*([A-Za-zñÑáéíóúÁÉÍÓÚ\\s])\\1{2})[A-Za-zñÑáéíóúÁÉÍÓÚ\\s0-9]+$")) {
@@ -704,10 +750,11 @@ public class Sucursales extends javax.swing.JFrame {
             txtTelefonoS.setForeground(new Color(153, 153, 153));
         } else if (txtTelefonoS.getText().length() < 8) {
             JOptionPane.showMessageDialog(null, "El número de teléfono debe contener 8 dígitos", "Advertencia", JOptionPane.WARNING_MESSAGE);
-        } else if (!txtTelefonoS.getText().matches("(^[9]{1}[0-9]{7}$)|(^[3]{1}[0-9]{7}$)|(^[7]{1}[0-9]{7}$)")) {
-            JOptionPane.showMessageDialog(null, "El número de celular debe comenzar en 9, 3 o 7", "Error", JOptionPane.ERROR_MESSAGE);
+        } else if (!txtTelefonoS.getText().matches("(^[9]{1}[0-9]{7}$)|(^[3]{1}[0-9]{7}$)|(^[7]{1}[0-9]{7}$)|(^[8]{1}[0-9]{7}$)")) {
+            JOptionPane.showMessageDialog(null, "El número de celular debe comenzar en 9, 3, 7 o 8", "Error", JOptionPane.ERROR_MESSAGE);
         } else {
             verificarDatosExistentes(txtTelefonoS.getText(), "Telefono", "Sucursal", "El  número de telefono ya existe");
+
         }
     }//GEN-LAST:event_txtTelefonoSFocusLost
 
@@ -733,6 +780,17 @@ public class Sucursales extends javax.swing.JFrame {
         }
     }
 
+    public boolean validarNumCelular(String cadena) {
+        String patron = "^[23789]\\d{7}$";
+        Pattern patt = Pattern.compile(patron);
+        Matcher comparador = patt.matcher(cadena);
+        if (comparador.matches()) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     private void txtTelefonoSKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtTelefonoSKeyTyped
         validarNumeros(evt);
         if (txtTelefonoS.getText().length() > 7) {
@@ -753,14 +811,21 @@ public class Sucursales extends javax.swing.JFrame {
     }
 
     private void txtNombreSKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtNombreSKeyTyped
-        validarNumerosLetras(evt);
+
         if (txtNombreS.getText().length() > 25) {
-            JOptionPane.showMessageDialog(null, "Alcanzaste el máximo de caracteres para este campo", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(null, "El máximo es de 25 caracteres para este campo", "Advertencia", JOptionPane.WARNING_MESSAGE);
             evt.consume();
         } else if (txtNombreS.getText().length() > 0) {
-            if (!txtNombreS.getText().matches("^(?!.*([A-Za-zñÑáéíóúÁÉÍÓÚ\\s])\\1{2})[A-Za-zñÑáéíóúÁÉÍÓÚ\\s0-9]+$")) {
-                JOptionPane.showMessageDialog(null, "No repitas caracteres de forma incorrecta", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            if (!txtNombreS.getText().matches("^(?!.*([A-Za-zñÑáéíóúÁÉÍÓÚ\\s])\\1{2})[A-Za-zñÑáéíóúÁÉÍÓÚ\\s]+$")) {
+                JOptionPane.showMessageDialog(null, "No repitas caracteres de forma incorrecta", "Error", JOptionPane.ERROR_MESSAGE);
+
                 evt.consume();
+                txtNombreS.setText("");
+                if (txtNombreS.getText().equals("")) {
+                    txtNombreS.setText("Ingrese Nombre Sucursal");
+                    txtNombreS.setForeground(new Color(153, 153, 153));
+                }
+
             }
             /**
              * if (nuevo.isEmpty()) { JOptionPane.showMessageDialog(null, "NO
@@ -776,11 +841,12 @@ public class Sucursales extends javax.swing.JFrame {
     }//GEN-LAST:event_txtNombreSKeyReleased
 
     private void txtDireccionSKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtDireccionSKeyTyped
-        if (txtDireccionS.getText().length() > 25) {
-            JOptionPane.showMessageDialog(null, "Alcanzaste el máximo de caracteres para este campo", "Advertencia", JOptionPane.WARNING_MESSAGE);
+        if (txtDireccionS.getText().length() > 20) {
+            JOptionPane.showMessageDialog(null, "El máximo es de 20 caracteres para este campo", "Advertencia", JOptionPane.WARNING_MESSAGE);
             evt.consume();
         } else if (txtDireccionS.getText().length() > 0) {
             if (!txtDireccionS.getText().matches("^(?!.*([A-Za-zñÑáéíóúÁÉÍÓÚ\\s])\\1{2})[A-Za-zñÑáéíóúÁÉÍÓÚ\\s0-9]+$")) {
+                JOptionPane.showMessageDialog(null, "No repitas caracteres de forma incorrecta", "Error", JOptionPane.ERROR_MESSAGE);
                 evt.consume();
             }
         }
@@ -802,6 +868,23 @@ public class Sucursales extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_BotonCajaSMouseClicked
 
+    private void reporteMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_reporteMouseClicked
+        JasperReport reporte;
+        HashMap hm = new HashMap();
+        hm.put("Usuario", usuario.getText());
+        
+        try {
+            Connection con = Conexion.getConexion();
+            reporte = JasperCompileManager.compileReport("src/Reportes/ReporteSucursal.jrxml");
+            JasperPrint jp = JasperFillManager.fillReport(reporte, hm, con);
+            JasperViewer.viewReport(jp, true);
+            ReportView view = new ReportView(jp, false);
+            view.setVisible(true);
+        } catch (JRException ex) {
+            Logger.getLogger(Clientes.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_reporteMouseClicked
+
     private void cargartabla() {
         DefaultTableModel modeloTabla = (DefaultTableModel) tablasucursal.getModel();
         modeloTabla.setRowCount(0);
@@ -810,6 +893,7 @@ public class Sucursales extends javax.swing.JFrame {
         ResultSet rs;
         ResultSetMetaData rsmd;
         int columnas;
+        String cargart = "CargarTabla";
 
         try {
             Connection con = Conexion.getConexion();
@@ -831,6 +915,7 @@ public class Sucursales extends javax.swing.JFrame {
 
             // JOptionPane.showMessageDialog(null, "Registro guardado");
         } catch (SQLException ex) {
+            lo.LogBitacora("Error: No se pudo cargar la tabla " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), sucursales,cargart);
             JOptionPane.showMessageDialog(null, ex.toString());
         }
     }
@@ -885,14 +970,16 @@ public class Sucursales extends javax.swing.JFrame {
     private javax.swing.JLabel botonSalirS;
     private javax.swing.ButtonGroup grupoBotonSucursal;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JLabel reporte;
     private javax.swing.JTable tablasucursal;
     private javax.swing.JTextField txtBuscarS;
     private javax.swing.JTextField txtDireccionS;
-    private javax.swing.JLabel txtEstadoS;
     private javax.swing.JLabel txtIdS;
     private javax.swing.JTextField txtNombreS;
     private javax.swing.JTextField txtTelefonoS;
+    private javax.swing.JLabel usuario;
     // End of variables declaration//GEN-END:variables
 
     private void Limpiar() {
@@ -920,16 +1007,17 @@ public class Sucursales extends javax.swing.JFrame {
 
         BotonActivoS.setVisible(Boolean.FALSE);
         BotonInactivoS.setVisible(Boolean.FALSE);
-        txtEstadoS.setVisible(Boolean.FALSE);
     }
 
     void buscarData(String valor) {
+        String buscar ="Buscar";
         String[] titulos = {"ID", "Nombre", "Ciudad", "Direccion", "Telefono", "Estado"};
         String[] registros = new String[13];
-        String sql = "SELECT Id_Sucursal,Nombre,Ciudad,Direccion, Telefono,estado\n"
-                + "FROM Sucursal \n"
-                + "WHERE CONCAT (Id_Sucursal, ' ', Nombre) LIKE '%" + valor + "%'\n"
-                + "ORDER BY Id_Sucursal";
+        String sql = "SELECT S.Id_Sucursal,S.Nombre,S.Ciudad,S.Direccion, S.Telefono,E.Estado\n"
+                + "FROM Sucursal as S\n"
+                + "Inner Join   Estado as E on S.Id_Estado=E.Id_Estado \n"
+                + "WHERE CONCAT (S.Id_Sucursal, ' ', S.Nombre) LIKE '%" + valor + "%'\n"
+                + "ORDER BY S.Id_Sucursal";
 
         DefaultTableModel model = new DefaultTableModel(null, titulos);
         Connection con = Conexion.getConexion();
@@ -945,7 +1033,7 @@ public class Sucursales extends javax.swing.JFrame {
                 registros[2] = rs.getString("Ciudad");
                 registros[3] = rs.getString("Direccion");
                 registros[4] = rs.getString("Telefono");
-                registros[5] = rs.getString("estado");
+                registros[5] = rs.getString("Estado");
 
                 model.addRow(registros);
             }
@@ -953,6 +1041,7 @@ public class Sucursales extends javax.swing.JFrame {
             tablasucursal.setModel(model);
             // anchoColumnas();
         } catch (SQLException ex) {
+            lo.LogBitacora("Error: No se pudo buscar el dato " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), sucursales, buscar);
             Logger.getLogger(Sucursales.class.getName()).log(Level.SEVERE, null, ex);
         }
     }

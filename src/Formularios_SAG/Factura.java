@@ -6,6 +6,7 @@
 package Formularios_SAG;
 
 import Conexion.Conexion;
+import Logs.log;
 import java.awt.Color;
 import java.awt.event.KeyEvent;
 import java.sql.Connection;
@@ -45,6 +46,8 @@ import net.sf.jasperreports.engine.JasperReport;
  */
 public class Factura extends javax.swing.JFrame {
 
+    log lo = new log();
+    String Factura = "Factura";
     String[] titulos = {"ID", "Restricción", "Verificación"};
     String[] registros = new String[13];
     boolean ColumnasEditables[] = {false, false, true};
@@ -75,7 +78,7 @@ public class Factura extends javax.swing.JFrame {
     public Factura() {
         initComponents();
         Ncaja.setText(Operaciones2.caja);
-        Usuario.setText(Operaciones2.Id_Empleado);
+        Usuario.setText(LoginVendedores.txtUsuarioV.getText());
 
         CargarTP ctp = new Factura.CargarTP();
         ComboTipoPago.setModel(ctp.getvalues());
@@ -90,6 +93,7 @@ public class Factura extends javax.swing.JFrame {
         cargarCAI();
         txtAgregarNombre.setText("Consumidor Final");
         Date min = new Date();
+        Fecha.setDateFormatString("dd-MM-yyyy");
         Fecha.setSelectableDateRange(min, min);
         Fecha.setDate(min);
         Calendar Cal = Calendar.getInstance();
@@ -178,7 +182,7 @@ public class Factura extends javax.swing.JFrame {
                 txtTotalaPagarPMousePressed(evt);
             }
         });
-        getContentPane().add(txtTotalaPagarP, new org.netbeans.lib.awtextra.AbsoluteConstraints(840, 665, 140, 30));
+        getContentPane().add(txtTotalaPagarP, new org.netbeans.lib.awtextra.AbsoluteConstraints(850, 660, 140, 30));
 
         txtISVP.setFont(new java.awt.Font("Georgia", 0, 14)); // NOI18N
         txtISVP.setForeground(new java.awt.Color(153, 153, 153));
@@ -198,7 +202,12 @@ public class Factura extends javax.swing.JFrame {
                 txtISVPMousePressed(evt);
             }
         });
-        getContentPane().add(txtISVP, new org.netbeans.lib.awtextra.AbsoluteConstraints(840, 624, 140, 30));
+        txtISVP.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtISVPActionPerformed(evt);
+            }
+        });
+        getContentPane().add(txtISVP, new org.netbeans.lib.awtextra.AbsoluteConstraints(850, 630, 130, 30));
 
         txtDescP.setFont(new java.awt.Font("Georgia", 0, 14)); // NOI18N
         txtDescP.setForeground(new java.awt.Color(153, 153, 153));
@@ -223,7 +232,7 @@ public class Factura extends javax.swing.JFrame {
                 txtDescPActionPerformed(evt);
             }
         });
-        getContentPane().add(txtDescP, new org.netbeans.lib.awtextra.AbsoluteConstraints(590, 664, 140, 30));
+        getContentPane().add(txtDescP, new org.netbeans.lib.awtextra.AbsoluteConstraints(600, 660, 140, 30));
 
         Ncaja.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
         getContentPane().add(Ncaja, new org.netbeans.lib.awtextra.AbsoluteConstraints(700, 110, 100, 20));
@@ -246,7 +255,7 @@ public class Factura extends javax.swing.JFrame {
                 txtSubTotalPMousePressed(evt);
             }
         });
-        getContentPane().add(txtSubTotalP, new org.netbeans.lib.awtextra.AbsoluteConstraints(610, 630, 120, 30));
+        getContentPane().add(txtSubTotalP, new org.netbeans.lib.awtextra.AbsoluteConstraints(600, 630, 120, 30));
 
         txtBuscarP.setFont(new java.awt.Font("Georgia", 0, 14)); // NOI18N
         txtBuscarP.setForeground(new java.awt.Color(153, 153, 153));
@@ -420,6 +429,13 @@ public class Factura extends javax.swing.JFrame {
         });
         getContentPane().add(txtCantidadP, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 430, 180, 30));
         getContentPane().add(BotonEliminarP, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 330, 120, 30));
+
+        Botongenerar.setEnabled(false);
+        Botongenerar.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                BotongenerarMouseClicked(evt);
+            }
+        });
         getContentPane().add(Botongenerar, new org.netbeans.lib.awtextra.AbsoluteConstraints(850, 330, 120, 30));
 
         BotonAgregarP.setEnabled(false);
@@ -479,7 +495,7 @@ public class Factura extends javax.swing.JFrame {
                 txtNumeroFacturaKeyPressed(evt);
             }
         });
-        getContentPane().add(txtNumeroFactura, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 255, 190, 30));
+        getContentPane().add(txtNumeroFactura, new org.netbeans.lib.awtextra.AbsoluteConstraints(560, 250, 190, 30));
 
         ComboTipoPago.setForeground(new java.awt.Color(153, 153, 153));
         ComboTipoPago.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Seleccione Tipo de Pago" }));
@@ -558,7 +574,7 @@ public class Factura extends javax.swing.JFrame {
                 txtAgregarNombreActionPerformed(evt);
             }
         });
-        getContentPane().add(txtAgregarNombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(535, 150, 211, 25));
+        getContentPane().add(txtAgregarNombre, new org.netbeans.lib.awtextra.AbsoluteConstraints(540, 150, 211, 25));
 
         txtBuscarC.setFont(new java.awt.Font("Georgia", 0, 14)); // NOI18N
         txtBuscarC.setForeground(new java.awt.Color(153, 153, 153));
@@ -864,24 +880,28 @@ public class Factura extends javax.swing.JFrame {
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
-    void verificarDatosExistentes(String campo, String columna, String tabla, String mensaje) {
-        Conexion cc = new Conexion();
-        Connection cn = cc.getConexion();
-        String sql = "SELECT " + columna + " FROM " + tabla + " WHERE " + columna + " = '" + campo + "'";
-
-        try {
-            Statement st = cn.createStatement();
-            ResultSet rs = st.executeQuery(sql);
-
-            if (rs.next()) {
-                if (rs.getString(columna).equals(campo)) {
-                    JOptionPane.showMessageDialog(null, mensaje, "Error", JOptionPane.ERROR_MESSAGE);
-                }
-            }
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(null, "No se pudo verificar\n" + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
-        }
-    }
+//    public boolean verificarDatosExistentes(String campo, String columna, String tabla, String mensaje) {
+//
+//        Conexion cc = new Conexion();
+//        Connection cn = cc.getConexion();
+//        boolean resultado = true;
+//        String sql = "SELECT " + columna + " FROM " + tabla + " WHERE " + columna + " = '" + campo + "'";
+//
+//        try {
+//            Statement st = cn.createStatement();
+//            ResultSet rs = st.executeQuery(sql);
+//
+//            if (rs.next()) {
+//                if (rs.getString(columna).equals(campo)) {
+//                    JOptionPane.showMessageDialog(null, mensaje, "Error", JOptionPane.ERROR_MESSAGE);
+//                    resultado = false;
+//                }
+//            }
+//        } catch (Exception e) {
+//            JOptionPane.showMessageDialog(null, "No se pudo verificar\n" + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
+//        }
+//        return resultado;
+//    }
     private void txtHoraFActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtHoraFActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txtHoraFActionPerformed
@@ -926,6 +946,7 @@ public class Factura extends javax.swing.JFrame {
     }//GEN-LAST:event_txtHoraFFocusGained
 
     private void txtHoraFFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtHoraFFocusLost
+
         if (txtHoraF.getText().equals("")) {
             txtHoraF.setText("Ingrese Hora");
             txtHoraF.setForeground(new Color(153, 153, 153));
@@ -983,7 +1004,7 @@ public class Factura extends javax.swing.JFrame {
     }//GEN-LAST:event_txtDescuentoFocusLost
 
     private void txtNumeroFacturaFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtNumeroFacturaFocusGained
-        if (txtNumeroFactura.getText().equals("Ingrese Nombre Producto")) {
+        if (txtNumeroFactura.getText().equals("Ingrese Número Factura")) {
             txtNumeroFactura.setText("");
             txtNumeroFactura.setForeground(new Color(0, 0, 0));
         }
@@ -991,7 +1012,7 @@ public class Factura extends javax.swing.JFrame {
 
     private void txtNumeroFacturaFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtNumeroFacturaFocusLost
         if (txtNumeroFactura.getText().equals("")) {
-            txtNumeroFactura.setText("Ingrese Descripción Producto");
+            txtNumeroFactura.setText("Ingrese Número Factura");
             txtNumeroFactura.setForeground(new Color(153, 153, 153));
         }
     }//GEN-LAST:event_txtNumeroFacturaFocusLost
@@ -1330,6 +1351,7 @@ public class Factura extends javax.swing.JFrame {
     }//GEN-LAST:event_ComboProductoMousePressed
 
     private void ComboProductoItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_ComboProductoItemStateChanged
+        String combop = "ComboProducto";
         ObtenerIdProd();
 
         //Connection con = Conexion.getConexion();
@@ -1362,6 +1384,8 @@ public class Factura extends javax.swing.JFrame {
             txtCantidadP.setEnabled(Boolean.TRUE);
 
         } catch (SQLException ex) {
+            lo.LogBitacora("Error: No se cargar producto " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), Factura,combop);
+
             JOptionPane.showMessageDialog(null, ex.toString());
         }
         llenar_tabla();
@@ -1382,11 +1406,11 @@ public class Factura extends javax.swing.JFrame {
     }//GEN-LAST:event_buscarCMouseClicked
 
     private void BotonRegresarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonRegresarMouseClicked
-        java.awt.EventQueue.invokeLater(new Runnable() {
+        /* java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new MenuPrincipal().setVisible(true);
+                new Factura().setVisible(false);
             }
-        });
+        });*/
         this.dispose();
     }//GEN-LAST:event_BotonRegresarMouseClicked
 
@@ -1402,6 +1426,7 @@ public class Factura extends javax.swing.JFrame {
     }//GEN-LAST:event_txtNumeroFacturaMousePressed
 
     private void BotonGuardarFMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonGuardarFMouseClicked
+        String Guardar = "Guardar";
         if (ComboTipoPago.equals("Seleccione Tipo de Pago...")) {
             JOptionPane.showMessageDialog(null, "Seleccione tipo de pago");
 
@@ -1419,11 +1444,11 @@ public class Factura extends javax.swing.JFrame {
                 ps.setString(2, FechaCom);
                 ps.setString(3, Hora);
                 ps.setString(4, factura);
-                ps.setInt(5, 2);
+                ps.setInt(5, Integer.parseInt(Operaciones2.Id_Empleado));
                 ps.setInt(6, ComboTipoPago.getSelectedIndex());
                 ps.setInt(7, idcai);
                 ps.setString(8, tarjeta);
-                ps.setString(9, String.valueOf(monto));
+                ps.setString(10, String.valueOf(monto));
                 ps.executeUpdate();
 
                 JOptionPane.showMessageDialog(null, "Registro guardado");
@@ -1434,8 +1459,11 @@ public class Factura extends javax.swing.JFrame {
                 ComboDescuentoF.setEnabled(Boolean.TRUE);
                 ComboProducto.setEnabled(Boolean.TRUE);
                 BotonAgregarP.setEnabled(Boolean.TRUE);
+                Botongenerar.setEnabled(Boolean.TRUE);
 
             } catch (SQLException ex) {
+                lo.LogBitacora("Error: No se pudo guardar la factura" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), Factura, Guardar);
+
                 JOptionPane.showMessageDialog(null, ex.toString());
             }
         }
@@ -1447,17 +1475,15 @@ public class Factura extends javax.swing.JFrame {
 
     private void btncalimpuestoMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_btncalimpuestoMouseClicked
 
-       
-        
-        if (txtCantidadP.getText().equals("Ingrese Cantidad")){
-             JOptionPane.showMessageDialog(null, "Debe ingresar cantidad de producto para calcular impuesto", "Error", JOptionPane.ERROR_MESSAGE);
-            
+        if (txtCantidadP.getText().equals("Ingrese Cantidad")) {
+            JOptionPane.showMessageDialog(null, "Debe ingresar cantidad de producto para calcular impuesto", "Error", JOptionPane.ERROR_MESSAGE);
+
         } else {
             Double Cantidad = Double.parseDouble(txtCantidadP.getText());
             Double precio = Double.parseDouble(txtPrecioUnitario.getText());
             Double impuesto = Double.parseDouble(txtporimpuesto.getText());
             Double valor = (Cantidad * precio) * impuesto;
-            txtImpuesto.setText(new DecimalFormat("####.##").format(valor));
+            txtImpuesto.setText(new DecimalFormat("####.00").format(valor));
         }
     }//GEN-LAST:event_btncalimpuestoMouseClicked
 
@@ -1470,7 +1496,7 @@ public class Factura extends javax.swing.JFrame {
             Double precio = Double.parseDouble(txtPrecioUnitario.getText());
             Double Descuento = Double.parseDouble(txtpordesc.getText());
             Double valor = (Cantidad * precio) * Descuento;
-            txtDescuentoP.setText(new DecimalFormat("####.##").format(valor));
+            txtDescuentoP.setText(new DecimalFormat("####.00").format(valor));
         }
     }//GEN-LAST:event_btncaldescuentoMouseClicked
 
@@ -1497,6 +1523,7 @@ public class Factura extends javax.swing.JFrame {
     }//GEN-LAST:event_txtCantidadPKeyReleased
 
     private void BotonAgregarPMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonAgregarPMouseClicked
+        String Agregar = "Agregar";
         cargarFact();
         if (agrega == true) {
 
@@ -1525,8 +1552,7 @@ public class Factura extends javax.swing.JFrame {
 
                     JOptionPane.showMessageDialog(null, "Registro guardado");
 
-                   // txtNumeroFactura.setText(factura);
-
+                    // txtNumeroFactura.setText(factura);
                     CARGARtp();
                     ComboDescuentoF.setEnabled(Boolean.TRUE);
                     ComboTipoPago.setEnabled(Boolean.TRUE);
@@ -1535,6 +1561,8 @@ public class Factura extends javax.swing.JFrame {
                     ObtenerTotales();
 
                 } catch (SQLException ex) {
+                    lo.LogBitacora("Error: No se pudo agregar datos" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), Factura, Agregar);
+
                     JOptionPane.showMessageDialog(null, ex.toString());
                 }
             }
@@ -1564,7 +1592,7 @@ public class Factura extends javax.swing.JFrame {
                     Double Obtener = Double.parseDouble(txtSubTotalP.getText());
 
                     Descuentos = Obtener * descuentar;
-                    txtDescuento.setText(new DecimalFormat("####.##").format(Descuentos));
+                    txtDescuento.setText(new DecimalFormat("####.00").format(Descuentos));
                 } else {
                     JOptionPane.showMessageDialog(this, "El cliente no aplica al descuento de la tercera edad/n Tercera edad a partir de los 60 años", "SAG", JOptionPane.INFORMATION_MESSAGE);
                 }
@@ -1573,13 +1601,14 @@ public class Factura extends javax.swing.JFrame {
                 Double Obtener = Double.parseDouble(txtSubTotalP.getText());
 
                 Descuentos = Obtener * descuentar;
-                txtDescuento.setText(new DecimalFormat("####.##").format(Descuentos));
+                txtDescuento.setText(new DecimalFormat("####.00").format(Descuentos));
             }
         }
 
     }//GEN-LAST:event_btnDescuentoTMouseClicked
 
     private void aplicardescuentoMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_aplicardescuentoMouseClicked
+        String aplicard = "AplicarDescuento";
         if (ComboProducto.equals("Seleccione Tipo de Pago...")) {
             JOptionPane.showMessageDialog(null, "Seleccione tipo de pago");
 
@@ -1606,11 +1635,12 @@ public class Factura extends javax.swing.JFrame {
                 //ComboDescuentoF.setVisible(Boolean.TRUE);
                 //txtSubTotalP.setText(Subtotal.toString());
                 descuentito = Descuento + desc;
-                txtDescP.setText(new DecimalFormat("####.##").format(descuentito));
+                txtDescP.setText(new DecimalFormat("####.00").format(descuentito));
                 //txtISVP.setText(Impuesto.toString());
                 Total = ((Subtotal - (this.Descuento + desc)) + Impuesto);
-                txtTotalaPagarP.setText(new DecimalFormat("####.##").format(Total));
+                txtTotalaPagarP.setText(new DecimalFormat("####.00").format(Total));
             } catch (SQLException ex) {
+                lo.LogBitacora("Error: No se pudo aplicar el descuento" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), Factura, aplicard);
                 JOptionPane.showMessageDialog(null, ex.toString());
             }
         }
@@ -1731,6 +1761,7 @@ public class Factura extends javax.swing.JFrame {
                 monto = Double.parseDouble(Mon);
             }
         }
+
     }//GEN-LAST:event_ComboTipoPagoItemStateChanged
 
     private void ComboTipoPagoMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_ComboTipoPagoMouseClicked
@@ -1746,7 +1777,7 @@ public class Factura extends javax.swing.JFrame {
     }//GEN-LAST:event_BotonGuardarFMousePressed
 
     private void BotonEditarFMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonEditarFMouseClicked
-
+        String bE = "BtnE";
         try {
             Connection con = Conexion.getConexion();
             PreparedStatement ps = con.prepareStatement("Update Factura set Id_Cliente=?, Id_Tipo_Pago=?, Num_Tarjeta=?, montotarjeta=? where Id_Factura=?");
@@ -1759,10 +1790,25 @@ public class Factura extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, "Registro Actualizado");
 
         } catch (SQLException ex) {
+            lo.LogBitacora("Error: No se pudo editar" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), Factura, bE);
             JOptionPane.showMessageDialog(null, ex.toString());
         }
 
     }//GEN-LAST:event_BotonEditarFMouseClicked
+
+    private void txtISVPActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtISVPActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtISVPActionPerformed
+
+    private void BotongenerarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotongenerarMouseClicked
+        ReporteFactura RP = new ReporteFactura();
+        {
+            RP.setVisible(true);
+            //dispose();
+
+        }
+
+    }//GEN-LAST:event_BotongenerarMouseClicked
 
     /**
      * @param args the command line arguments
@@ -1809,46 +1855,47 @@ public class Factura extends javax.swing.JFrame {
     private javax.swing.JLabel BotonRegresar;
     private javax.swing.JLabel Botongenerar;
     private javax.swing.JComboBox<String> ComboDescuentoF;
-    private javax.swing.JComboBox<String> ComboProducto;
-    private javax.swing.JComboBox<String> ComboTipoPago;
-    private com.toedter.calendar.JDateChooser Fecha;
+    public static javax.swing.JComboBox<String> ComboProducto;
+    public static javax.swing.JComboBox<String> ComboTipoPago;
+    public static com.toedter.calendar.JDateChooser Fecha;
     private javax.swing.JLabel Ncaja;
-    private javax.swing.JLabel Usuario;
+    public static javax.swing.JLabel Usuario;
     private javax.swing.JLabel aplicardescuento;
     private javax.swing.JLabel btnDescuentoT;
     private javax.swing.JLabel btncaldescuento;
     private javax.swing.JLabel btncalimpuesto;
     private javax.swing.JLabel buscarC;
     private javax.swing.JLabel idDescuento;
-    private javax.swing.JLabel idFactura;
+    public static javax.swing.JLabel idFactura;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTable tablacompra;
     private javax.swing.JTable tabladetalle;
-    private javax.swing.JTextField txtAgregarNombre;
-    private javax.swing.JTextField txtBuscarC;
+    public static javax.swing.JTextField txtAgregarNombre;
+    public static javax.swing.JTextField txtBuscarC;
     private javax.swing.JTextField txtBuscarP;
-    private javax.swing.JTextField txtCaiF;
+    public static javax.swing.JTextField txtCaiF;
     private javax.swing.JTextField txtCantidadP;
-    private javax.swing.JTextField txtDescP;
+    public static javax.swing.JTextField txtDescP;
     private javax.swing.JTextField txtDescuento;
     private javax.swing.JTextField txtDescuentoP;
-    private javax.swing.JTextField txtHoraF;
-    private javax.swing.JTextField txtISVP;
+    public static javax.swing.JTextField txtHoraF;
+    public static javax.swing.JTextField txtISVP;
     private javax.swing.JLabel txtIdProducto;
     private javax.swing.JTextField txtImpuesto;
-    private javax.swing.JTextField txtNumeroFactura;
+    public static javax.swing.JTextField txtNumeroFactura;
     private javax.swing.JTextField txtPrecioUnitario;
     private javax.swing.JTextField txtStockP;
-    private javax.swing.JTextField txtSubTotalP;
-    private javax.swing.JTextField txtTotalaPagarP;
+    public static javax.swing.JTextField txtSubTotalP;
+    public static javax.swing.JTextField txtTotalaPagarP;
     private javax.swing.JTextField txtpordesc;
     private javax.swing.JTextField txtporimpuesto;
     // End of variables declaration//GEN-END:variables
 
     private void buscarIDCliente(String cliente) {
+        String buscarc = "BuscarIDCliente";
         cliente = txtBuscarC.getText();
         try {
             ResultSet rs;
@@ -1874,12 +1921,15 @@ public class Factura extends javax.swing.JFrame {
 
             System.out.println(txtAgregarNombre.getText() + " " + idcliente);
         } catch (Exception e) {
+            lo.LogBitacora("Error: No se pudo buscar el id cliente" + "Excepción: " + e + ". Origen: " + this.getClass().getSimpleName(), factura, buscarc);
+
             System.out.println(e);
         }
 
     }
 
     public void ObtenerIdProd() {
+        String obtnp ="Obtener Producto";
         String Nombre = ComboProducto.getSelectedItem().toString();
         try {
             ResultSet rs;
@@ -1893,11 +1943,13 @@ public class Factura extends javax.swing.JFrame {
             }
 
         } catch (SQLException ex) {
+             lo.LogBitacora("Error: No se pudo obtener el id del producto" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), factura,obtnp );
             JOptionPane.showMessageDialog(null, ex.toString());
         }
     }
 
     public void ObtenerIdDesc() {
+        String obtd ="obtenerDescuento";
         String Nombre = ComboDescuentoF.getSelectedItem().toString();
         try {
             ResultSet rs;
@@ -1916,11 +1968,13 @@ public class Factura extends javax.swing.JFrame {
             }
 
         } catch (SQLException ex) {
+             lo.LogBitacora("Error: No se pudo obtener  el descuento" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), factura,obtd );
             JOptionPane.showMessageDialog(null, ex.toString());
         }
     }
 
     public void cargarFact() {
+        String cargarf = "CargarFactura";
         String Factura = txtNumeroFactura.getText();
         try {
             ResultSet rs;
@@ -1935,6 +1989,8 @@ public class Factura extends javax.swing.JFrame {
             }
 
         } catch (SQLException ex) {
+            lo.LogBitacora("Error: No se cargar la factura" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), factura, cargarf);
+
             JOptionPane.showMessageDialog(null, ex.toString());
         }
     }
@@ -1942,6 +1998,7 @@ public class Factura extends javax.swing.JFrame {
     public class CargarProductor {
 
         public DefaultComboBoxModel getvalues() {
+            String cargarpro = "CargarProducto";
             //int Prove = Integer.parseInt(txtIdProv.getText());
             DefaultComboBoxModel modelo = new DefaultComboBoxModel();
             try {
@@ -1957,6 +2014,8 @@ public class Factura extends javax.swing.JFrame {
                 con.close();
                 rs.close();
             } catch (Exception e) {
+                lo.LogBitacora("Error: No se cargar producto" + "Excepción: " + e + ". Origen: " + this.getClass().getSimpleName(),factura,cargarpro);
+
                 System.out.println(e);
             }
             return modelo;
@@ -1971,6 +2030,7 @@ public class Factura extends javax.swing.JFrame {
         ResultSetMetaData rsmd;
         int columnas;
         int id = Integer.parseInt(idFactura.getText());
+        String cargartp="CargarTP";
         try {
             Connection con = Conexion.getConexion();
             ps = con.prepareStatement("Select DF.Id_Detalle_Factura, F.Num_Factura, P.Nombre_Producto,DF.Precio_Unitario,DF.Cantidad,DF.Impuesto,DF.Descuento\n"
@@ -1993,13 +2053,15 @@ public class Factura extends javax.swing.JFrame {
             }
 
         } catch (SQLException ex) {
+          lo.LogBitacora("Error: No se pudo cargar " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(),factura, cargartp);
+
             JOptionPane.showMessageDialog(null, ex.toString());
         }
     }
 
     public void llenar_tabla() {
         model.setRowCount(0);
-
+        String llenart = "llenarTabla";
         PreparedStatement ps;
         ResultSet rs;
         ResultSetMetaData rsmd;
@@ -2045,6 +2107,7 @@ public class Factura extends javax.swing.JFrame {
             }
 
         } catch (SQLException ex) {
+            lo.LogBitacora("Error: No se pudo llenar la tabla" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), factura, llenart);
             JOptionPane.showMessageDialog(null, ex.toString());
         }
     }
@@ -2080,6 +2143,7 @@ public class Factura extends javax.swing.JFrame {
         }
     }*/
     public void cargarCAI() {
+        String cargarcai = "CargarCAI";
         try {
             ResultSet rs;
             Connection con = Conexion.getConexion();
@@ -2097,33 +2161,36 @@ public class Factura extends javax.swing.JFrame {
 
             System.out.println(factura + " " + idcai);
         } catch (Exception e) {
+            lo.LogBitacora("Error: No se pudo cargar el cai" + "Excepción: " + e + ". Origen: " + this.getClass().getSimpleName(), factura, cargarcai);
             System.out.println(e);
         }
     }
 
     public void ObtenerTotales() {
-
+        String obt = "obtenertotal";
         try {
             ResultSet rs;
             Connection con = Conexion.getConexion();
-            PreparedStatement ps = con.prepareStatement(" Select Sum(F.Precio_Unitario*F.Cantidad) AS SUBTOTAL, Sum(F.Impuesto) as Impuesto, Sum(f.Descuento) as Descuento, (Sum(F.Precio_Unitario*F.Cantidad)  + Sum(f.Descuento))-Sum(F.Impuesto) as Total\n"
+            PreparedStatement ps = con.prepareStatement(" Select Sum(F.Precio_Unitario*F.Cantidad) AS SUBTOTAL, Sum(F.Impuesto) as Impuesto, Sum(f.Descuento) as Descuento, (Sum(F.Precio_Unitario*F.Cantidad)  - Sum(f.Descuento))+Sum(F.Impuesto) as Total\n"
                     + "        From DetalleFactura as F \n"
                     + "      where F.Id_Factura=?");
             ps.setInt(1, Integer.parseInt(idFactura.getText()));
             rs = ps.executeQuery();
             while (rs.next()) {
-                txtSubTotalP.setText(rs.getString("SUBTOTAL"));
-                txtDescP.setText(rs.getString("Descuento"));
-                txtISVP.setText(rs.getString("Impuesto"));
+                txtSubTotalP.setText(new DecimalFormat("####.00").format(Double.parseDouble(rs.getString("SUBTOTAL"))));
+                txtDescP.setText(new DecimalFormat("####.00").format(Double.parseDouble(rs.getString("Descuento"))));
+                txtISVP.setText(new DecimalFormat("####.00").format(Double.parseDouble(rs.getString("Impuesto"))));
                 //Total = (Subtotal - this.Descuento) + Impuesto;
-                txtTotalaPagarP.setText(rs.getString("Total"));
+                txtTotalaPagarP.setText(new DecimalFormat("####.00").format(Double.parseDouble(rs.getString("Total"))));
             }
 
             con.close();
             rs.close();
 
-            System.out.println(factura + " " + idcai);
+            //System.out.println(factura + " " + idcai);
         } catch (Exception e) {
+
+            lo.LogBitacora("Error: No se pudo obtener el total" + "Excepción: " + e + ". Origen: " + this.getClass().getSimpleName(), factura, obt);
             System.out.println(e);
         }
     }
@@ -2133,6 +2200,7 @@ public class Factura extends javax.swing.JFrame {
         public DefaultComboBoxModel getvalues() {
             //int Prove = Integer.parseInt(txtIdProv.getText());
             DefaultComboBoxModel modelo = new DefaultComboBoxModel();
+            String cargartp = "CargarTipoPago";
             try {
                 ResultSet rs;
                 Connection con = Conexion.getConexion();
@@ -2146,6 +2214,7 @@ public class Factura extends javax.swing.JFrame {
                 con.close();
                 rs.close();
             } catch (Exception e) {
+                lo.LogBitacora("Error: No se pudo cargar el tipo de pago" + "Excepción: " + e + ". Origen: " + this.getClass().getSimpleName(), factura, cargartp);
                 System.out.println(e);
             }
             return modelo;
@@ -2155,7 +2224,7 @@ public class Factura extends javax.swing.JFrame {
     public class CargarTipoDescuento {
 
         public DefaultComboBoxModel getvalues() {
-
+            String cargari = "CargarImpuesto";
             DefaultComboBoxModel modelo = new DefaultComboBoxModel();
             try {
                 Connection con = Conexion.getConexion();
@@ -2172,6 +2241,7 @@ public class Factura extends javax.swing.JFrame {
                 con.close();
                 rs.close();
             } catch (Exception e) {
+                lo.LogBitacora("Error: No se pudo cargar impuesto" + "Excepción: " + e + ". Origen: " + this.getClass().getSimpleName(), factura, cargari);
                 System.out.println(e);
             }
             return modelo;
@@ -2181,6 +2251,7 @@ public class Factura extends javax.swing.JFrame {
     public class CargarTipoImpuesto {
 
         public DefaultComboBoxModel getvalues() {
+            String cargarti = "CargarTipoImpuesto";
 
             DefaultComboBoxModel modelo = new DefaultComboBoxModel();
             try {
@@ -2195,6 +2266,7 @@ public class Factura extends javax.swing.JFrame {
                 con.close();
                 rs.close();
             } catch (Exception e) {
+                lo.LogBitacora("Error: No se pudo cargar el impuesto" + "Excepción: " + e + ". Origen: " + this.getClass().getSimpleName(), factura, cargarti);
                 System.out.println(e);
             }
             return modelo;
@@ -2215,4 +2287,5 @@ public class Factura extends javax.swing.JFrame {
         }
         return bandera;
     }
+
 }

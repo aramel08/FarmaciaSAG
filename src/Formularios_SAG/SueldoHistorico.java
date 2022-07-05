@@ -6,6 +6,7 @@
 package Formularios_SAG;
 
 import Conexion.Conexion;
+import Logs.log;
 import java.awt.Color;
 import java.awt.Image;
 import java.awt.Toolkit;
@@ -35,15 +36,14 @@ public class SueldoHistorico extends javax.swing.JFrame {
     /**
      * Creates new form SueldoHistorico
      */
-    
-    
-       
+    log lo = new log();
+    String sueldoh = "SueldoHistorico";
+
     @Override
     public Image getIconImage() {
         Image retValue = Toolkit.getDefaultToolkit().getImage(ClassLoader.getSystemResource("componentes/LOGOSAG(2).png"));
         return retValue;
     }
- 
 
     public SueldoHistorico() {
         initComponents();
@@ -158,7 +158,7 @@ public class SueldoHistorico extends javax.swing.JFrame {
                 BotonRegresarSHMouseClicked(evt);
             }
         });
-        getContentPane().add(BotonRegresarSH, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 50, 130, 50));
+        getContentPane().add(BotonRegresarSH, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 40, 130, 40));
 
         txtSueldoSH.setFont(new java.awt.Font("Georgia", 0, 14)); // NOI18N
         txtSueldoSH.setForeground(new java.awt.Color(153, 153, 153));
@@ -346,7 +346,6 @@ public class SueldoHistorico extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_txtBuscarSHFocusLost
 
-  
 
     private void txtSueldoSHActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtSueldoSHActionPerformed
         // TODO add your handling code here:
@@ -355,7 +354,7 @@ public class SueldoHistorico extends javax.swing.JFrame {
     private void BotonRegresarSHMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonRegresarSHMouseClicked
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new Empleados().setVisible(true);
+                new Empleados1().setVisible(true);
             }
         });
         this.dispose();
@@ -377,6 +376,7 @@ public class SueldoHistorico extends javax.swing.JFrame {
     }//GEN-LAST:event_txtBuscarSHKeyPressed
 
     private void TablaSueldoHistoricoMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_TablaSueldoHistoricoMouseClicked
+        String tablasl = "TablaSueldoHistorico";
         try {
             int fila = TablaSueldoHistorico.getSelectedRow();
             int id = Integer.parseInt(TablaSueldoHistorico.getValueAt(fila, 0).toString());
@@ -406,12 +406,14 @@ public class SueldoHistorico extends javax.swing.JFrame {
 
             Habillitar();
         } catch (SQLException ex) {
+            lo.LogBitacora("Error: No se pudo seleccionar el dato " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), sueldoh, tablasl);
             JOptionPane.showMessageDialog(null, ex.toString());
         }
 
     }//GEN-LAST:event_TablaSueldoHistoricoMouseClicked
 
     private void BotonEditarSHMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonEditarSHMouseClicked
+        String editar = "BtnEditar";
         if (txtEmpleadoSH.getText().equals("Ingrese Nombre Empleado") || txtSueldoSH.getText().equals("Ingrese Sueldo")) {
             JOptionPane.showMessageDialog(null, "No se puede Guardar datos vacios");
         } else {
@@ -424,7 +426,7 @@ public class SueldoHistorico extends javax.swing.JFrame {
 
             try {
                 Connection con = Conexion.getConexion();
-                PreparedStatement ps = con.prepareStatement("Update Sueldo_Historico set  Fecha_Inicio=?,Fecha_Finalizacion=?,Sueldo=? Where Id_Sueldo_Historico=?");
+                PreparedStatement ps = con.prepareStatement("Update Sueldo_Historico set  Fecha_Inicio=,Fecha_Finalizacion=?,Sueldo=? Where Id_Sueldo_Historico=?");
                 ps.setString(1, FechaI);
                 ps.setString(2, FechaF);
                 ps.setString(3, Sueldo);
@@ -437,6 +439,7 @@ public class SueldoHistorico extends javax.swing.JFrame {
                 // Inhabillitar();
 
             } catch (SQLException ex) {
+                lo.LogBitacora("Error: No se pudo editar el dato " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), sueldoh, editar);
                 JOptionPane.showMessageDialog(null, ex.toString());
 
             }
@@ -446,6 +449,7 @@ public class SueldoHistorico extends javax.swing.JFrame {
     }//GEN-LAST:event_BotonEditarSHMouseClicked
 
     private void BotonGuardarSHMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonGuardarSHMouseClicked
+        String guardar = "BtGuardar";
         if (txtEmpleadoSH.getText().equals("Ingrese Nombre Empleado") || txtFechaInicioSH.getText().equals("") || txtFechaFinalSH.getText().equals("")
                 || txtSueldoSH.getText().equals("Ingrese Sueldo")) {
             JOptionPane.showMessageDialog(null, "No se puede Guardar datos vacios");
@@ -470,6 +474,7 @@ public class SueldoHistorico extends javax.swing.JFrame {
                 cargartabla();
                 Limpiar();
             } catch (SQLException ex) {
+                lo.LogBitacora("Error: No se pudo guardar el dato " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), sueldoh, guardar);
                 JOptionPane.showMessageDialog(null, ex.toString());
             }
         }
@@ -503,32 +508,6 @@ public class SueldoHistorico extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_txtBuscarSHKeyTyped
 
-    private void txtCargarEmpleadoMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txtCargarEmpleadoMouseClicked
-
-        //System.out.println(txtCargarEmpleado.getSelectedIndex());
-    }//GEN-LAST:event_txtCargarEmpleadoMouseClicked
-
-    private void txtCargarEmpleadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtCargarEmpleadoActionPerformed
-        PreparedStatement ps;
-        ResultSet rs;
-        String Nombre = txtCargarEmpleado.getSelectedItem().toString();
-        try {
-            txtIdEmpleado.setText(Empleados.Id_emp);
-
-            Connection con = Conexion.getConexion();
-            ps = con.prepareStatement("Select  Id_Empleado from Empleados where NombreE=?");
-            ps.setString(1, Nombre);
-            rs = ps.executeQuery();
-            while (rs.next()) {
-                txtIdEmpleado.setText(rs.getString("Id_Empleado"));
-            }
-            buscarData(Integer.parseInt(txtIdEmpleado.getText()));
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(null, ex.toString());
-        }
-
-    }//GEN-LAST:event_txtCargarEmpleadoActionPerformed
-
     private void txtEmpleadoSHMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txtEmpleadoSHMousePressed
 
     }//GEN-LAST:event_txtEmpleadoSHMousePressed
@@ -542,7 +521,7 @@ public class SueldoHistorico extends javax.swing.JFrame {
     }//GEN-LAST:event_txtSueldoSHMousePressed
 
     private void txtSueldoSHKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtSueldoSHKeyTyped
-      validarNumeros(evt);
+        validarNumeros(evt);
         if (txtSueldoSH.getText().length() > 7) {
             evt.consume();
         }
@@ -556,7 +535,7 @@ public class SueldoHistorico extends javax.swing.JFrame {
     }//GEN-LAST:event_txtFechaInicioSHFocusGained
 
     private void txtFechaInicioSHFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtFechaInicioSHFocusLost
-         if (txtFechaInicioSH.getText().equals("")) {
+        if (txtFechaInicioSH.getText().equals("")) {
             txtFechaInicioSH.setText("Ingrese Fecha Inicio");
             txtFechaInicioSH.setForeground(new Color(153, 153, 153));
         }
@@ -576,14 +555,41 @@ public class SueldoHistorico extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_txtFechaFinalSHFocusLost
 
-   public void validarNumeros(java.awt.event.KeyEvent e) {
+    private void txtCargarEmpleadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtCargarEmpleadoActionPerformed
+        PreparedStatement ps;
+        ResultSet rs;
+        String Nombre = txtCargarEmpleado.getSelectedItem().toString();
+        String cargare = "cargarEmpleado";
+        try {
+            txtIdEmpleado.setText(Empleados.Id_emp);
+
+            Connection con = Conexion.getConexion();
+            ps = con.prepareStatement("Select  Id_Empleado from Empleados where NombreE=?");
+            ps.setString(1, Nombre);
+            rs = ps.executeQuery();
+            while (rs.next()) {
+                txtIdEmpleado.setText(rs.getString("Id_Empleado"));
+            }
+            buscarData(Integer.parseInt(txtIdEmpleado.getText()));
+        } catch (SQLException ex) {
+            lo.LogBitacora("Error: No se pudo cargar el empleado " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), sueldoh, cargare);
+            JOptionPane.showMessageDialog(null, ex.toString());
+        }
+    }//GEN-LAST:event_txtCargarEmpleadoActionPerformed
+
+    private void txtCargarEmpleadoMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txtCargarEmpleadoMouseClicked
+
+        //System.out.println(txtCargarEmpleado.getSelectedIndex());
+    }//GEN-LAST:event_txtCargarEmpleadoMouseClicked
+
+    public void validarNumeros(java.awt.event.KeyEvent e) {
         if (e.getKeyChar() >= 33 && e.getKeyChar() <= 47
                 || e.getKeyChar() >= 58 && e.getKeyChar() <= 238) {
             e.consume();
             JOptionPane.showMessageDialog(null, "Este campo solo admite números", "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
-  
+
     /**
      * @param args the command line arguments
      */
@@ -676,9 +682,10 @@ public class SueldoHistorico extends javax.swing.JFrame {
     }
 
     private void buscarData(int valor) {
+        String buscar = "Buscar";
         String[] titulos = {"ID Sueldo", "Nombre Empleado", "Fecha Inicio", "Fecha Final", "Sueldo"};
         String[] registros = new String[13];
-        String sql = "Select SH.Id_Sueldo_Historico, E.NombreE, SH.Fecha_Inicio,SH.Fecha_Finalizacion,SH.Sueldo\n"
+        String sql = "Select .Id_Sueldo_Historico, E.NombreE, SH.Fecha_Inicio,SH.Fecha_Finalizacion,SH.Sueldo\n"
                 + "FROM Sueldo_Historico AS SH \n"
                 + "INNER JOIN Empleados AS E ON SH.Id_Empleado = E.Id_Empleado\n"
                 + "WHERE E.Id_Empleado=" + valor + "\n"
@@ -705,6 +712,7 @@ public class SueldoHistorico extends javax.swing.JFrame {
             TablaSueldoHistorico.setModel(model);
             // anchoColumnas();
         } catch (SQLException ex) {
+            lo.LogBitacora("Error: No se pudo buscar el dato " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), sueldoh, buscar);
             Logger.getLogger(Clientes.class.getName()).log(Level.SEVERE, null, ex);
         }
 
@@ -718,6 +726,7 @@ public class SueldoHistorico extends javax.swing.JFrame {
         ResultSet rs;
         ResultSetMetaData rsmd;
         int columnas;
+        String cargart="cargarTabla";
 
         try {
             Connection con = Conexion.getConexion();
@@ -738,6 +747,7 @@ public class SueldoHistorico extends javax.swing.JFrame {
             }
 
         } catch (SQLException ex) {
+              lo.LogBitacora("Error: No se pudo cargar la tabla " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(),sueldoh,cargart);
             JOptionPane.showMessageDialog(null, ex.toString());
         }
 
@@ -748,6 +758,7 @@ public class SueldoHistorico extends javax.swing.JFrame {
         int tener = txtCargarEmpleado.getSelectedIndex();
         PreparedStatement ps;
         ResultSet rs;
+        String nombre ="cargarNombre";
 
         try {
             txtIdEmpleado.setText(Empleados.Id_emp);
@@ -761,6 +772,7 @@ public class SueldoHistorico extends javax.swing.JFrame {
                 txtEmpleadoSH.setText(rs.getString("NombreE"));
             }
         } catch (SQLException ex) {
+              lo.LogBitacora("Error: No se pudo cargar el nombre " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(),sueldoh,nombre);
             JOptionPane.showMessageDialog(null, ex.toString());
         }
 
@@ -769,6 +781,7 @@ public class SueldoHistorico extends javax.swing.JFrame {
     public class CargaE {
 
         public DefaultComboBoxModel getvalues() {
+            String cargare ="CargarEmpleado";
 
             DefaultComboBoxModel modelo = new DefaultComboBoxModel();
             try {
@@ -783,6 +796,7 @@ public class SueldoHistorico extends javax.swing.JFrame {
                 con.close();
                 rs.close();
             } catch (Exception e) {
+                  lo.LogBitacora("Error: No se pudo cargar el empleado " + "Excepción: " + e + ". Origen: " + this.getClass().getSimpleName(),sueldoh,cargare);
                 System.out.println(e);
             }
             return modelo;
@@ -791,6 +805,7 @@ public class SueldoHistorico extends javax.swing.JFrame {
     }
 
     private void buscarDato(String valor) {
+        String buscard="BuscarDato";
         String[] titulos = {"ID Sueldo", "Nombre Empleado", "Fecha Inicio", "Fecha Final", "Sueldo"};
         String[] registros = new String[13];
         String sql = "Select SH.Id_Sueldo_Historico, E.NombreE, SH.Fecha_Inicio,SH.Fecha_Finalizacion,SH.Sueldo\n"
@@ -820,6 +835,7 @@ public class SueldoHistorico extends javax.swing.JFrame {
             TablaSueldoHistorico.setModel(model);
             // anchoColumnas();
         } catch (SQLException ex) {
+              lo.LogBitacora("Error: No se pudo buscar el dato " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(),sueldoh,buscard);
             Logger.getLogger(Clientes.class.getName()).log(Level.SEVERE, null, ex);
         }
 

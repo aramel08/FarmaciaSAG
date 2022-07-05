@@ -6,6 +6,9 @@
 package Formularios_SAG;
 
 import Conexion.Conexion;
+import Logs.log;
+import Reportes.ReportView;
+import java.awt.Color;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.sql.Connection;
@@ -16,14 +19,25 @@ import java.sql.SQLException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.view.JasperViewer;
 
 /**
  *
  * @author carba
  */
 public class PrecioHistoricoProducto extends javax.swing.JFrame {
+
+    log lo = new log();
+    String PrecioHistorico = "Precio historico producto";
 
     /**
      * Creates new form PrecioHistoricoProducto
@@ -33,15 +47,17 @@ public class PrecioHistoricoProducto extends javax.swing.JFrame {
         Image retValue = Toolkit.getDefaultToolkit().getImage(ClassLoader.getSystemResource("componentes/LOGOSAG(2).png"));
         return retValue;
     }
+
     public PrecioHistoricoProducto() {
         initComponents();
         txtId_Pro.setText(Productos.Id_Producto);
-        cargartabla();
+        usuario.setText(Login.txtUsuario.getText());
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DAY_OF_WEEK, +5);
         Date max = cal.getTime();
         Date min = new Date();
-        FechaFinalPH.setSelectableDateRange(min, max);
+        txtId_Pro.setVisible(Boolean.FALSE);
+        //FechaFinalPH.setSelectableDateRange(min, max);
     }
 
     /**
@@ -54,23 +70,18 @@ public class PrecioHistoricoProducto extends javax.swing.JFrame {
     private void initComponents() {
 
         buttonGroupPH = new javax.swing.ButtonGroup();
-        lbfechaentrega = new javax.swing.JLabel();
-        lbfechacompra = new javax.swing.JLabel();
         txtId_Pro = new javax.swing.JLabel();
         BotonRegresarPH = new javax.swing.JLabel();
         BotonAgregarPH = new javax.swing.JLabel();
-        BotonEditarPH = new javax.swing.JLabel();
         BotonCancelarPH = new javax.swing.JLabel();
         txtIdPH = new javax.swing.JLabel();
-        ComboIdProductoPH = new javax.swing.JComboBox<>();
-        txtPrecioPH = new javax.swing.JTextField();
         txtId_PrecioHistorico = new javax.swing.JLabel();
         txtBuscarPH = new javax.swing.JTextField();
+        ComboHistorico = new javax.swing.JComboBox<>();
         BotonGuardarPH = new javax.swing.JLabel();
-        FechaInicioPH = new com.toedter.calendar.JDateChooser();
-        FechaFinalPH = new com.toedter.calendar.JDateChooser();
-        BotonActivoPH = new javax.swing.JRadioButton();
-        BotonInactivoPH = new javax.swing.JRadioButton();
+        usuario = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        reporte = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         TablaPrecioHistorico = new javax.swing.JTable();
         jLabel2 = new javax.swing.JLabel();
@@ -79,23 +90,7 @@ public class PrecioHistoricoProducto extends javax.swing.JFrame {
         setIconImage(getIconImage());
         setUndecorated(true);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
-
-        lbfechaentrega.setBackground(new java.awt.Color(255, 255, 255));
-        lbfechaentrega.setFont(new java.awt.Font("Georgia", 0, 14)); // NOI18N
-        lbfechaentrega.setForeground(new java.awt.Color(153, 153, 153));
-        lbfechaentrega.setText("Fecha Finalización");
-        lbfechaentrega.setToolTipText("");
-        lbfechaentrega.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        getContentPane().add(lbfechaentrega, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 440, 150, 20));
-
-        lbfechacompra.setBackground(new java.awt.Color(255, 255, 255));
-        lbfechacompra.setFont(new java.awt.Font("Georgia", 0, 14)); // NOI18N
-        lbfechacompra.setForeground(new java.awt.Color(153, 153, 153));
-        lbfechacompra.setText("Fecha de Inicio");
-        lbfechacompra.setToolTipText("");
-        lbfechacompra.setCursor(new java.awt.Cursor(java.awt.Cursor.DEFAULT_CURSOR));
-        getContentPane().add(lbfechacompra, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 380, 170, 30));
-        getContentPane().add(txtId_Pro, new org.netbeans.lib.awtextra.AbsoluteConstraints(110, 190, 20, 40));
+        getContentPane().add(txtId_Pro, new org.netbeans.lib.awtextra.AbsoluteConstraints(240, 120, 20, 40));
 
         BotonRegresarPH.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -111,48 +106,43 @@ public class PrecioHistoricoProducto extends javax.swing.JFrame {
             }
         });
         getContentPane().add(BotonAgregarPH, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 120, 120, 30));
-
-        BotonEditarPH.setEnabled(false);
-        BotonEditarPH.addMouseListener(new java.awt.event.MouseAdapter() {
-            public void mouseClicked(java.awt.event.MouseEvent evt) {
-                BotonEditarPHMouseClicked(evt);
-            }
-        });
-        getContentPane().add(BotonEditarPH, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 120, 120, 30));
-        getContentPane().add(BotonCancelarPH, new org.netbeans.lib.awtextra.AbsoluteConstraints(750, 120, 120, 30));
-        getContentPane().add(txtIdPH, new org.netbeans.lib.awtextra.AbsoluteConstraints(230, 190, 40, 20));
-
-        ComboIdProductoPH.setBackground(new java.awt.Color(240, 240, 240));
-        ComboIdProductoPH.setFont(new java.awt.Font("Georgia", 0, 12)); // NOI18N
-        ComboIdProductoPH.setForeground(new java.awt.Color(153, 153, 153));
-        ComboIdProductoPH.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Seleccione Id Producto" }));
-        ComboIdProductoPH.setBorder(null);
-        ComboIdProductoPH.setEnabled(false);
-        ComboIdProductoPH.setOpaque(false);
-        getContentPane().add(ComboIdProductoPH, new org.netbeans.lib.awtextra.AbsoluteConstraints(55, 314, 182, 28));
-
-        txtPrecioPH.setBackground(new java.awt.Color(240, 240, 240));
-        txtPrecioPH.setFont(new java.awt.Font("Georgia", 0, 12)); // NOI18N
-        txtPrecioPH.setForeground(new java.awt.Color(153, 153, 153));
-        txtPrecioPH.setText("Ingrese Precio del producto");
-        txtPrecioPH.setBorder(null);
-        txtPrecioPH.setEnabled(false);
-        txtPrecioPH.setOpaque(false);
-        getContentPane().add(txtPrecioPH, new org.netbeans.lib.awtextra.AbsoluteConstraints(55, 500, 180, 28));
+        getContentPane().add(BotonCancelarPH, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 120, 120, 30));
+        getContentPane().add(txtIdPH, new org.netbeans.lib.awtextra.AbsoluteConstraints(340, 20, 40, 20));
         getContentPane().add(txtId_PrecioHistorico, new org.netbeans.lib.awtextra.AbsoluteConstraints(80, 280, 100, 20));
 
         txtBuscarPH.setBackground(new java.awt.Color(240, 240, 240));
         txtBuscarPH.setFont(new java.awt.Font("Georgia", 0, 12)); // NOI18N
         txtBuscarPH.setForeground(new java.awt.Color(153, 153, 153));
-        txtBuscarPH.setText("Buscar por Id Precio Histórico");
+        txtBuscarPH.setText("Buscar por Id");
         txtBuscarPH.setBorder(null);
         txtBuscarPH.setOpaque(false);
+        txtBuscarPH.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                txtBuscarPHFocusGained(evt);
+            }
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                txtBuscarPHFocusLost(evt);
+            }
+        });
         txtBuscarPH.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
                 txtBuscarPHActionPerformed(evt);
             }
         });
-        getContentPane().add(txtBuscarPH, new org.netbeans.lib.awtextra.AbsoluteConstraints(640, 200, 235, 28));
+        getContentPane().add(txtBuscarPH, new org.netbeans.lib.awtextra.AbsoluteConstraints(670, 110, 235, 28));
+
+        ComboHistorico.setBackground(new java.awt.Color(240, 240, 240));
+        ComboHistorico.setFont(new java.awt.Font("Georgia", 0, 12)); // NOI18N
+        ComboHistorico.setForeground(new java.awt.Color(153, 153, 153));
+        ComboHistorico.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Seleccione Historico", "Precio", "Impuesto", "Descuento" }));
+        ComboHistorico.setBorder(null);
+        ComboHistorico.setOpaque(false);
+        ComboHistorico.addItemListener(new java.awt.event.ItemListener() {
+            public void itemStateChanged(java.awt.event.ItemEvent evt) {
+                ComboHistoricoItemStateChanged(evt);
+            }
+        });
+        getContentPane().add(ComboHistorico, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 110, 182, 28));
 
         BotonGuardarPH.setEnabled(false);
         BotonGuardarPH.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -162,35 +152,27 @@ public class PrecioHistoricoProducto extends javax.swing.JFrame {
         });
         getContentPane().add(BotonGuardarPH, new org.netbeans.lib.awtextra.AbsoluteConstraints(610, 120, 110, 30));
 
-        FechaInicioPH.setEnabled(false);
-        getContentPane().add(FechaInicioPH, new org.netbeans.lib.awtextra.AbsoluteConstraints(55, 376, 182, 28));
+        usuario.setFont(new java.awt.Font("Georgia", 1, 18)); // NOI18N
+        usuario.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        getContentPane().add(usuario, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 490, 230, 20));
 
-        FechaFinalPH.setEnabled(false);
-        getContentPane().add(FechaFinalPH, new org.netbeans.lib.awtextra.AbsoluteConstraints(55, 439, 182, 28));
+        jLabel3.setFont(new java.awt.Font("Georgia", 0, 12)); // NOI18N
+        jLabel3.setForeground(new java.awt.Color(102, 102, 102));
+        jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel3.setText("Usuario");
+        getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 520, 70, -1));
 
-        buttonGroupPH.add(BotonActivoPH);
-        BotonActivoPH.setFont(new java.awt.Font("Georgia", 1, 18)); // NOI18N
-        BotonActivoPH.setForeground(new java.awt.Color(255, 255, 255));
-        BotonActivoPH.setText("Activo");
-        BotonActivoPH.setOpaque(false);
-        BotonActivoPH.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                BotonActivoPHActionPerformed(evt);
+        reporte.setBackground(new java.awt.Color(204, 204, 204));
+        reporte.setFont(new java.awt.Font("Georgia", 0, 14)); // NOI18N
+        reporte.setForeground(new java.awt.Color(255, 255, 255));
+        reporte.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/analitica.png"))); // NOI18N
+        reporte.setText("REPORTE");
+        reporte.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                reporteMouseClicked(evt);
             }
         });
-        getContentPane().add(BotonActivoPH, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 200, -1, -1));
-
-        buttonGroupPH.add(BotonInactivoPH);
-        BotonInactivoPH.setFont(new java.awt.Font("Georgia", 1, 18)); // NOI18N
-        BotonInactivoPH.setForeground(new java.awt.Color(255, 255, 255));
-        BotonInactivoPH.setText("Inactivo");
-        BotonInactivoPH.setOpaque(false);
-        BotonInactivoPH.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                BotonInactivoPHActionPerformed(evt);
-            }
-        });
-        getContentPane().add(BotonInactivoPH, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 200, -1, -1));
+        getContentPane().add(reporte, new org.netbeans.lib.awtextra.AbsoluteConstraints(780, 50, 120, 40));
 
         TablaPrecioHistorico.setFont(new java.awt.Font("Georgia", 0, 14)); // NOI18N
         TablaPrecioHistorico.setModel(new javax.swing.table.DefaultTableModel(
@@ -201,11 +183,11 @@ public class PrecioHistoricoProducto extends javax.swing.JFrame {
                 {null, null, null, null, null}
             },
             new String [] {
-                "ID Precio Historico", "ID Producto", "Fecha Inicio", "Fecha Final", "Precio del producto"
+                "ID Precio Historico", "Producto", "Fecha Inicio", "Fecha Final", "Valor"
             }
         ) {
             Class[] types = new Class [] {
-                java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.Float.class
+                java.lang.Integer.class, java.lang.Integer.class, java.lang.String.class, java.lang.String.class, java.lang.String.class
             };
             boolean[] canEdit = new boolean [] {
                 false, false, false, false, false
@@ -226,7 +208,7 @@ public class PrecioHistoricoProducto extends javax.swing.JFrame {
         });
         jScrollPane1.setViewportView(TablaPrecioHistorico);
 
-        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(350, 240, 570, 290));
+        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 170, 890, 310));
 
         jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/Pantalla Precio Historico.png"))); // NOI18N
         jLabel2.setText("jLabel2");
@@ -240,16 +222,8 @@ public class PrecioHistoricoProducto extends javax.swing.JFrame {
         // TODO add your handling code here:
     }//GEN-LAST:event_txtBuscarPHActionPerformed
 
-    private void BotonActivoPHActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BotonActivoPHActionPerformed
-        
-    }//GEN-LAST:event_BotonActivoPHActionPerformed
-
-    private void BotonInactivoPHActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BotonInactivoPHActionPerformed
-        
-    }//GEN-LAST:event_BotonInactivoPHActionPerformed
-
     private void BotonRegresarPHMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonRegresarPHMouseClicked
-         java.awt.EventQueue.invokeLater(new Runnable() {
+        java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 new Productos().setVisible(true);
             }
@@ -258,7 +232,7 @@ public class PrecioHistoricoProducto extends javax.swing.JFrame {
     }//GEN-LAST:event_BotonRegresarPHMouseClicked
 
     private void TablaPrecioHistoricoMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_TablaPrecioHistoricoMouseClicked
-         try {
+        /* try {
             int fila = TablaPrecioHistorico.getSelectedRow();
             int id = Integer.parseInt(TablaPrecioHistorico.getValueAt(fila, 0).toString());
             PreparedStatement ps;
@@ -280,48 +254,17 @@ public class PrecioHistoricoProducto extends javax.swing.JFrame {
                 FechaInicioPH.setDate(rs.getDate("Fecha_Incio"));
                 FechaFinalPH.setDate(rs.getDate("Fecha_Finalizacion"));
                 txtPrecioPH.setText(rs.getString("Precio"));
-                
+
                 System.out.println(id);
 
             }
 
-           FechaFinalPH.setEnabled(Boolean.TRUE);
-           BotonEditarPH.setEnabled(Boolean.TRUE);
+            FechaFinalPH.setEnabled(Boolean.TRUE);
+            BotonEditarPH.setEnabled(Boolean.TRUE);
         } catch (SQLException ex) {
             JOptionPane.showMessageDialog(null, ex.toString());
-        }
+        }*/
     }//GEN-LAST:event_TablaPrecioHistoricoMouseClicked
-
-    private void BotonEditarPHMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonEditarPHMouseClicked
-         if (BotonAgregarPH.isEnabled() == false) {
-
-            JOptionPane.showMessageDialog(null, "Seleccione un registro para editar", "Advertencia", JOptionPane.WARNING_MESSAGE);
-
-        } else {
-        int IdPrecio = Integer.parseInt(txtIdPH.getText());
-
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-            String FechaF = sdf.format(FechaFinalPH.getDate());
-
-            try {
-                Connection con = Conexion.getConexion();
-                PreparedStatement ps = con.prepareStatement("Update PrecioHistorico set Fecha_Finalizacion=? Where Id_Precio_Historico=?");
-                ps.setString(1, FechaF);
-                ps.setInt(2, IdPrecio);
-                ps.executeUpdate();
-                JOptionPane.showMessageDialog(null, "Registro Actualizado");
-                cargartabla();
-                FechaFinalPH.setEnabled(Boolean.FALSE);
-
-
-            } catch (SQLException ex) {
-                JOptionPane.showMessageDialog(null, ex.toString());
-
-            }
-        }
-        
-        
-    }//GEN-LAST:event_BotonEditarPHMouseClicked
 
     private void BotonAgregarPHMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonAgregarPHMouseClicked
         if (BotonAgregarPH.isEnabled() == false) {
@@ -336,8 +279,84 @@ public class PrecioHistoricoProducto extends javax.swing.JFrame {
 
             JOptionPane.showMessageDialog(null, "Los campos han sido cargados previamente no se puede guardar solo editar", "Advertencia", JOptionPane.WARNING_MESSAGE);
 
-        } 
+        }
     }//GEN-LAST:event_BotonGuardarPHMouseClicked
+
+    private void ComboHistoricoItemStateChanged(java.awt.event.ItemEvent evt) {//GEN-FIRST:event_ComboHistoricoItemStateChanged
+        if (ComboHistorico.getSelectedIndex() == 1) {
+            cargartabla();
+        } else if (ComboHistorico.getSelectedIndex() == 2) {
+            cargartablaImpuesto();
+        } else if (ComboHistorico.getSelectedIndex() == 3) {
+            cargartablaDescuento();
+        }
+    }//GEN-LAST:event_ComboHistoricoItemStateChanged
+
+    private void txtBuscarPHFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtBuscarPHFocusGained
+        if (txtBuscarPH.getText().equals("Buscar por Id")) {
+            txtBuscarPH.setText("");
+            txtBuscarPH.setForeground(new Color(0, 0, 0));
+        }
+    }//GEN-LAST:event_txtBuscarPHFocusGained
+
+    private void txtBuscarPHFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtBuscarPHFocusLost
+        if (txtBuscarPH.getText().equals("")) {
+            txtBuscarPH.setText("Buscar por Id");
+            txtBuscarPH.setForeground(new Color(153, 153, 153));
+        }
+    }//GEN-LAST:event_txtBuscarPHFocusLost
+
+    private void reporteMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_reporteMouseClicked
+       net.sf.jasperreports.engine.JasperReport reporte;
+          HashMap hm = new HashMap();
+          hm.put("Usuario", usuario.getText());
+          hm.put("idp", Integer.valueOf(txtId_Pro.getText()));
+        
+        if(Integer.parseInt(txtId_Pro.getText())==0){
+         JOptionPane.showMessageDialog(null, "Seleccione un Producto en la pantalla de Productos");
+       }else{
+            if(ComboHistorico.getSelectedIndex()==1){
+
+              try {
+                  Connection con = Conexion.getConexion();
+                  reporte = JasperCompileManager.compileReport("src/Reportes/ReporteHistoricoPrecio.jrxml");
+                  JasperPrint jp = JasperFillManager.fillReport(reporte, hm, con);
+                  JasperViewer.viewReport(jp, true);
+                  ReportView view = new ReportView(jp, false);
+                  view.setVisible(true);
+              } catch (JRException ex) {
+                  Logger.getLogger(Clientes.class.getName()).log(Level.SEVERE, null, ex);
+              } 
+            }else if(ComboHistorico.getSelectedIndex()==2){
+                      try {
+                        Connection con = Conexion.getConexion();
+                        reporte = JasperCompileManager.compileReport("src/Reportes/ReporteHistoricoImpuesto.jrxml");
+                        JasperPrint jp = JasperFillManager.fillReport(reporte, hm, con);
+                        JasperViewer.viewReport(jp, true);
+                        ReportView view = new ReportView(jp, false);
+                        view.setVisible(true);
+                    } catch (JRException ex) {
+                        Logger.getLogger(Clientes.class.getName()).log(Level.SEVERE, null, ex);
+                    } 
+            }else if(ComboHistorico.getSelectedIndex()==3){
+                  try {
+                    Connection con = Conexion.getConexion();
+                    reporte = JasperCompileManager.compileReport("src/Reportes/ReporteHistoricoDescuento.jrxml");
+                    JasperPrint jp = JasperFillManager.fillReport(reporte, hm, con);
+                    JasperViewer.viewReport(jp, true);
+                    ReportView view = new ReportView(jp, false);
+                    view.setVisible(true);
+                } catch (JRException ex) {
+                    Logger.getLogger(Clientes.class.getName()).log(Level.SEVERE, null, ex);
+                }
+           }else{
+               JOptionPane.showMessageDialog(null, "Seleccione un Historico");
+           }   
+       }
+        
+        
+        
+    }//GEN-LAST:event_reporteMouseClicked
 
     /**
      * @param args the command line arguments
@@ -375,32 +394,28 @@ public class PrecioHistoricoProducto extends javax.swing.JFrame {
     }
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JRadioButton BotonActivoPH;
     private javax.swing.JLabel BotonAgregarPH;
     private javax.swing.JLabel BotonCancelarPH;
-    private javax.swing.JLabel BotonEditarPH;
     private javax.swing.JLabel BotonGuardarPH;
-    private javax.swing.JRadioButton BotonInactivoPH;
     private javax.swing.JLabel BotonRegresarPH;
-    private javax.swing.JComboBox<String> ComboIdProductoPH;
-    private com.toedter.calendar.JDateChooser FechaFinalPH;
-    private com.toedter.calendar.JDateChooser FechaInicioPH;
+    private javax.swing.JComboBox<String> ComboHistorico;
     private javax.swing.JTable TablaPrecioHistorico;
     private javax.swing.ButtonGroup buttonGroupPH;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JScrollPane jScrollPane1;
-    private javax.swing.JLabel lbfechacompra;
-    private javax.swing.JLabel lbfechaentrega;
+    private javax.swing.JLabel reporte;
     private javax.swing.JTextField txtBuscarPH;
     private javax.swing.JLabel txtIdPH;
     private javax.swing.JLabel txtId_PrecioHistorico;
     private javax.swing.JLabel txtId_Pro;
-    private javax.swing.JTextField txtPrecioPH;
+    private javax.swing.JLabel usuario;
     // End of variables declaration//GEN-END:variables
 private void cargartabla() {
+        String cargarTabla = "Cargar Tabla";
         DefaultTableModel modeloTabla = (DefaultTableModel) TablaPrecioHistorico.getModel();
         modeloTabla.setRowCount(0);
-        int idpro= Integer.parseInt(txtId_Pro.getText());
+        int idpro = Integer.parseInt(txtId_Pro.getText());
 
         PreparedStatement ps;
         ResultSet rs;
@@ -428,6 +443,88 @@ private void cargartabla() {
             }
 
         } catch (SQLException ex) {
+            lo.LogBitacora("Error: No se pudo cargar id de la tabla " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), PrecioHistorico, cargarTabla);
+
+            JOptionPane.showMessageDialog(null, ex.toString());
+        }
+
+    }
+
+    private void cargartablaImpuesto() {
+        String CargarTablaImpuesto = "Cargar tabla impuesto";
+        DefaultTableModel modeloTabla = (DefaultTableModel) TablaPrecioHistorico.getModel();
+        modeloTabla.setRowCount(0);
+        int idpro = Integer.parseInt(txtId_Pro.getText());
+
+        PreparedStatement ps;
+        ResultSet rs;
+        ResultSetMetaData rsmd;
+        int columnas;
+
+        try {
+            Connection con = Conexion.getConexion();
+            ps = con.prepareStatement("Select IH.Id_Impuesto_Historico,P.Nombre_Producto,IH.Fecha_Incio,IH.Fecha_Finalizacion,TI.ISV\n"
+                    + "From ImpuestoHistorico as IH\n"
+                    + "Inner Join Productos as P ON IH.Id_Producto=P.Id_Producto\n"
+                    + "Inner Join Tipo_Impuesto as TI ON IH.Id_Impuesto=TI.Id_Tipo_Impuesto\n"
+                    + "Where P.Id_Producto=?\n"
+                    + "Order by IH.Id_Impuesto_Historico");
+            ps.setInt(1, idpro);
+            rs = ps.executeQuery();
+            rsmd = rs.getMetaData();
+            columnas = rsmd.getColumnCount();
+
+            while (rs.next()) {
+                Object[] fila = new Object[columnas];
+                for (int indice = 0; indice < columnas; indice++) {
+                    fila[indice] = rs.getObject(indice + 1);
+                }
+                modeloTabla.addRow(fila);
+            }
+
+        } catch (SQLException ex) {
+            lo.LogBitacora("Error: No se pudo cargar tabla impuesto " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), PrecioHistorico, CargarTablaImpuesto);
+
+            JOptionPane.showMessageDialog(null, ex.toString());
+        }
+
+    }
+
+    private void cargartablaDescuento() {
+        String cargarD = "Cargar descuento";
+        DefaultTableModel modeloTabla = (DefaultTableModel) TablaPrecioHistorico.getModel();
+        modeloTabla.setRowCount(0);
+        int idpro = Integer.parseInt(txtId_Pro.getText());
+
+        PreparedStatement ps;
+        ResultSet rs;
+        ResultSetMetaData rsmd;
+        int columnas;
+
+        try {
+            Connection con = Conexion.getConexion();
+            ps = con.prepareStatement("Select IH.Id_Descuento_Historico,P.Nombre_Producto,IH.Fecha_Inicio,IH.Fecha_Finalizacion,TI.Descripcion\n"
+                    + "                    From Descuento_Historico as IH\n"
+                    + "                    Inner Join Productos as P ON IH.Id_Producto=P.Id_Producto\n"
+                    + "                    Inner Join DescuentoProducto as TI ON IH.Id_Descuento=TI.Id_DescuentoP\n"
+                    + "                    Where P.Id_Producto=?\n"
+                    + "                    Order by IH.Id_Descuento_Historico");
+            ps.setInt(1, idpro);
+            rs = ps.executeQuery();
+            rsmd = rs.getMetaData();
+            columnas = rsmd.getColumnCount();
+
+            while (rs.next()) {
+                Object[] fila = new Object[columnas];
+                for (int indice = 0; indice < columnas; indice++) {
+                    fila[indice] = rs.getObject(indice + 1);
+                }
+                modeloTabla.addRow(fila);
+            }
+
+        } catch (SQLException ex) {
+            lo.LogBitacora("Error: No se pudo cargar tabla descuento " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), PrecioHistorico, cargarD);
+
             JOptionPane.showMessageDialog(null, ex.toString());
         }
 

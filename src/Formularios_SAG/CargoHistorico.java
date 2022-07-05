@@ -6,6 +6,7 @@
 package Formularios_SAG;
 
 import Conexion.Conexion;
+import Logs.log;
 import java.awt.Color;
 import java.awt.Image;
 import java.awt.Toolkit;
@@ -34,6 +35,9 @@ public class CargoHistorico extends javax.swing.JFrame {
     /**
      * Creates new form CargoHistorico
      */
+    log lo = new log();
+    String cargoH = "Cargo Historico";
+
     @Override
     public Image getIconImage() {
         Image retValue = Toolkit.getDefaultToolkit().getImage(ClassLoader.getSystemResource("componentes/LOGOSAG(2).png"));
@@ -108,7 +112,7 @@ public class CargoHistorico extends javax.swing.JFrame {
                 BotonAgregarCHMouseClicked(evt);
             }
         });
-        getContentPane().add(BotonAgregarCH, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 150, 130, 30));
+        getContentPane().add(BotonAgregarCH, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 140, 130, 40));
 
         BotonEditarCH.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
@@ -228,7 +232,7 @@ public class CargoHistorico extends javax.swing.JFrame {
                 txtNombreCHKeyTyped(evt);
             }
         });
-        getContentPane().add(txtNombreCH, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 340, 190, 40));
+        getContentPane().add(txtNombreCH, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 350, 190, 30));
         getContentPane().add(txtIdE, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 240, 20, 20));
 
         comboCargarEmpleado.setFont(new java.awt.Font("Georgia", 0, 14)); // NOI18N
@@ -314,11 +318,11 @@ public class CargoHistorico extends javax.swing.JFrame {
 
     private void txtCargoCHKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtCargoCHKeyTyped
         if (txtCargoCH.getText().length() > 20) {
-            JOptionPane.showMessageDialog(null, "Alcanzaste el máximo de caracteres para este campo", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(null, "El máximo es de 20 caracteres para este campo", "Advertencia", JOptionPane.WARNING_MESSAGE);
             evt.consume();
         } else if (txtCargoCH.getText().length() > 0) {
-            if (!txtCargoCH.getText().matches("^(?!.*([A-Za-zñÑáéíóúÁÉÍÓÚ\\s])\\1{2})[A-Za-zñÑáéíóúÁÉÍÓÚ\\s0-9]+$")) {
-                JOptionPane.showMessageDialog(null, "No repitas caracteres de forma incorrecta", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            if (!txtCargoCH.getText().matches("^(?!.*([A-Za-zñÑáéíóúÁÉÍÓÚ\\s])\\1{2})[A-Za-zñÑáéíóúÁÉÍÓÚ\\s]+$")) {
+                JOptionPane.showMessageDialog(null, "No repitas caracteres de forma incorrecta", "Error", JOptionPane.ERROR_MESSAGE);
                 evt.consume();
             }
         }
@@ -332,9 +336,9 @@ public class CargoHistorico extends javax.swing.JFrame {
     }//GEN-LAST:event_txtNombreCHFocusGained
 
     private void txtNombreCHFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtNombreCHFocusLost
-        if (txtBuscarCH.getText().equals("")) {
-            txtBuscarCH.setText("Ingrese Nombre Empleado");
-            txtBuscarCH.setForeground(new Color(153, 153, 153));
+        if (txtNombreCH.getText().equals("")) {
+            txtNombreCH.setText("Ingrese Nombre Empleado");
+            txtNombreCH.setForeground(new Color(153, 153, 153));
         }
     }//GEN-LAST:event_txtNombreCHFocusLost
 
@@ -344,11 +348,11 @@ public class CargoHistorico extends javax.swing.JFrame {
 
     private void txtNombreCHKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtNombreCHKeyTyped
         if (txtNombreCH.getText().length() > 20) {
-            JOptionPane.showMessageDialog(null, "Alcanzaste el máximo de caracteres para este campo", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(null, "El máximo es de 20 caracteres para este campo", "Advertencia", JOptionPane.WARNING_MESSAGE);
             evt.consume();
         } else if (txtNombreCH.getText().length() > 0) {
-            if (!txtNombreCH.getText().matches("^(?!.*([A-Za-zñÑáéíóúÁÉÍÓÚ\\s])\\1{2})[A-Za-zñÑáéíóúÁÉÍÓÚ\\s0-9]+$")) {
-                JOptionPane.showMessageDialog(null, "No repitas caracteres de forma incorrecta", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            if (!txtNombreCH.getText().matches("^(?!.*([A-Za-zñÑáéíóúÁÉÍÓÚ\\s])\\1{2})[A-Za-zñÑáéíóúÁÉÍÓÚ\\s]+$")) {
+                JOptionPane.showMessageDialog(null, "No repitas caracteres de forma incorrecta", "Error", JOptionPane.ERROR_MESSAGE);
                 evt.consume();
             }
         }
@@ -374,6 +378,7 @@ public class CargoHistorico extends javax.swing.JFrame {
     }//GEN-LAST:event_BotonAgregarCHMouseClicked
 
     private void BotonGuardarCHMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonGuardarCHMouseClicked
+        String Guardar = "BtnGuardar";
         if (txtNombreCH.getText().equals("Ingrese Nombre Empleado") || txtFechaIncioCH.getDate().equals("") || txtFechaFinalCH.getDate().equals("")
                 || txtCargoCH.getText().equals("Ingrese Cargo")) {
             JOptionPane.showMessageDialog(null, "No se puede Guardar datos vacios");
@@ -388,7 +393,7 @@ public class CargoHistorico extends javax.swing.JFrame {
 
             try {
                 Connection con = Conexion.getConexion();
-                PreparedStatement ps = con.prepareStatement("Insert into Cargo_Historico(Id_Empleado,Fecha_Inicio,Fecha_Finalizacion,Cargo) VALUES(?,?,?,?)");
+                PreparedStatement ps = con.prepareStatement("Insert in Cargo_Historico(Id_Empleado,Fecha_Inicio,Fecha_Finalizacion,Cargo) VALUES(?,?,?,?)");
 
                 ps.setInt(1, Integer.parseInt(Id_Empleado));
                 ps.setString(2, FechaInicio);
@@ -399,12 +404,14 @@ public class CargoHistorico extends javax.swing.JFrame {
                 cargartabla();
                 Limpiar();
             } catch (SQLException ex) {
+                lo.LogBitacora("Error: No se pudo guardar el dato " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), cargoH, Guardar);
                 JOptionPane.showMessageDialog(null, ex.toString());
             }
         }
     }//GEN-LAST:event_BotonGuardarCHMouseClicked
 
     private void BotonEditarCHMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonEditarCHMouseClicked
+        String editar = "BtnEditar";
         if (txtCargoCH.getText().equals("Ingrese Nombre Empleado") || txtCargoCH.getText().equals("Ingrese Número de Documento")) {
             JOptionPane.showMessageDialog(null, "No se puede Guardar datos vacios");
         } else {
@@ -430,6 +437,7 @@ public class CargoHistorico extends javax.swing.JFrame {
                 // Inhabillitar();
 
             } catch (SQLException ex) {
+                lo.LogBitacora("Error: No se pudo editar el datos " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), cargoH, editar);
                 JOptionPane.showMessageDialog(null, ex.toString());
 
             }
@@ -437,13 +445,14 @@ public class CargoHistorico extends javax.swing.JFrame {
     }//GEN-LAST:event_BotonEditarCHMouseClicked
 
     private void TablaCHMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_TablaCHMouseClicked
+        String tabla = "BtnTabla";
         try {
             int fila = TablaCH.getSelectedRow();
             int id = Integer.parseInt(TablaCH.getValueAt(fila, 0).toString());
             PreparedStatement ps;
             ResultSet rs;
             Connection con = Conexion.getConexion();
-            ps = con.prepareStatement("SELECT  E.Id_Empleado,CH. Id_Cargo_Historico,CH.Fecha_Inicio,CH.Fecha_Finalizacion,CH.Cargo,E.NombreE \n"
+            ps = con.prepareStatement("SELECT  .Id_Empleado,CH. Id_Cargo_Historico,CH.Fecha_Inicio,CH.Fecha_Finalizacion,CH.Cargo,E.NombreE \n"
                     + "From Cargo_Historico as CH\n"
                     + "INNER JOIN Empleados AS E ON CH.Id_Empleado = E.Id_Empleado\n"
                     + "Where CH.Id_Cargo_Historico=?\n"
@@ -465,6 +474,7 @@ public class CargoHistorico extends javax.swing.JFrame {
 
             Habillitar();
         } catch (SQLException ex) {
+            lo.LogBitacora("Error: No se pudo guardar el dato " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), cargoH, tabla);
             JOptionPane.showMessageDialog(null, ex.toString());
         }
     }//GEN-LAST:event_TablaCHMouseClicked
@@ -501,6 +511,7 @@ public class CargoHistorico extends javax.swing.JFrame {
     }//GEN-LAST:event_comboCargarEmpleadoMouseClicked
 
     private void comboCargarEmpleadoActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_comboCargarEmpleadoActionPerformed
+        String cargar = "Btncargar";
         PreparedStatement ps;
         ResultSet rs;
         String Nombre = comboCargarEmpleado.getSelectedItem().toString();
@@ -516,6 +527,7 @@ public class CargoHistorico extends javax.swing.JFrame {
             }
             buscarData(Integer.parseInt(txtIdE.getText()));
         } catch (SQLException ex) {
+            lo.LogBitacora("Error: No se pudo cargar el dato " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), cargoH, cargar);
             JOptionPane.showMessageDialog(null, ex.toString());
         }
     }//GEN-LAST:event_comboCargarEmpleadoActionPerformed
@@ -558,6 +570,7 @@ public class CargoHistorico extends javax.swing.JFrame {
      * @param args the command line arguments
      */
     void buscarData(int valor) {
+        String Buscar = "btnBuscar";
         String[] titulos = {"Id_Cargo", "Nombre Empleado", "Fecha inicio", "Fecha Final", "Cargo"};
         String[] registros = new String[13];
         String sql = "Select CH.Id_Cargo_Historico, E.NombreE, CH.Fecha_Inicio,CH.Fecha_Finalizacion,CH.Cargo\n"
@@ -587,6 +600,7 @@ public class CargoHistorico extends javax.swing.JFrame {
             TablaCH.setModel(model);
             // anchoColumnas();
         } catch (SQLException ex) {
+            lo.LogBitacora("Error: No se pudo buscar el dato " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), cargoH, Buscar);
             Logger.getLogger(Sucursales.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -665,6 +679,7 @@ public class CargoHistorico extends javax.swing.JFrame {
     }
 
     private void cargartabla() {
+        String Cargar = "cargarTabla";
         DefaultTableModel modeloTabla = (DefaultTableModel) TablaCH.getModel();
         modeloTabla.setRowCount(0);
 
@@ -692,6 +707,7 @@ public class CargoHistorico extends javax.swing.JFrame {
             }
 
         } catch (SQLException ex) {
+            lo.LogBitacora("Error: No se pudo cargar la tabla " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), cargoH, Cargar);
             JOptionPane.showMessageDialog(null, ex.toString());
         }
 
@@ -722,7 +738,7 @@ public class CargoHistorico extends javax.swing.JFrame {
     public class CargaE {
 
         public DefaultComboBoxModel getvalues() {
-
+          String CargarEmpleado="Cargar Empleado";
             DefaultComboBoxModel modelo = new DefaultComboBoxModel();
             try {
                 Connection con = Conexion.getConexion();
@@ -736,6 +752,8 @@ public class CargoHistorico extends javax.swing.JFrame {
                 con.close();
                 rs.close();
             } catch (Exception e) {
+                            lo.LogBitacora("Error: No se pudo cargar empleado " + "Excepción: " + e + ". Origen: " + this.getClass().getSimpleName(), cargoH, CargarEmpleado);
+
                 System.out.println(e);
             }
             return modelo;
@@ -743,6 +761,7 @@ public class CargoHistorico extends javax.swing.JFrame {
     }
 
     private void buscarDato(String valor) {
+        String BuscarD = "BuscarDato";
         String[] titulos = {"ID Sueldo", "Nombre Empleado", "Fecha Inicio", "Fecha Final", "Sueldo"};
         String[] registros = new String[13];
         String sql = "Select SH.Id_Sueldo_Historico, E.NombreE, SH.Fecha_Inicio,SH.Fecha_Finalizacion,SH.Sueldo\n"
@@ -772,6 +791,7 @@ public class CargoHistorico extends javax.swing.JFrame {
             TablaCH.setModel(model);
             // anchoColumnas();
         } catch (SQLException ex) {
+            lo.LogBitacora("Error: No se pudo Buscar el dato " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), cargoH, BuscarD);
             Logger.getLogger(Clientes.class.getName()).log(Level.SEVERE, null, ex);
         }
 

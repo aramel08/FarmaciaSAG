@@ -6,6 +6,10 @@
 package Formularios_SAG;
 
 import Conexion.Conexion;
+import static Formularios_SAG.RegistroVentas.TablaDEVenta;
+import Logs.log;
+import Reportes.ReportView;
+import java.awt.Color;
 import java.awt.Image;
 import java.awt.Toolkit;
 import java.sql.Connection;
@@ -13,9 +17,19 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.HashMap;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.view.JasperViewer;
 
 /**
  *
@@ -23,9 +37,11 @@ import javax.swing.table.TableColumnModel;
  */
 public class RegistroCompras extends javax.swing.JFrame {
 
+    log lo = new log();
+    String comprasr = "RegistroCompra";
+
     String Estado;
     String EstadoDC;
-    
 
     @Override
     public Image getIconImage() {
@@ -33,8 +49,10 @@ public class RegistroCompras extends javax.swing.JFrame {
         return retValue;
     }
     public static String Id_Comp = "0";
+
     public RegistroCompras() {
         initComponents();
+        usuario.setText(Login.txtUsuario.getText());
         cargartabla();
         anchoColumnas();
         TablaDTC.setVisible(Boolean.FALSE);
@@ -55,7 +73,7 @@ public class RegistroCompras extends javax.swing.JFrame {
         anchoColumnas.getColumn(7).setPreferredWidth(150);
         anchoColumnas.getColumn(8).setPreferredWidth(150);
         anchoColumnas.getColumn(9).setPreferredWidth(150);
-        
+
         TableColumnModel anchoColumna = TablaDTC.getColumnModel();
         anchoColumna.getColumn(0).setPreferredWidth(50);
         anchoColumna.getColumn(1).setPreferredWidth(150);
@@ -65,7 +83,7 @@ public class RegistroCompras extends javax.swing.JFrame {
         anchoColumna.getColumn(5).setPreferredWidth(150);
         anchoColumna.getColumn(6).setPreferredWidth(150);
         anchoColumna.getColumn(7).setPreferredWidth(150);
-        
+
     }
 
     /**
@@ -83,11 +101,14 @@ public class RegistroCompras extends javax.swing.JFrame {
         TablaDTC = new javax.swing.JTable();
         jLabel1 = new javax.swing.JLabel();
         Editar = new javax.swing.JLabel();
+        usuario = new javax.swing.JLabel();
+        reporte = new javax.swing.JLabel();
         txtRegresarC = new javax.swing.JLabel();
-        jTextField1 = new javax.swing.JTextField();
+        BuscarC = new javax.swing.JTextField();
         iddetalle = new javax.swing.JLabel();
         Anular = new javax.swing.JLabel();
         Jlabel = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setIconImage(getIconImage());
@@ -187,6 +208,22 @@ public class RegistroCompras extends javax.swing.JFrame {
         });
         getContentPane().add(Editar, new org.netbeans.lib.awtextra.AbsoluteConstraints(1120, 220, -1, -1));
 
+        usuario.setFont(new java.awt.Font("Georgia", 1, 18)); // NOI18N
+        usuario.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        getContentPane().add(usuario, new org.netbeans.lib.awtextra.AbsoluteConstraints(500, 680, 230, 20));
+
+        reporte.setBackground(new java.awt.Color(204, 204, 204));
+        reporte.setFont(new java.awt.Font("Georgia", 0, 14)); // NOI18N
+        reporte.setForeground(new java.awt.Color(255, 255, 255));
+        reporte.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/analitica.png"))); // NOI18N
+        reporte.setText("REPORTE");
+        reporte.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                reporteMouseClicked(evt);
+            }
+        });
+        getContentPane().add(reporte, new org.netbeans.lib.awtextra.AbsoluteConstraints(1050, 60, 120, 40));
+
         txtRegresarC.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 txtRegresarCMouseClicked(evt);
@@ -194,12 +231,25 @@ public class RegistroCompras extends javax.swing.JFrame {
         });
         getContentPane().add(txtRegresarC, new org.netbeans.lib.awtextra.AbsoluteConstraints(41, 56, 160, 40));
 
-        jTextField1.setFont(new java.awt.Font("Georgia", 0, 14)); // NOI18N
-        jTextField1.setForeground(new java.awt.Color(153, 153, 153));
-        jTextField1.setText("Buscar");
-        jTextField1.setBorder(null);
-        jTextField1.setOpaque(false);
-        getContentPane().add(jTextField1, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 155, 300, 37));
+        BuscarC.setFont(new java.awt.Font("Georgia", 0, 14)); // NOI18N
+        BuscarC.setForeground(new java.awt.Color(153, 153, 153));
+        BuscarC.setText("Buscar por Id o Número de Factura");
+        BuscarC.setBorder(null);
+        BuscarC.setOpaque(false);
+        BuscarC.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                BuscarCFocusGained(evt);
+            }
+            public void focusLost(java.awt.event.FocusEvent evt) {
+                BuscarCFocusLost(evt);
+            }
+        });
+        BuscarC.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                BuscarCKeyTyped(evt);
+            }
+        });
+        getContentPane().add(BuscarC, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 155, 300, 37));
         getContentPane().add(iddetalle, new org.netbeans.lib.awtextra.AbsoluteConstraints(630, 640, 20, 20));
 
         Anular.setFont(new java.awt.Font("Georgia", 0, 18)); // NOI18N
@@ -214,19 +264,25 @@ public class RegistroCompras extends javax.swing.JFrame {
         Jlabel.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/Pantalla Compras(4).png"))); // NOI18N
         getContentPane().add(Jlabel, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, -10, -1, 760));
 
+        jLabel2.setFont(new java.awt.Font("Georgia", 0, 12)); // NOI18N
+        jLabel2.setForeground(new java.awt.Color(102, 102, 102));
+        jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel2.setText("Usuario");
+        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(580, 700, 70, -1));
+
         pack();
         setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 
     private void TablaDEcomprasMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_TablaDEcomprasMouseClicked
-       cargarTDetalle();
+        cargarTDetalle();
     }//GEN-LAST:event_TablaDEcomprasMouseClicked
 
     private void TablaDTCMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_TablaDTCMouseClicked
-       int fila=TablaDTC.getSelectedRow();
-       int id = Integer.parseInt(TablaDTC.getValueAt(fila, 0).toString());
-       iddetalle.setText(String.valueOf(id));
-       EstadoDC = TablaDTC.getValueAt(fila, 7).toString();
+        int fila = TablaDTC.getSelectedRow();
+        int id = Integer.parseInt(TablaDTC.getValueAt(fila, 0).toString());
+        iddetalle.setText(String.valueOf(id));
+        EstadoDC = TablaDTC.getValueAt(fila, 7).toString();
         System.out.println(id);
         System.out.println(EstadoDC);
         if (EstadoDC.equals("Procesada")) {
@@ -245,7 +301,7 @@ public class RegistroCompras extends javax.swing.JFrame {
     }//GEN-LAST:event_EditarMouseClicked
 
     private void jLabel1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel1MouseClicked
-        Id_Comp="0";
+        Id_Comp = "0";
         PantallaCompras PC = new PantallaCompras();
         {
             PC.setVisible(true);
@@ -254,32 +310,33 @@ public class RegistroCompras extends javax.swing.JFrame {
     }//GEN-LAST:event_jLabel1MouseClicked
 
     private void AnularMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_AnularMouseClicked
-       
-        int resp = JOptionPane.showConfirmDialog(null, "¿Deseas Anular este registro?"+" "+"Esta acción es irreversible", "Alerta!", JOptionPane.YES_NO_OPTION);
-       int detalle=Integer.parseInt(iddetalle.getText());
-       int fila = Integer.parseInt(iddetalle.getText());
-            int cant = Integer.parseInt(TablaDTC.getValueAt(detalle, 4).toString());
-            System.out.println(detalle);
-      if(resp==0){
-          try {
-            Connection con = Conexion.getConexion();
-            PreparedStatement ps = con.prepareStatement("Update Detalle_Compra set Cantidad=0,Id_EstadoDC=3 where Id_Detalle_Compra=?");
-            ps.setInt(1, Integer.parseInt(iddetalle.getText()));
-            ps.executeUpdate();
-            /*PreparedStatement pst = con.prepareStatement("Update inventario set Entradas = Entradas-?, Stock= Stock-?");
+        String anularc = "AnularCompra";
+        int resp = JOptionPane.showConfirmDialog(null, "¿Deseas Anular este registro?" + " " + "Esta acción es irreversible", "Alerta!", JOptionPane.YES_NO_OPTION);
+        int detalle = Integer.parseInt(iddetalle.getText());
+        int fila = Integer.parseInt(iddetalle.getText());
+        int filaw = TablaDTC.getSelectedRow();
+        String id = TablaDTC.getValueAt(filaw, 0).toString();
+        System.out.println(detalle);
+        if (resp == 0) {
+            try {
+                Connection con = Conexion.getConexion();
+                PreparedStatement ps = con.prepareStatement("Update Detalle_Compra set Cantidad=0,Id_EstadoDC=3 where Id_Detalle_Compra=?");
+                ps.setString(1, id);
+                ps.executeUpdate();
+                /*PreparedStatement pst = con.prepareStatement("Update inventario set Entradas = Entradas-?, Stock= Stock-?");
             pst.setInt(1, cant);
             pst.setInt(2, cant);
             pst.executeUpdate();*/
 
-
-            JOptionPane.showMessageDialog(null, "Registro Anulado");
-             cargarTDetalle();
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(null, ex.toString());
+                JOptionPane.showMessageDialog(null, "Registro Anulado");
+                cargarTDetalle();
+            } catch (SQLException ex) {
+                 lo.LogBitacora("Error: No se pudo anular la compra" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(),comprasr,anularc);
+                JOptionPane.showMessageDialog(null, ex.toString());
+            }
         }
-       }
-        
-        
+
+
     }//GEN-LAST:event_AnularMouseClicked
 
     private void txtRegresarCMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txtRegresarCMouseClicked
@@ -290,6 +347,40 @@ public class RegistroCompras extends javax.swing.JFrame {
         });
         this.dispose();
     }//GEN-LAST:event_txtRegresarCMouseClicked
+
+    private void BuscarCFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_BuscarCFocusGained
+        if (BuscarC.getText().equals("Buscar por Id o Número de Factura")) {
+            BuscarC.setText("");
+            BuscarC.setForeground(new Color(0, 0, 0));
+        }
+    }//GEN-LAST:event_BuscarCFocusGained
+
+    private void BuscarCFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_BuscarCFocusLost
+        if (BuscarC.getText().equals("")) {
+            BuscarC.setText("Buscar por Id o Número de Factura");
+            BuscarC.setForeground(new Color(153, 153, 153));
+        }
+    }//GEN-LAST:event_BuscarCFocusLost
+
+    private void BuscarCKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_BuscarCKeyTyped
+        buscarData(BuscarC.getText());
+    }//GEN-LAST:event_BuscarCKeyTyped
+
+    private void reporteMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_reporteMouseClicked
+        JasperReport reporte;
+        HashMap hm = new HashMap();
+        hm.put("Usuario", usuario.getText());
+        try {
+            Connection con = Conexion.getConexion();
+            reporte = JasperCompileManager.compileReport("src/Reportes/ReporteCompras.jrxml");
+            JasperPrint jp = JasperFillManager.fillReport(reporte, hm, con);
+            JasperViewer.viewReport(jp, true);
+            ReportView view = new ReportView(jp, false);
+            view.setVisible(true);
+        } catch (JRException ex) {
+            Logger.getLogger(Clientes.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_reporteMouseClicked
 
     /**
      * @param args the command line arguments
@@ -329,6 +420,7 @@ public class RegistroCompras extends javax.swing.JFrame {
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel Anular;
+    private javax.swing.JTextField BuscarC;
     private javax.swing.JLabel Editar;
     private javax.swing.JLabel Jlabel;
     private javax.swing.JTable TablaDEcompras;
@@ -337,8 +429,10 @@ public class RegistroCompras extends javax.swing.JFrame {
     private javax.swing.JScrollPane barraEmpleado1;
     private javax.swing.JLabel iddetalle;
     private javax.swing.JLabel jLabel1;
-    private javax.swing.JTextField jTextField1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel reporte;
     private javax.swing.JLabel txtRegresarC;
+    private javax.swing.JLabel usuario;
     // End of variables declaration//GEN-END:variables
 
     private void cargartabla() {
@@ -348,6 +442,7 @@ public class RegistroCompras extends javax.swing.JFrame {
         ResultSet rs;
         ResultSetMetaData rsmd;
         int columnas;
+        String cargart="CargarTabla";
 
         try {
             Connection con = Conexion.getConexion();
@@ -370,13 +465,15 @@ public class RegistroCompras extends javax.swing.JFrame {
             }
 
         } catch (SQLException ex) {
+             lo.LogBitacora("Error: No se pudo cargar la tabla" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(),comprasr,cargart);
             JOptionPane.showMessageDialog(null, ex.toString());
         }
 
     }
 
     private void cargarTDetalle() {
-         barraEmpleado1.setVisible(true);
+        String cargard="CargarDetalle";
+        barraEmpleado1.setVisible(true);
         TablaDTC.setVisible(true);
         DefaultTableModel modeloTabla = (DefaultTableModel) TablaDTC.getModel();
         Estado = TablaDEcompras.getValueAt(TablaDEcompras.getSelectedRow(), 9).toString();
@@ -420,7 +517,50 @@ public class RegistroCompras extends javax.swing.JFrame {
             Id_Comp = TablaDEcompras.getValueAt(filaw, 0).toString();
 
         } catch (SQLException ex) {
+             lo.LogBitacora("Error: No se pudo cargar el detalle" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(),comprasr,cargard);
             JOptionPane.showMessageDialog(null, ex.toString());
+        }
+    }
+
+    void buscarData(String valor) {
+        String buscar ="Buscar";
+        String[] titulos = {"ID", "Factura", "Empresa", "Fecha", "Fecha Entrega", "Fecha Vencimiento", "Descripcion", "Descuento", "Total Compra", "Estado"};
+        String[] registros = new String[13];
+        String sql = "Select C.Id_Compra, C.Num_Factura,P.Nombre_Empresa, C.Fecha_Compra,C.Fecha_Entrega,C.Fecha_Vencimiento,C.Descripcion,C.Descuento,C.Total_Compra, E.Estado\n"
+                + "from Compras as C \n"
+                + "Inner Join Proveedor as P ON C.Id_Proveedor = P.Id_Proveedor\n"
+                + "Inner Join EstadoC as E on C.Id_EstadoC=E.Id_EstadoC\n"
+                + "Where CONCAT (C.Id_Compra, ' ', C.Num_Factura) LIKE '%" + valor + "%'\n"
+                + "Order by C.Id_Compra";
+
+        DefaultTableModel model = new DefaultTableModel(null, titulos);
+        Connection con = Conexion.getConexion();
+
+        try {
+
+            Statement st = con.createStatement();
+            ResultSet rs = st.executeQuery(sql);
+
+            while (rs.next()) {
+                registros[0] = rs.getString("Id_Compra");
+                registros[1] = rs.getString("Num_Factura");
+                registros[2] = rs.getString("Nombre_Empresa");
+                registros[3] = rs.getString("Fecha_Compra");
+                registros[4] = rs.getString("Fecha_Entrega");
+                registros[5] = rs.getString("Fecha_Vencimiento");
+                registros[6] = rs.getString("Descripcion");
+                registros[7] = rs.getString("Descuento");
+                registros[8] = rs.getString("Total_Compra");
+                registros[9] = rs.getString("Estado");
+
+                model.addRow(registros);
+            }
+
+            TablaDEcompras.setModel(model);
+            anchoColumnas();
+        } catch (SQLException ex) {
+             lo.LogBitacora("Error: No se pudo buscar los datos" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(),comprasr,buscar);
+            Logger.getLogger(Sucursales.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 }

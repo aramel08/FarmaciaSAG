@@ -6,6 +6,8 @@
 package Formularios_SAG;
 
 import Conexion.Conexion;
+import Logs.log;
+import Reportes.ReportView;
 import java.awt.Color;
 import java.awt.Image;
 import java.awt.Toolkit;
@@ -16,11 +18,18 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.HashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+import net.sf.jasperreports.view.JasperViewer;
 import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
 
 /**
@@ -32,17 +41,19 @@ public class DetalleAlmacen extends javax.swing.JFrame {
     /**
      * Creates new form DetalleAlmacen
      */
+    log lo = new log();
+    String detallea = "DetalleAlmacen";
     public DetalleAlmacen() {
         initComponents();
+        usuario.setText(Login.txtUsuario.getText());
         cargartabla();
         Inhabillitar();
         DetalleAlmacen.CargarAlmacen A = new DetalleAlmacen.CargarAlmacen();
         comboAlmacen.setModel(A.getvalues());
         DetalleAlmacen.CargarProducto p = new DetalleAlmacen.CargarProducto();
         comboProducto.setModel(p.getvalues());
-         AutoCompleteDecorator.decorate(comboAlmacen);
-             AutoCompleteDecorator.decorate(comboProducto);
-       
+        AutoCompleteDecorator.decorate(comboAlmacen);
+        AutoCompleteDecorator.decorate(comboProducto);
 
     }
 
@@ -69,6 +80,9 @@ public class DetalleAlmacen extends javax.swing.JFrame {
         txtIdDetalleAL = new javax.swing.JLabel();
         txtIdAlmacen = new javax.swing.JLabel();
         txtIdProducto = new javax.swing.JLabel();
+        reporte = new javax.swing.JLabel();
+        usuario = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
         jScrollPane1 = new javax.swing.JScrollPane();
         TablaDetalleAlmacen = new javax.swing.JTable();
         jLabel1 = new javax.swing.JLabel();
@@ -204,6 +218,11 @@ public class DetalleAlmacen extends javax.swing.JFrame {
                 txtDescripcionDAActionPerformed(evt);
             }
         });
+        txtDescripcionDA.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                txtDescripcionDAKeyTyped(evt);
+            }
+        });
         getContentPane().add(txtDescripcionDA, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 515, 178, 28));
 
         txtBuscarDetalle.setBackground(new java.awt.Color(240, 240, 240));
@@ -230,6 +249,28 @@ public class DetalleAlmacen extends javax.swing.JFrame {
         getContentPane().add(txtIdDetalleAL, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 300, 40, 20));
         getContentPane().add(txtIdAlmacen, new org.netbeans.lib.awtextra.AbsoluteConstraints(120, 300, 40, 20));
         getContentPane().add(txtIdProducto, new org.netbeans.lib.awtextra.AbsoluteConstraints(190, 300, 40, 20));
+
+        reporte.setBackground(new java.awt.Color(204, 204, 204));
+        reporte.setFont(new java.awt.Font("Georgia", 0, 14)); // NOI18N
+        reporte.setForeground(new java.awt.Color(255, 255, 255));
+        reporte.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/analitica.png"))); // NOI18N
+        reporte.setText("REPORTE");
+        reporte.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                reporteMouseClicked(evt);
+            }
+        });
+        getContentPane().add(reporte, new org.netbeans.lib.awtextra.AbsoluteConstraints(820, 50, 120, 40));
+
+        usuario.setFont(new java.awt.Font("Georgia", 1, 18)); // NOI18N
+        usuario.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        getContentPane().add(usuario, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 510, 230, 20));
+
+        jLabel3.setFont(new java.awt.Font("Georgia", 0, 12)); // NOI18N
+        jLabel3.setForeground(new java.awt.Color(102, 102, 102));
+        jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel3.setText("Usuario");
+        getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 530, 70, -1));
 
         TablaDetalleAlmacen.setFont(new java.awt.Font("Georgia", 0, 12)); // NOI18N
         TablaDetalleAlmacen.setModel(new javax.swing.table.DefaultTableModel(
@@ -266,10 +307,15 @@ public class DetalleAlmacen extends javax.swing.JFrame {
         });
         jScrollPane1.setViewportView(TablaDetalleAlmacen);
 
-        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(440, 260, 480, 290));
+        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(330, 290, 590, 190));
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/Pantalla Detalle Almacen.png"))); // NOI18N
         jLabel1.setText("jLabel1");
+        jLabel1.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                jLabel1KeyTyped(evt);
+            }
+        });
         getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 950, 560));
 
         pack();
@@ -302,8 +348,16 @@ public class DetalleAlmacen extends javax.swing.JFrame {
     private void botonEditarDAMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_botonEditarDAMouseClicked
         ObtenerIDAlmacen();
         ObtenerIDProducto();
-        if (comboAlmacen.equals("Seleccione Almacen") || comboProducto.equals("Seleccione Producto") || txtCapacidadDA.getText().equals("Ingrese Capacidad") || txtDescripcionDA.getText().equals("Ingrese Descripción")) {
-            JOptionPane.showMessageDialog(null, "No se puede Guardar datos vacios");
+        String editar ="BtnEditar";
+        if (comboAlmacen.getSelectedIndex() == 0) {
+            JOptionPane.showMessageDialog(null, "Seleccione Almacen");
+
+        } else if (comboProducto.getSelectedIndex() == 0) {
+            JOptionPane.showMessageDialog(null, "Seleccione un Producto");
+        } else if (txtCapacidadDA.getText().equals("Ingrese Capacidad")) {
+            JOptionPane.showMessageDialog(null, "Ingrese Capacidad");
+        } else if (txtDescripcionDA.getText().equals("Ingrese Descripción")) {
+            JOptionPane.showMessageDialog(null, "Ingrese una Dirección");
         } else {
             int Id = Integer.parseInt(txtIdDetalleAL.getText());
             int Almacen = Integer.parseInt(txtIdAlmacen.getText());
@@ -328,6 +382,7 @@ public class DetalleAlmacen extends javax.swing.JFrame {
                 Inhabillitar();
 
             } catch (SQLException ex) {
+                 lo.LogBitacora("Error: No se pudo editar el dato " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(),detallea, editar);
                 JOptionPane.showMessageDialog(null, ex.toString());
             }
         }
@@ -337,8 +392,17 @@ public class DetalleAlmacen extends javax.swing.JFrame {
     private void botonGuardarDAMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_botonGuardarDAMouseClicked
         ObtenerIDAlmacen();
         ObtenerIDProducto();
-        if (comboAlmacen.getSelectedIndex() == 0 && comboProducto.getSelectedIndex() == 0 && txtCapacidadDA.getText().equals("Ingrese Capacidad") && txtDescripcionDA.getText().equals("Ingrese Descripción")) {
-            JOptionPane.showMessageDialog(null, "No se puede Guardar datos vacios");
+        String guardar = "Btnguardar";
+        if ((comboAlmacen.getSelectedIndex() == 0) || comboProducto.getSelectedIndex() == 0 || txtCapacidadDA.getText().equals("Ingrese Capacidad") || txtDescripcionDA.getText().equals("Ingrese Descripción")) {
+            if (comboAlmacen.getSelectedIndex() == 0) {
+                JOptionPane.showMessageDialog(null, "Seleccione Almacen");
+            } else if (comboProducto.getSelectedIndex() == 0) {
+                JOptionPane.showMessageDialog(null, "Seleccione un Producto");
+            } else if (txtCapacidadDA.getText().equals("Ingrese Capacidad")) {
+                JOptionPane.showMessageDialog(null, "Ingrese Capacidad");
+            } else if (txtDescripcionDA.getText().equals("Ingrese Descripción")) {
+                JOptionPane.showMessageDialog(null, "Ingrese una Descripciom");
+            }
         } else {
             int Almacen = Integer.parseInt(txtIdAlmacen.getText());
             int Productos = Integer.parseInt(txtIdProducto.getText());
@@ -361,19 +425,21 @@ public class DetalleAlmacen extends javax.swing.JFrame {
                 Inhabillitar();
 
             } catch (SQLException ex) {
+                 lo.LogBitacora("Error: No se pudo guardar el dato " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(),detallea, guardar);
                 JOptionPane.showMessageDialog(null, ex.toString());
             }
         }
     }//GEN-LAST:event_botonGuardarDAMouseClicked
 
     private void TablaDetalleAlmacenMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_TablaDetalleAlmacenMouseClicked
+        String tablad = "TablaDetalle";
         try {
             int fila = TablaDetalleAlmacen.getSelectedRow();
             int id = Integer.parseInt(TablaDetalleAlmacen.getValueAt(fila, 0).toString());
             PreparedStatement ps;
             ResultSet rs;
             Connection con = Conexion.getConexion();
-            ps = con.prepareStatement("Select DA.Id_Detalle_Almacen,Al.Ubicacion,P.Nombre_Producto,DA.Capacidad,DA.Descripcion\n"
+            ps = con.prepareStatement("Select .Id_Detalle_Almacen,Al.Ubicacion,P.Nombre_Producto,DA.Capacidad,DA.Descripcion\n"
                     + "From Detalle_Almacen as DA\n"
                     + "INNER JOIN Almacen AS AL ON AL.Id_Almacen =DA.Id_Almacen\n"
                     + "INNER JOIN Productos AS P ON DA.Id_Producto = P.Id_Producto\n"
@@ -393,6 +459,7 @@ public class DetalleAlmacen extends javax.swing.JFrame {
                 Habilitar();
             }
         } catch (SQLException ex) {
+             lo.LogBitacora("Error: No se pudo cargar tabla " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(),detallea,tablad);
             JOptionPane.showMessageDialog(null, ex.toString());
         }
     }//GEN-LAST:event_TablaDetalleAlmacenMouseClicked
@@ -406,17 +473,16 @@ public class DetalleAlmacen extends javax.swing.JFrame {
     }//GEN-LAST:event_botonCancelarDAMouseClicked
 
     private void txtBuscarDetalleKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtBuscarDetalleKeyTyped
-         buscarData(txtBuscarDetalle.getText());
+        buscarData(txtBuscarDetalle.getText());
         validarNumerosLetras(evt);
         if (txtBuscarDetalle.getText().length() > 15) {
-           JOptionPane.showMessageDialog(null, "Alcanzaste el máximo de caracteres para este campo", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Alcanzaste el máximo de caracteres para este campo", "Advertencia", JOptionPane.WARNING_MESSAGE);
             evt.consume();
         } else if (txtBuscarDetalle.getText().length() > 0) {
             if (!txtBuscarDetalle.getText().matches("^(?!.*([A-Za-zñÑáéíóúÁÉÍÓÚ\\s])\\1{2})[A-Za-zñÑáéíóúÁÉÍÓÚ\\s0-9]+$")) {
                 JOptionPane.showMessageDialog(null, "No repitas caracteres de forma incorrecta", "Advertencia", JOptionPane.WARNING_MESSAGE);
                 evt.consume();
-                
-                
+
             }
         }
     }//GEN-LAST:event_txtBuscarDetalleKeyTyped
@@ -475,9 +541,14 @@ public class DetalleAlmacen extends javax.swing.JFrame {
     }//GEN-LAST:event_txtDescripcionDAFocusGained
 
     private void txtDescripcionDAFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtDescripcionDAFocusLost
-       if (txtDescripcionDA.getText().equals("")) {
+        if (txtDescripcionDA.getText().equals("")) {
             txtDescripcionDA.setText("Ingrese Descripción");
             txtDescripcionDA.setForeground(new Color(153, 153, 153));
+        } else if (!txtDescripcionDA.getText().isEmpty()) {
+            if (!txtDescripcionDA.getText().matches("^[A-Z-ÁÉÍÓÚÑ]{1}[a-z-áéíóúñ]+$")) {
+                JOptionPane.showMessageDialog(null, "Debes escribir la descripción del Almacen comenzado en mayúscula. No utilice espacios", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+
         }
     }//GEN-LAST:event_txtDescripcionDAFocusLost
 
@@ -489,7 +560,7 @@ public class DetalleAlmacen extends javax.swing.JFrame {
     }//GEN-LAST:event_txtBuscarDetalleFocusGained
 
     private void txtBuscarDetalleFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtBuscarDetalleFocusLost
-       if (txtBuscarDetalle.getText().equals("")) {
+        if (txtBuscarDetalle.getText().equals("")) {
             txtBuscarDetalle.setText("Buscar Por Almacén o Producto");
             txtBuscarDetalle.setForeground(new Color(153, 153, 153));
         }
@@ -501,6 +572,39 @@ public class DetalleAlmacen extends javax.swing.JFrame {
             evt.consume();
         }
     }//GEN-LAST:event_txtCapacidadDAKeyTyped
+
+    private void txtDescripcionDAKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtDescripcionDAKeyTyped
+        if (txtDescripcionDA.getText().length() > 50) {
+            JOptionPane.showMessageDialog(null, "El máximo es de 50 caracteres para este campo", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            evt.consume();
+        } else if (txtDescripcionDA.getText().length() > 0) {
+            if (!txtDescripcionDA.getText().matches("^(?!.*([A-Za-zñÑáéíóúÁÉÍÓÚ\\s])\\1{2})[A-Za-zñÑáéíóúÁÉÍÓÚ\\s0-9]+$")) {
+                JOptionPane.showMessageDialog(null, "No repitas caracteres de forma incorrecta", "Error", JOptionPane.ERROR_MESSAGE);
+                evt.consume();
+            }
+
+        }
+    }//GEN-LAST:event_txtDescripcionDAKeyTyped
+
+    private void jLabel1KeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jLabel1KeyTyped
+        // TODO add your handling code here:
+    }//GEN-LAST:event_jLabel1KeyTyped
+
+    private void reporteMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_reporteMouseClicked
+        JasperReport reporte;
+        HashMap hm = new HashMap();
+        hm.put("Usuario", usuario.getText());
+        try {
+            Connection con = Conexion.getConexion();
+            reporte = JasperCompileManager.compileReport("src/Reportes/ReporteDetalleAlmacen.jrxml");
+            JasperPrint jp = JasperFillManager.fillReport(reporte, hm, con);
+            JasperViewer.viewReport(jp, true);
+            ReportView view = new ReportView(jp, false);
+            view.setVisible(true);
+        } catch (JRException ex) {
+            Logger.getLogger(Clientes.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_reporteMouseClicked
 
     /**
      * @param args the command line arguments
@@ -547,13 +651,16 @@ public class DetalleAlmacen extends javax.swing.JFrame {
     private javax.swing.JComboBox<String> comboAlmacen;
     private javax.swing.JComboBox<String> comboProducto;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JLabel reporte;
     private javax.swing.JTextField txtBuscarDetalle;
     private javax.swing.JTextField txtCapacidadDA;
     private javax.swing.JTextField txtDescripcionDA;
     private javax.swing.JLabel txtIdAlmacen;
     private javax.swing.JLabel txtIdDetalleAL;
     private javax.swing.JLabel txtIdProducto;
+    private javax.swing.JLabel usuario;
     // End of variables declaration//GEN-END:variables
 
     private void Habilitar() {
@@ -572,6 +679,8 @@ public class DetalleAlmacen extends javax.swing.JFrame {
         ResultSet rs;
         ResultSetMetaData rsmd;
         int columnas;
+        
+        String cargart ="CargarTabla";
 
         try {
             Connection con = Conexion.getConexion();
@@ -593,6 +702,7 @@ public class DetalleAlmacen extends javax.swing.JFrame {
             }
 
         } catch (SQLException ex) {
+             lo.LogBitacora("Error: No se pudo cargar el dato " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(),detallea,cargart);
             JOptionPane.showMessageDialog(null, ex.toString());
         }
 
@@ -626,10 +736,11 @@ public class DetalleAlmacen extends javax.swing.JFrame {
 
     private void ObtenerIDAlmacen() {
         String Nombre = comboAlmacen.getSelectedItem().toString();
+        String obtenerA ="ObtenerIdAlmacen";
         try {
             ResultSet rs;
             Connection con = Conexion.getConexion();
-            PreparedStatement ps = con.prepareStatement("Select Id_Almacen From Almacen Where Ubicacion=?");
+            PreparedStatement ps = con.prepareStatement("Select Id_Almacen Almacen Where Ubicacion=?");
             ps.setString(1, Nombre);
             rs = ps.executeQuery();
 
@@ -638,12 +749,14 @@ public class DetalleAlmacen extends javax.swing.JFrame {
             }
 
         } catch (SQLException ex) {
+             lo.LogBitacora("Error: No se pudo obtener el id almacen " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(),detallea,obtenerA);
             JOptionPane.showMessageDialog(null, ex.toString());
         }
     }
 
     private void ObtenerIDProducto() {
         String Nombre = comboProducto.getSelectedItem().toString();
+        String obtenerP = "ObtenerIdP";
         try {
             ResultSet rs;
             Connection con = Conexion.getConexion();
@@ -656,12 +769,14 @@ public class DetalleAlmacen extends javax.swing.JFrame {
             }
 
         } catch (SQLException ex) {
+             lo.LogBitacora("Error: No se pudo obtener el id producto " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(),detallea, obtenerP);
             JOptionPane.showMessageDialog(null, ex.toString());
         }
 
     }
 
     private void buscarData(String valor) {
+        String buscar ="Buscar";
         String[] titulos = {"Id Detalle Almacen", "Ubicacion", "Producto", "Capacidad", "Descipcion"};
         String[] registros = new String[13];
         String sql = "Select DA.Id_Detalle_Almacen,AL.Ubicacion,P.Nombre_Producto,DA.Capacidad,DA.Descripcion\n"
@@ -692,6 +807,7 @@ public class DetalleAlmacen extends javax.swing.JFrame {
             TablaDetalleAlmacen.setModel(model);
             // anchoColumnas();
         } catch (SQLException ex) {
+             lo.LogBitacora("Error: No se pudo buscar el dato " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(),detallea,buscar);
             Logger.getLogger(Clientes.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -710,19 +826,19 @@ public class DetalleAlmacen extends javax.swing.JFrame {
     }
 
     private void validarNumeros(KeyEvent e) {
-         
+
         if (e.getKeyChar() >= 33 && e.getKeyChar() <= 47
-               || e.getKeyChar() >= 58 && e.getKeyChar() <= 238) {
+                || e.getKeyChar() >= 58 && e.getKeyChar() <= 238) {
             e.consume();
-           JOptionPane.showMessageDialog(null, "Este campo solo admite números", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null, "Este campo solo admite números", "Error", JOptionPane.ERROR_MESSAGE);
         }
-        
-    } 
-    
+
+    }
 
     public class CargarProducto {
 
         public DefaultComboBoxModel getvalues() {
+            String cargarp = "cargarproducto";
 
             DefaultComboBoxModel modelo = new DefaultComboBoxModel();
             try {
@@ -737,6 +853,7 @@ public class DetalleAlmacen extends javax.swing.JFrame {
                 con.close();
                 rs.close();
             } catch (Exception e) {
+                 lo.LogBitacora("Error: No se pudo cargar el producto " + "Excepción: " + e + ". Origen: " + this.getClass().getSimpleName(), detallea, cargarp);
                 System.out.println(e);
             }
             return modelo;
@@ -746,11 +863,12 @@ public class DetalleAlmacen extends javax.swing.JFrame {
     public class CargarAlmacen {
 
         public DefaultComboBoxModel getvalues() {
+            String cargara ="CargarAlmacen";
 
             DefaultComboBoxModel modelo = new DefaultComboBoxModel();
             try {
                 Connection con = Conexion.getConexion();
-                String sql = "select Ubicacion from Almacen";
+                String sql = "select Ubicacion  Almacen";
                 Statement st = con.createStatement();
                 ResultSet rs = st.executeQuery(sql);
                 modelo.addElement("Seleccione Almacen...");
@@ -760,6 +878,7 @@ public class DetalleAlmacen extends javax.swing.JFrame {
                 con.close();
                 rs.close();
             } catch (Exception e) {
+                lo.LogBitacora("Error: No se pudo cargar almacen " + "Excepción: " + e + ". Origen: " + this.getClass().getSimpleName(), detallea, cargara);
                 System.out.println(e);
             }
             return modelo;
