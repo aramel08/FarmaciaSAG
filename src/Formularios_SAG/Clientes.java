@@ -6,9 +6,12 @@
 package Formularios_SAG;
 
 import Conexion.Conexion;
+import Logs.log;
+import Reportes.ReportView;
 import java.awt.Color;
 import java.awt.Image;
 import java.awt.Toolkit;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -16,14 +19,29 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.logging.FileHandler;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.logging.SimpleFormatter;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
+//import org.apache.poi.hssf.util.HSSFColor;
+
+//import org.apache.poi.hssf.usermodel.HSSFCellStyle;
+//import org.apache.poi.hssf.util.HSSFColor$WHITE;
+import net.sf.jasperreports.view.JasperViewer;
 
 /**
  *
@@ -34,6 +52,9 @@ public class Clientes extends javax.swing.JFrame {
     /**
      * Creates new form Clientes
      */
+    log lo = new log();
+    String cliente = "ClientesP";
+
     @Override
     public Image getIconImage() {
         Image retValue = Toolkit.getDefaultToolkit().getImage(ClassLoader.getSystemResource("componentes/LOGOSAG(2).png"));
@@ -48,12 +69,28 @@ public class Clientes extends javax.swing.JFrame {
         txtIdC.setVisible(Boolean.FALSE);
         BotonActivoC.setVisible(Boolean.FALSE);
         BotonInactivoC.setVisible(Boolean.FALSE);
+        Date max = new Date();
+        txtFechaRegistro.setSelectableDateRange(max, max);
+        txtFechaRegistro.setDate(max);
+        Calendar cal = Calendar.getInstance();
+        cal.add(Calendar.YEAR, -95);
+        Calendar cale = Calendar.getInstance();
+        cale.add(Calendar.YEAR, -18);
+        Date min = cal.getTime();
+        Date maxi = cale.getTime();
+        txtFechaNac.setSelectableDateRange(min, maxi);
+        txtFechaNac.setDateFormatString("dd/MM/yyyy");
+        txtFechaNac.setDate(maxi);
+        usuario.setText(Login.txtUsuario.getText());
+
     }
 
-    void verificarDatosExistentes(String campo, String columna, String tabla, String mensaje) {
+    boolean verificarDatosExistentes(String campo, String columna, String tabla, String mensaje) {
         Conexion cc = new Conexion();
         Connection cn = cc.getConexion();
-        String sql = "SELECT " + columna + " FROM " + tabla + " WHERE " + columna + " = '" + campo + "'";
+        boolean resultado = true;
+        String verificar ="verificar";
+        String sql = "SELECT " + columna + " FROM " + tabla + "  " + columna + " = '" + campo + "'";
 
         try {
             Statement st = cn.createStatement();
@@ -62,11 +99,15 @@ public class Clientes extends javax.swing.JFrame {
             if (rs.next()) {
                 if (rs.getString(columna).equals(campo)) {
                     JOptionPane.showMessageDialog(null, mensaje, "Error", JOptionPane.ERROR_MESSAGE);
+                    resultado = false;
                 }
             }
         } catch (Exception e) {
+            lo.LogBitacora("Error: No se pudo verificar datos existentes" + "Excepción: " + e + ". Origen: " + this.getClass().getSimpleName(), cliente, verificar);
+
             JOptionPane.showMessageDialog(null, "No se pudo verificar\n" + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
+        return resultado;
     }
 
     /**
@@ -103,6 +144,9 @@ public class Clientes extends javax.swing.JFrame {
         BotonActivoC = new javax.swing.JRadioButton();
         txtEstadoC = new javax.swing.JLabel();
         txtGeneroC = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        usuario = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
         txtFechaRegistro = new com.toedter.calendar.JDateChooser();
         txtIdC = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
@@ -440,7 +484,7 @@ public class Clientes extends javax.swing.JFrame {
         });
         tablaClientes.setViewportView(tablaCliente);
 
-        getContentPane().add(tablaClientes, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 300, 710, 400));
+        getContentPane().add(tablaClientes, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 300, 710, 360));
 
         grupoBotonClientes.add(BotonInactivoC);
         BotonInactivoC.setFont(new java.awt.Font("Georgia", 1, 14)); // NOI18N
@@ -471,6 +515,28 @@ public class Clientes extends javax.swing.JFrame {
         txtEstadoC.setText("Estado");
         getContentPane().add(txtEstadoC, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 250, 70, 20));
         getContentPane().add(txtGeneroC, new org.netbeans.lib.awtextra.AbsoluteConstraints(320, 290, 120, 30));
+
+        jLabel2.setBackground(new java.awt.Color(204, 204, 204));
+        jLabel2.setFont(new java.awt.Font("Georgia", 0, 14)); // NOI18N
+        jLabel2.setForeground(new java.awt.Color(255, 255, 255));
+        jLabel2.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/analitica.png"))); // NOI18N
+        jLabel2.setText("REPORTE");
+        jLabel2.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jLabel2MouseClicked(evt);
+            }
+        });
+        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(840, 50, 120, 40));
+
+        usuario.setFont(new java.awt.Font("Georgia", 1, 18)); // NOI18N
+        usuario.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        getContentPane().add(usuario, new org.netbeans.lib.awtextra.AbsoluteConstraints(390, 680, 230, 20));
+
+        jLabel3.setFont(new java.awt.Font("Georgia", 0, 12)); // NOI18N
+        jLabel3.setForeground(new java.awt.Color(102, 102, 102));
+        jLabel3.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel3.setText("Usuario");
+        getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(470, 700, 70, -1));
 
         txtFechaRegistro.setOpaque(false);
         getContentPane().add(txtFechaRegistro, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 665, 200, 30));
@@ -516,71 +582,92 @@ public class Clientes extends javax.swing.JFrame {
     }//GEN-LAST:event_botonAgregarCMouseClicked
 
     private void botonEditarCMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_botonEditarCMouseClicked
-        int Id = Integer.parseInt(txtIdC.getText());
-        String RTN = txtRTN.getText();
-        String Nombre = txtNombreC.getText();
-        String Apellido = txtApellidoC.getText();
-        int Genero = comboGenero.getSelectedIndex();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        String FechaNac = sdf.format(txtFechaNac.getDate());
-        String Direccion = txtDireccionC.getText();
-        String Telefono = txtTelefonoC.getText();
-        String Email = txtEmail.getText();
-        String FechaRegistro = sdf.format(txtFechaRegistro.getDate());
-        String Estado = "";
 
-        try {
-            Connection con = Conexion.getConexion();
-            PreparedStatement ps = con.prepareStatement("Update Cliente set Nombre_Cliente=?,Apellido_Cliente=?,RTN=?,Telefono=?, Id_Genero=?,Direccion=?,Fecha_Nacimiento=?,[E-mail]=?,Fecha_Registro=? Where Id_Cliente=?");
-            ps.setString(3, RTN);
-            ps.setString(1, Nombre);
-            ps.setString(2, Apellido);
-            ps.setInt(5, Genero);
-            ps.setString(7, FechaNac);
-            ps.setString(6, Direccion);
-            ps.setInt(4, Integer.valueOf(Telefono));
-            ps.setString(8, Email);
-            ps.setString(9, FechaRegistro);
-            ps.setInt(10, Id);
-            ps.executeUpdate();
-            JOptionPane.showMessageDialog(null, "Registro Actualizado");
-            cargartabla();
-            Limpiar();
-            Inhabillitar();
-            txtEstadoC.setVisible(Boolean.FALSE);
+        String editar = "BtnEditar";
 
-        } catch (SQLException ex) {
-            JOptionPane.showMessageDialog(null, ex.toString());
+        if (txtNombreC.getText().equals("Ingrese Nombre")) {
+
+        } else if (txtRTN.getText().equals("Ingrese RTN")) {
+
+            JOptionPane.showMessageDialog(null, "Seleccione Femenino o Masculino");
+        } else if (txtFechaNac.getDateFormatString().equals("")) {
+            JOptionPane.showMessageDialog(null, "Debe ingresar Fecha Nacimiento");
+        } else if (txtDireccionC.getText().equals("Ingrese Dirección")) {
+            JOptionPane.showMessageDialog(null, "Debe ingresar una Dirección");
+        } else if (txtTelefonoC.getText().equals("Ingrese Teléfono")) {
+            JOptionPane.showMessageDialog(null, "Debe ingresar un Teléfono");
+        } else if (txtEmail.getText().equals("Ingrese E-mail")) {
+            JOptionPane.showMessageDialog(null, "Debe ingresar E-mail");
+        } else if (txtFechaRegistro.getDateFormatString().equals("")) {
+            JOptionPane.showMessageDialog(null, "Debe ingresar Fecha Registro");
+
+        } else {
+
+            int Id = Integer.parseInt(txtIdC.getText());
+            String RTN = txtRTN.getText();
+            String Nombre = txtNombreC.getText();
+            String Apellido = txtApellidoC.getText();
+            int Genero = comboGenero.getSelectedIndex();
+            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+            String FechaNac = sdf.format(txtFechaNac.getDate());
+            String Direccion = txtDireccionC.getText();
+            String Telefono = txtTelefonoC.getText();
+            String Email = txtEmail.getText();
+            String FechaRegistro = sdf.format(txtFechaRegistro.getDate());
+            String Estado = "";
+
+            try {
+                Connection con = Conexion.getConexion();
+                PreparedStatement ps = con.prepareStatement("Update Cliente set Nombre_Cliente=?,Apellido_Cliente=?,RTN=?,Telefono=?, Id_Genero=?,Direccion=?,Fecha_Nacimiento=?,[E-mail]=?,Fecha_Registro=? Where Id_Cliente=?");
+                ps.setString(3, RTN);
+                ps.setString(1, Nombre);
+                ps.setString(2, Apellido);
+                ps.setInt(5, Genero);
+                ps.setString(7, FechaNac);
+                ps.setString(6, Direccion);
+                ps.setInt(4, Integer.valueOf(Telefono));
+                ps.setString(8, Email);
+                ps.setString(9, FechaRegistro);
+                ps.setInt(10, Id);
+                ps.executeUpdate();
+                JOptionPane.showMessageDialog(null, "Registro Actualizado");
+                cargartabla();
+                Limpiar();
+                Inhabillitar();
+                txtEstadoC.setVisible(Boolean.FALSE);
+
+            } catch (Exception ex) {
+                lo.LogBitacora("Error: No se pudo editar el registro " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), cliente, editar);
+                JOptionPane.showMessageDialog(null, ex.toString());
+            }
         }
+
     }//GEN-LAST:event_botonEditarCMouseClicked
        private void botonGuardarCMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_botonGuardarCMouseClicked
-        if(botonGuardarC.isEnabled()){
-            if (txtNombreC.getText().equals("Ingrese Nombre") || txtTelefonoC.getText().equals("Ingrese Teléfono") || txtDireccionC.getText().equals("Ingrese Dirección") || txtEmail.getText().equals("Ingrese E-mail")
-                   || txtApellidoC.getText().equals("Ingrese Apellido") || txtRTN.getText().equals("Ingrese RTN") || comboGenero.getSelectedItem().equals("Seleccione Género...")) {
-               if (txtRTN.getText().equals("Ingrese RTN")) {
-                   JOptionPane.showMessageDialog(null, "Debe ingresar un RTN");
-               } else if (txtNombreC.getText().equals("Ingrese Nombre")) {
-                   JOptionPane.showMessageDialog(null, "Debe ingresar un Nombre");
-               } else if (txtApellidoC.getText().equals("Ingrese Apellido")) {
-                   JOptionPane.showMessageDialog(null, "Debe ingresar Apellido");
-               } else if (comboGenero.getSelectedItem().equals("Seleccione Género...")) {
-                   JOptionPane.showMessageDialog(null, "Seleccione Femenino o Masculino");
-               } else if (txtFechaNac.getDateFormatString().equals("")) {
-                   JOptionPane.showMessageDialog(null, "Debe ingresar Fecha Nacimiento");
-               } else if (txtDireccionC.getText().equals("Ingrese Dirección")) {
-                   JOptionPane.showMessageDialog(null, "Debe ingresar una Dirección");
-               } else if (txtTelefonoC.getText().equals("Ingrese Teléfono")) {
-                   JOptionPane.showMessageDialog(null, "Debe ingresar un Teléfono");
-               } else if (txtEmail.getText().equals("Ingrese E-mail")) {
-                   JOptionPane.showMessageDialog(null, "Debe ingresar E-mail");
-               } else if (txtFechaRegistro.getDateFormatString().equals("")) {
-                   JOptionPane.showMessageDialog(null, "Debe ingresar Fecha Registro");
-               }
+           String guardar = "BtnGuardar";
+
+           //        if (botonGuardarC.isEnabled()) {
+           if (txtNombreC.getText().equals("Ingrese Nombre")) {
+
+           } else if (txtRTN.getText().equals("Ingrese RTN")) {
+
+               JOptionPane.showMessageDialog(null, "Seleccione Femenino o Masculino");
+           } else if (txtFechaNac.getDateFormatString().equals("")) {
+               JOptionPane.showMessageDialog(null, "Debe ingresar Fecha Nacimiento");
+           } else if (txtDireccionC.getText().equals("Ingrese Dirección")) {
+               JOptionPane.showMessageDialog(null, "Debe ingresar una Dirección");
+           } else if (txtTelefonoC.getText().equals("Ingrese Teléfono")) {
+               JOptionPane.showMessageDialog(null, "Debe ingresar un Teléfono");
+           } else if (txtEmail.getText().equals("Ingrese E-mail")) {
+               JOptionPane.showMessageDialog(null, "Debe ingresar E-mail");
+           } else if (txtFechaRegistro.getDateFormatString().equals("")) {
+               JOptionPane.showMessageDialog(null, "Debe ingresar Fecha Registro");
+
            } else {
                String RTN = txtRTN.getText();
                String Nombre = txtNombreC.getText();
                String Apellido = txtApellidoC.getText();
-               int Genero = comboGenero.getSelectedIndex() + 1;
+               int Genero = comboGenero.getSelectedIndex();
                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
                String FechaNac = sdf.format(txtFechaNac.getDate());
                String Direccion = txtDireccionC.getText();
@@ -589,7 +676,7 @@ public class Clientes extends javax.swing.JFrame {
                String FechaRegistro = sdf.format(txtFechaRegistro.getDate());
                try {
                    Connection con = Conexion.getConexion();
-                   PreparedStatement ps = con.prepareStatement("Insert into Cliente(Nombre_Cliente, Apellido_Cliente, RTN,Telefono,Id_Genero,Direccion,Fecha_Nacimiento,[E-mail],Fecha_Registro,Id_Estado) VALUES(?,?,?,?,?,?,?,?,?,?)");
+                   PreparedStatement ps = con.prepareStatement("Insert ClienteNombre_Cliente, Apellido_Cliente RTN,Telefono,Id_Genero,Direccion,Fecha_Nacimiento,[E-mail],Fecha_Registro,Id_Estado) VALUES(?,?,?,?,?,?,?,?,?,?)");
                    ps.setString(1, Nombre);
                    ps.setString(2, Apellido);
                    ps.setString(3, RTN);
@@ -607,13 +694,14 @@ public class Clientes extends javax.swing.JFrame {
                    Inhabillitar();
 
                } catch (SQLException ex) {
+                   lo.LogBitacora("Error: No se pudo guardar el registro " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), cliente, guardar);
                    JOptionPane.showMessageDialog(null, ex.toString());
                }
+
+               //} else {
+               //JOptionPane.showMessageDialog(null, "Debe dar click en agregar para guardar");
            }
-        }else{
-            JOptionPane.showMessageDialog(null, "Debe dar click en agregar para guardar");
-        }
-           
+
     }//GEN-LAST:event_botonGuardarCMouseClicked
 
     private void botonCancelarCMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_botonCancelarCMouseClicked
@@ -626,29 +714,29 @@ public class Clientes extends javax.swing.JFrame {
     }//GEN-LAST:event_botonBuscarCMouseClicked
 
     private void botonRegresarCMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_botonRegresarCMouseClicked
-        
-        if(Factura.regresar.equals("1")){
+
+        if (Factura.regresar.equals("1")) {
             java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new Factura().setVisible(true);
-            }
-        });
-        this.dispose(); 
-        }else{
-          java.awt.EventQueue.invokeLater(new Runnable() {
-            public void run() {
-                new MenuPrincipal().setVisible(true);
-            }
-        });
-        this.dispose();  
+                public void run() {
+                    new Factura().setVisible(true);
+                }
+            });
+            this.dispose();
+        } else {
+            java.awt.EventQueue.invokeLater(new Runnable() {
+                public void run() {
+                    new MenuPrincipal().setVisible(true);
+                }
+            });
+            this.dispose();
         }
-        
-        
+
+
     }//GEN-LAST:event_botonRegresarCMouseClicked
 
     private void tablaClienteMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tablaClienteMouseClicked
         // //TODO add your handling code here:
-
+        String tabla = "TablaCliente";
         try {
             int fila = tablaCliente.getSelectedRow();
             int id = Integer.parseInt(tablaCliente.getValueAt(fila, 0).toString());
@@ -689,6 +777,7 @@ public class Clientes extends javax.swing.JFrame {
             botonAgregarC.setVisible(Boolean.TRUE);
             Habillitar();
         } catch (SQLException ex) {
+            lo.LogBitacora("Error: No se pudo seleccionar el registro de la tabla " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(),cliente,tabla);
             JOptionPane.showMessageDialog(null, ex.toString());
         }
 
@@ -696,13 +785,13 @@ public class Clientes extends javax.swing.JFrame {
     }//GEN-LAST:event_tablaClienteMouseClicked
 
     private void BotonActivoCActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BotonActivoCActionPerformed
-        int Id = Integer.parseInt(txtIdC.getText());
-
+        String IdC = txtIdC.getText();
+        String activo="BtnActivo";
         try {
             Connection con = Conexion.getConexion();
             PreparedStatement ps = con.prepareStatement("Update Cliente set Id_Estado=? Where Id_Cliente=?");
             ps.setInt(1, 1);
-            ps.setInt(2, Id);
+            ps.setString(2, IdC);
             ps.executeUpdate();
             JOptionPane.showMessageDialog(null, "Registro Habilitado");
             cargartabla();
@@ -713,18 +802,73 @@ public class Clientes extends javax.swing.JFrame {
             BotonInactivoC.setVisible(Boolean.FALSE);
 
         } catch (SQLException ex) {
+            lo.LogBitacora("Error: No se pudo actualizar el estado " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(),cliente,activo);
             JOptionPane.showMessageDialog(null, ex.toString());
-        }
+            
+            /*try{
+                Calendar fecha = new GregorianCalendar();
+                String fecha1;
+                String aux1,aux2,aux3;
+                aux1 = Integer.toString(fecha.get(Calendar.YEAR));
+                aux2 = (fecha.get(Calendar.MONTH)<10)? "0"+(Integer.toString(fecha.get(Calendar.MONTH)+1)) : Integer.toString(fecha.get(Calendar.MONTH));
+                switch(aux2){
+                    case "01":
+                        aux2= "01";
+                        break;
+                    case "02":
+                        aux2= "02";
+                        break;case "03":
+                            aux2= "03";
+                            break;case "04":
+                                aux2= "04";
+                                break;case "05":
+                                    aux2= "05";
+                                    break;case "06":
+                                        aux2= "06";
+                                        break;case "07":
+                                            aux2= "07";
+                                            break;case "08":
+                                                aux2= "08";
+                                                break;case "09":
+                                                    aux2= "09";
+                                                    break;
+                                                case "010":
+                                                    aux2= "10";
+                                                    break;
+                                                case "011":
+                                                    aux2= "11";
+                                                    break;
+                                                case "012":
+                                                    aux2= "12";
+                                                    break;
+                                                default:
+                                                    break;
+                }
+                aux3 = (fecha.get(Calendar.DAY_OF_MONTH)<10)? "0"+Integer.toString(fecha.get(Calendar.DAY_OF_MONTH)) : Integer.toString(fecha.get(Calendar.DAY_OF_MONTH));
+                fecha1 = aux1+aux2+aux3+"-"+fecha.get(Calendar.HOUR_OF_DAY)+fecha.get(Calendar.MINUTE)+fecha.get(Calendar.SECOND);
+                Logger logger = Logger.getLogger(Clientes.class.getName());
+                FileHandler fh = null;
+                fh = new FileHandler("./Logs/"+"ClietesPrueba-Activar-"+fecha1+".log");
+                logger.addHandler(fh);
+                fh.setFormatter(new SimpleFormatter());
+                logger.setLevel(Level.WARNING);
+                logger.log(Level.SEVERE,ex.getMessage());
+                fh.close();
+            } catch (IOException | SecurityException e) {
+                Logger.getLogger(Clientes.class.getName()).log(Level.SEVERE, null, ex);
+            }     */                   
+        }                
     }//GEN-LAST:event_BotonActivoCActionPerformed
 
     private void BotonInactivoCActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BotonInactivoCActionPerformed
-        int Id = Integer.parseInt(txtIdC.getText());
+        String IdC = txtIdC.getText();
+        String inactivo="BtnInactivo";
 
         try {
             Connection con = Conexion.getConexion();
             PreparedStatement ps = con.prepareStatement("Update Cliente set Id_Estado=? Where Id_Cliente=?");
             ps.setInt(1, 2);
-            ps.setInt(2, Id);
+            ps.setString(2, IdC);
             ps.executeUpdate();
             JOptionPane.showMessageDialog(null, "Registro Inhabilitado");
             cargartabla();
@@ -735,6 +879,7 @@ public class Clientes extends javax.swing.JFrame {
             BotonInactivoC.setVisible(Boolean.FALSE);
 
         } catch (SQLException ex) {
+            lo.LogBitacora("Error: No se pudo actualizar el estado " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(),cliente,inactivo);
             JOptionPane.showMessageDialog(null, ex.toString());
         }
 
@@ -792,6 +937,13 @@ public class Clientes extends javax.swing.JFrame {
             txtRTN.setForeground(new Color(153, 153, 153));
         } else if (txtRTN.getText().length() < 14) {
             JOptionPane.showMessageDialog(null, "El documento RTN debe contener 14 dígitos", "Advertencia", JOptionPane.WARNING_MESSAGE);
+        } else if (!txtRTN.getText().matches("(^[0]{1}[0-9]{13}$)|(^[1]{1}[0-9]{13}$)")) {
+            JOptionPane.showMessageDialog(null, "El número de RTN debe comenzar en 0 o en 1", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            txtRTN.setText("");
+            if (txtRTN.getText().equals("")) {
+                txtRTN.setText("Ingrese RTN");
+                txtRTN.setForeground(new Color(153, 153, 153));
+            }
         } else {
             verificarDatosExistentes(txtRTN.getText(), "RTN", "Cliente", "No puedes utilizar el RTN de otro Cliente");
         }
@@ -857,11 +1009,12 @@ public class Clientes extends javax.swing.JFrame {
             txtTelefonoC.setForeground(new Color(153, 153, 153));
         } else if (txtTelefonoC.getText().length() < 8) {
             JOptionPane.showMessageDialog(null, "El número de teléfono debe contener 8 dígitos", "Error", JOptionPane.ERROR_MESSAGE);
-        } else if (!txtTelefonoC.getText().matches("(^[9]{1}[0-9]{7}$)|(^[3]{1}[0-9]{7}$)|(^[7]{1}[0-9]{7}$)")) {
-            JOptionPane.showMessageDialog(null, "El número de celular debe comenzar en 9, 3 o 7", "Advertencia", JOptionPane.WARNING_MESSAGE);
+        } else if (!txtTelefonoC.getText().matches("(^[9]{1}[0-9]{7}$)|(^[3]{1}[0-9]{7}$)|(^[7]{1}[0-9]{7}$)|(^[8]{1}[0-9]{7}$)")) {
+            JOptionPane.showMessageDialog(null, "El número de celular debe comenzar en 9, 3,7,8", "Advertencia", JOptionPane.WARNING_MESSAGE);
         } else {
             verificarDatosExistentes(txtTelefonoC.getText(), "Telefono", "Cliente", "El  número de telefono ya existe");
         }
+
     }//GEN-LAST:event_txtTelefonoCFocusLost
 
     private void txtDireccionCFocusLost(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtDireccionCFocusLost
@@ -888,9 +1041,14 @@ public class Clientes extends javax.swing.JFrame {
             txtEmail.setForeground(new Color(153, 153, 153));
         } else if (!txtEmail.getText().matches("^(.+[@]{1}[a-z]+[.]{1}[a-z]+)$|^(.+[@]{1}[a-z]+[.]{1}[a-z]+[.]{1}[a-z]+)$")) {
             JOptionPane.showMessageDialog(null, "Debe escribir un correo válido ´\nEjemplo: farmaciasag@gmail.com", "Advertencia", JOptionPane.WARNING_MESSAGE);
-        } else {
+            txtEmail.setText("");
+            if (txtEmail.getText().equals("")) {
+                txtEmail.setText("Ingrese E-mail");
+                txtEmail.setForeground(new Color(153, 153, 153));
+            }
+        }/* else {
             verificarDatosExistentes(txtEmail.getText(), "E-mail", "Cliente", "No puedes utilizar el E-mail de otro Cliente");
-        }
+        }*/
     }//GEN-LAST:event_txtEmailFocusLost
 
     private void txtBuscarCFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtBuscarCFocusGained
@@ -944,7 +1102,7 @@ public class Clientes extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, "Alcanzaste el máximo de caracteres para este campo", "Advertencia", JOptionPane.WARNING_MESSAGE);
             evt.consume();
         } else if (txtNombreC.getText().length() > 0) {
-            if (!txtNombreC.getText().matches("^(?!.*([A-Za-zñÑáéíóúÁÉÍÓÚ\\s])\\1{2})[A-Za-zñÑáéíóúÁÉÍÓÚ\\s0-9]+$")) {
+            if (!txtNombreC.getText().matches("^(?!.*([A-Za-zñÑáéíóúÁÉÍÓÚ\\s])\\1{2})[A-Za-zñÑáéíóúÁÉÍÓÚ\\s]+$")) {
                 JOptionPane.showMessageDialog(null, "No repitas caracteres de forma incorrecta", "Error", JOptionPane.ERROR_MESSAGE);
                 evt.consume();
             }
@@ -952,11 +1110,11 @@ public class Clientes extends javax.swing.JFrame {
     }//GEN-LAST:event_txtNombreCKeyTyped
 
     private void txtApellidoCKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtApellidoCKeyTyped
-        if (txtNombreC.getText().length() > 12) {
+        if (txtApellidoC.getText().length() > 12) {
             JOptionPane.showMessageDialog(null, "Alcanzaste el máximo de caracteres para este campo", "Advertencia", JOptionPane.WARNING_MESSAGE);
             evt.consume();
-        } else if (txtNombreC.getText().length() > 0) {
-            if (!txtNombreC.getText().matches("^(?!.*([A-Za-zñÑáéíóúÁÉÍÓÚ\\s])\\1{2})[A-Za-zñÑáéíóúÁÉÍÓÚ\\s0-9]+$")) {
+        } else if (txtApellidoC.getText().length() > 0) {
+            if (!txtApellidoC.getText().matches("^(?!.*([A-Za-zñÑáéíóúÁÉÍÓÚ\\s])\\1{2})[A-Za-zñÑáéíóúÁÉÍÓÚ\\s]+$")) {
                 JOptionPane.showMessageDialog(null, "No repitas caracteres de forma incorrecta", "Error", JOptionPane.ERROR_MESSAGE);
                 evt.consume();
             }
@@ -965,7 +1123,7 @@ public class Clientes extends javax.swing.JFrame {
 
     private void txtDireccionCKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtDireccionCKeyTyped
         if (txtDireccionC.getText().length() > 25) {
-            JOptionPane.showMessageDialog(null, "Alcanzaste el máximo de caracteres para este campo", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(null, "El máximo es de 25 caracteres para este campo", "Advertencia", JOptionPane.WARNING_MESSAGE);
             evt.consume();
         } else if (txtDireccionC.getText().length() > 0) {
             if (!txtDireccionC.getText().matches("^(?!.*([A-Za-zñÑáéíóúÁÉÍÓÚ\\s])\\1{2})[A-Za-zñÑáéíóúÁÉÍÓÚ\\s0-9]+$")) {
@@ -977,7 +1135,7 @@ public class Clientes extends javax.swing.JFrame {
 
     private void txtEmailKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtEmailKeyTyped
         if (txtEmail.getText().length() > 30) {
-            JOptionPane.showMessageDialog(null, "Alcanzaste el máximo de caracteres para este campo", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            JOptionPane.showMessageDialog(null, " El máximo es de 30 caracteres para este campo", "Advertencia", JOptionPane.WARNING_MESSAGE);
             evt.consume();
         } else if (txtEmail.getText().length() > 15) {
             if (!txtEmail.getText().matches("^([a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\\\\.[a-zA-Z0-9-]+)*)")) {
@@ -1035,6 +1193,22 @@ public class Clientes extends javax.swing.JFrame {
         }
     }//GEN-LAST:event_comboGeneroMousePressed
 
+    private void jLabel2MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel2MouseClicked
+        JasperReport reporte;
+         HashMap hm = new HashMap();
+        hm.put("Usuario", usuario.getText());
+        try {
+            Connection con = Conexion.getConexion();
+            reporte = JasperCompileManager.compileReport("src/Reportes/ReporteClientes.jrxml");
+            JasperPrint jp = JasperFillManager.fillReport(reporte, hm, con);
+            //JasperViewer.viewReport(jp,true);
+            ReportView view = new ReportView(jp, false);
+            view.setVisible(true);
+        } catch (JRException ex) {
+            Logger.getLogger(Clientes.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }//GEN-LAST:event_jLabel2MouseClicked
+
     /**
      * @param args the command line arguments
      */
@@ -1083,6 +1257,8 @@ public class Clientes extends javax.swing.JFrame {
     private javax.swing.JComboBox<String> comboGenero;
     private javax.swing.ButtonGroup grupoBotonClientes;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JMenu jMenu1;
     private javax.swing.JMenu jMenu2;
     private javax.swing.JMenuBar jMenuBar1;
@@ -1100,9 +1276,11 @@ public class Clientes extends javax.swing.JFrame {
     private javax.swing.JTextField txtNombreC;
     private javax.swing.JTextField txtRTN;
     private javax.swing.JTextField txtTelefonoC;
+    private javax.swing.JLabel usuario;
     // End of variables declaration//GEN-END:variables
 
     private void cargartabla() {
+        String cargar = "Cargartabla";
         DefaultTableModel modeloTabla = (DefaultTableModel) tablaCliente.getModel();
         modeloTabla.setRowCount(0);
 
@@ -1132,6 +1310,7 @@ public class Clientes extends javax.swing.JFrame {
             }
 
         } catch (SQLException ex) {
+            lo.LogBitacora("Error: No se pudo cargar el registro " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(),cliente,cargar);
             JOptionPane.showMessageDialog(null, ex.toString());
         }
     }
@@ -1193,7 +1372,7 @@ public class Clientes extends javax.swing.JFrame {
 
         txtTelefonoC.setText("");
         if (txtTelefonoC.getText().equals("")) {
-            txtTelefonoC.setText("Ingrese Telefono");
+            txtTelefonoC.setText("Ingrese Teléfono");
             txtTelefonoC.setForeground(new Color(153, 153, 153));
         }
 
@@ -1212,6 +1391,7 @@ public class Clientes extends javax.swing.JFrame {
     public class Cargarg {
 
         public DefaultComboBoxModel getvalues() {
+            String cargarg= "CargarGenero";
 
             DefaultComboBoxModel modelo = new DefaultComboBoxModel();
             try {
@@ -1226,6 +1406,7 @@ public class Clientes extends javax.swing.JFrame {
                 con.close();
                 rs.close();
             } catch (Exception e) {
+                lo.LogBitacora("Error: No se pudo seleccionar el género " + "Excepción: " + e + ". Origen: " + this.getClass().getSimpleName(),cliente,cargarg);
                 System.out.println(e);
             }
             return modelo;
@@ -1233,9 +1414,10 @@ public class Clientes extends javax.swing.JFrame {
     }
 
     void buscarData(String valor) {
+        String buscar="Buscar";
         String[] titulos = {"ID", "Nombre", "Apellido", "RTN", "Telefono", "Genero", "Fecha de Nacimiento", "Direccion", "Email", "Fecha Registro", "Estado"};
         String[] registros = new String[13];
-        String sql = "SELECT C.Nombre_Cliente,C.Apellido_Cliente,C.RTN,C.Telefono,G.Genero,C.Fecha_Nacimiento,C.Direccion,C.[E-mail],C.Fecha_Registro,C.Id_Estado \n"
+        String sql = "SELECT C.Id_Cliente, C.Nombre_Cliente,C.Apellido_Cliente,C.RTN,C.Telefono,G.Genero,C.Fecha_Nacimiento,C.Direccion,C.[E-mail],C.Fecha_Registro,E.Estado \n"
                 + "FROM Cliente AS C\n"
                 + "INNER JOIN Genero AS G ON C.Id_Genero = G.Id_Genero\n"
                 + "INNER JOIN Estado AS E ON C.Id_Estado = E.Id_Estado\n"
@@ -1256,18 +1438,19 @@ public class Clientes extends javax.swing.JFrame {
                 registros[2] = rs.getString("Apellido_Cliente");
                 registros[3] = rs.getString("RTN");
                 registros[4] = rs.getString("Telefono");
-                registros[5] = rs.getString("Id_Genero");
+                registros[5] = rs.getString("Genero");
                 registros[6] = rs.getString("Fecha_Nacimiento");
                 registros[7] = rs.getString("Direccion");
                 registros[8] = rs.getString("E-mail");
                 registros[9] = rs.getString("Fecha_Registro");
-                registros[10] = rs.getString("Id_Estado");
+                registros[10] = rs.getString("Estado");
                 model.addRow(registros);
             }
 
             tablaCliente.setModel(model);
             // anchoColumnas();
         } catch (SQLException ex) {
+            lo.LogBitacora("Error: No se pudo buscar el dato " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(),cliente,buscar);
             Logger.getLogger(Clientes.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
