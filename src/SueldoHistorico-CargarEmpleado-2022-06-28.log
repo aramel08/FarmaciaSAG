@@ -1,0 +1,1 @@
+2022-06-28 03:54:48 -- Error: No se pudo cargar el empleado Excepción: com.microsoft.sqlserver.jdbc.SQLServerException: Invalid column name 'NombreE'.. Origen: CargaE

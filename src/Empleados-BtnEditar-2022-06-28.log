@@ -1,0 +1,1 @@
+2022-06-28 12:41:36 -- Error: No se pudo editar datos Excepción: com.microsoft.sqlserver.jdbc.SQLServerException: The UPDATE statement conflicted with the FOREIGN KEY constraint "FK_Empleados_Tipo_Documento". The conflict occurred in database "FarmaciaSAG", table "dbo.Tipo_Documento", column 'Id_Documento'.. Origen: Empleados1

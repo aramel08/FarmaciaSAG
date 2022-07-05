@@ -1,0 +1,1 @@
+2022-06-28 12:43:40 -- Error: No se pudo editar medicamento Excepción: com.microsoft.sqlserver.jdbc.SQLServerException: El índice 4 está fuera de intervalo.. Origen: Medicamentos_Restringidos

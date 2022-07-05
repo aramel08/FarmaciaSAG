@@ -1,0 +1,1 @@
+2022-06-28 11:34:13 -- Error: No se pudo actualizar la gerencia sucursal Excepción: com.microsoft.sqlserver.jdbc.SQLServerException: El índice 2 está fuera de intervalo.. Origen: GerenciaSucursal

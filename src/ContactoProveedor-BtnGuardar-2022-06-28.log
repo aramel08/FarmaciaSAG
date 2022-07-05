@@ -1,0 +1,1 @@
+2022-06-28 01:31:07 -- Error: No se pudo guardar el dato Excepción: com.microsoft.sqlserver.jdbc.SQLServerException: Invalid column name 'Id_ProveedorNombre_Contacto'.. Origen: Contacto_Proveedor

@@ -1,0 +1,1 @@
+2022-06-29 11:12:19 -- Error: No se cargar tablaExcepción: com.microsoft.sqlserver.jdbc.SQLServerException: Invalid column name 'C'.. Origen: RegistroVentas

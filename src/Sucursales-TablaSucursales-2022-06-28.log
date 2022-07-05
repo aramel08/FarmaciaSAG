@@ -1,0 +1,1 @@
+2022-06-28 03:28:23 -- Error: No se pudo seleccionar la tabla Excepción: com.microsoft.sqlserver.jdbc.SQLServerException: Invalid column name 'Id_Sucursal'.. Origen: Sucursales

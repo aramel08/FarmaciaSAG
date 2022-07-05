@@ -1,0 +1,1 @@
+2022-06-28 01:50:13 -- Error: No se pudo cargar el productoExcepción: com.microsoft.sqlserver.jdbc.SQLServerException: Invalid column name 'Nombre_Producto'.. Origen: CargarP

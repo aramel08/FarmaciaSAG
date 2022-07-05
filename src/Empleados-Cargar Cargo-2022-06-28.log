@@ -1,0 +1,1 @@
+2022-06-28 12:27:51 -- Error: No se pudo cargar el cargo  Excepción: com.microsoft.sqlserver.jdbc.SQLServerException: Invalid object name 'Carg'.. Origen: CargarCargo

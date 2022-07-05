@@ -1,0 +1,1 @@
+2022-06-28 12:46:27 -- Error: No se pudo guardar medicamento Excepción: com.microsoft.sqlserver.jdbc.SQLServerException: The multi-part identifier ".Id_MR" could not be bound.. Origen: Medicamentos_Restringidos

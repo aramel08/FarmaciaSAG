@@ -1,0 +1,1 @@
+2022-06-28 03:29:09 -- Error: No se pudo actualizar el dato Excepción: com.microsoft.sqlserver.jdbc.SQLServerException: El índice 2 está fuera de intervalo.. Origen: Sucursales

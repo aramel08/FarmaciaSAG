@@ -1,0 +1,1 @@
+2022-06-28 01:15:31 -- Error: No se pudo cargar tabla Excepción: com.microsoft.sqlserver.jdbc.SQLServerException: The multi-part identifier ".Id_Precio_Historico" could not be bound.. Origen: PrecioHistoricoProducto

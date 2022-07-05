@@ -1,0 +1,1 @@
+2022-06-28 12:21:58 -- Error: No se pudo cargar la tabla Excepción: com.microsoft.sqlserver.jdbc.SQLServerException: The multi-part identifier ".Id_Empleado" could not be bound.. Origen: Empleados1

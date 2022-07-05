@@ -1,0 +1,1 @@
+2022-06-29 11:13:47 -- Error: No se pudo buscar datos de resgirtosExcepción: com.microsoft.sqlserver.jdbc.SQLServerException: Invalid column name 'Num_'.. Origen: RegistroVentas

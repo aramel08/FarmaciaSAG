@@ -1,0 +1,1 @@
+2022-06-29 10:46:19 -- Error: No se cargar productoExcepción: com.microsoft.sqlserver.jdbc.SQLServerException: The multi-part identifier ".Precio" could not be bound.. Origen: Factura

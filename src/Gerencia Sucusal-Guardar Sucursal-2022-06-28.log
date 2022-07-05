@@ -1,0 +1,1 @@
+2022-06-28 11:37:07 -- Error: No se pudo guardar gerencia sucursal Excepción: com.microsoft.sqlserver.jdbc.SQLServerException: Invalid object name 'GerenteSucurs'.. Origen: GerenciaSucursal

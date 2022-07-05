@@ -1,0 +1,1 @@
+2022-06-29 04:14:03 -- Error: No se pudo establecer la conexión. Excepción: com.microsoft.sqlserver.jdbc.SQLServerException: Invalid object name 'Usuario'.. Origen: Login

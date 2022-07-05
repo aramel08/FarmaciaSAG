@@ -1,0 +1,1 @@
+2022-06-28 01:02:28 -- Error: No se pudo guardar la operacionExcepción: com.microsoft.sqlserver.jdbc.SQLServerException: Invalid column name '_Sucursal'.. Origen: Operaciones2

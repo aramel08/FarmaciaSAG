@@ -1,0 +1,1 @@
+2022-06-28 01:08:00 -- Error: No se pudo cargar cajaExcepción: com.microsoft.sqlserver.jdbc.SQLServerException: Invalid object name 'Ca'.. Origen: CargarCaja

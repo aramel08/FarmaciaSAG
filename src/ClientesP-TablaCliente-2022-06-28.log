@@ -1,0 +1,1 @@
+2022-06-28 01:00:04 -- Error: No se pudo seleccionar el registro de la tabla Excepción: com.microsoft.sqlserver.jdbc.SQLServerException: The multi-part identifier ".Nombre_Cliente" could not be bound.. Origen: Clientes

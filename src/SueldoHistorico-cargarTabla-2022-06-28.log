@@ -1,0 +1,1 @@
+2022-06-28 03:57:07 -- Error: No se pudo cargar la tabla Excepción: com.microsoft.sqlserver.jdbc.SQLServerException: The multi-part identifier ".Id_Sueldo_Historico" could not be bound.. Origen: SueldoHistorico

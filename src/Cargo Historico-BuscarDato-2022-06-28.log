@@ -1,0 +1,1 @@
+2022-06-28 01:40:05 -- Error: No se pudo Buscar el dato Excepción: com.microsoft.sqlserver.jdbc.SQLServerException: The multi-part identifier ".Id_Sueldo_Historico" could not be bound.. Origen: CargoHistorico

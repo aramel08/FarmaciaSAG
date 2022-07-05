@@ -1,0 +1,1 @@
+2022-06-29 03:19:26 -- Error: No se pudo editar el registro Excepción: com.microsoft.sqlserver.jdbc.SQLServerException: El índice 9 está fuera de intervalo.. Origen: Clientes

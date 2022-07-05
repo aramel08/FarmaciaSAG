@@ -1,0 +1,1 @@
+2022-06-28 12:51:50 -- Error: No se pudo cargar la restriccion Excepción: com.microsoft.sqlserver.jdbc.SQLServerException: Invalid object name 'Restricciones_Medicament'.. Origen: CargarRestriccion

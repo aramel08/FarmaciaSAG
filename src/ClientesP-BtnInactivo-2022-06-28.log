@@ -1,0 +1,1 @@
+2022-06-28 01:02:15 -- Error: No se pudo actualizar el estado Excepción: com.microsoft.sqlserver.jdbc.SQLServerException: El índice 2 está fuera de intervalo.. Origen: Clientes

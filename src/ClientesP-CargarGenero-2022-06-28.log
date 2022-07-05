@@ -1,0 +1,1 @@
+2022-06-28 01:04:36 -- Error: No se pudo seleccionar el género Excepción: com.microsoft.sqlserver.jdbc.SQLServerException: Invalid column name 'Genero'.. Origen: Cargarg

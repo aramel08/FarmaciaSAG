@@ -1,0 +1,1 @@
+2022-06-28 11:39:00 -- Error: No se pudo actualizar la tabla gerencia sucursal Excepción: com.microsoft.sqlserver.jdbc.SQLServerException: The multi-part identifier ".Nombre" could not be bound.. Origen: GerenciaSucursal

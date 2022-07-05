@@ -1,0 +1,1 @@
+2022-06-28 11:54:46 -- Error: No se pudo cargar la sucursal Excepción: com.microsoft.sqlserver.jdbc.SQLServerException: Invalid object name 'sucursa'.. Origen: CargarSucursal

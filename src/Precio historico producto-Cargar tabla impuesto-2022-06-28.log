@@ -1,0 +1,1 @@
+2022-06-28 01:17:24 -- Error: No se pudo cargar tabla impuesto Excepción: com.microsoft.sqlserver.jdbc.SQLServerException: The multi-part identifier ".Id_Impuesto_Historico" could not be bound.. Origen: PrecioHistoricoProducto

@@ -1,0 +1,1 @@
+2022-06-28 12:03:15 -- Error: No se pudo buscar inventario Excepción: com.microsoft.sqlserver.jdbc.SQLServerException: Invalid column name 'Id_inventario'.. Origen: Inventario

@@ -1,0 +1,1 @@
+2022-06-28 01:54:30 -- Error: No se pudo seleccionar la tabla Excepción: com.microsoft.sqlserver.jdbc.SQLServerException: The multi-part identifier ".Id_Producto_Proveedor" could not be bound.. Origen: Producto_Proveedor

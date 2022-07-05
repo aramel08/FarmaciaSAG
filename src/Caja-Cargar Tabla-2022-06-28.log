@@ -1,0 +1,1 @@
+2022-06-28 12:48:50 -- Error: No se pudo cargar la tablaExcepción: com.microsoft.sqlserver.jdbc.SQLServerException: The multi-part identifier ".Id_Caja" could not be bound.. Origen: Caja

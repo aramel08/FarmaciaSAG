@@ -1,0 +1,1 @@
+2022-06-28 01:57:05 -- Error: No se pudo editar el dato Excepción: com.microsoft.sqlserver.jdbc.SQLServerException: El índice 3 está fuera de intervalo.. Origen: Producto_Proveedor

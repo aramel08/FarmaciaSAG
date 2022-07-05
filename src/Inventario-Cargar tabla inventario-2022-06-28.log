@@ -1,0 +1,1 @@
+2022-06-28 11:58:39 -- Error: No se pudo cargar tabla inventarioExcepción: com.microsoft.sqlserver.jdbc.SQLServerException: The multi-part identifier ".Id_inventario" could not be bound.. Origen: Inventario

@@ -1,0 +1,1 @@
+2022-06-28 01:28:47 -- Error: No se pudo seleccionar el registroExcepción: com.microsoft.sqlserver.jdbc.SQLServerException: The multi-part identifier ".Id_Contacto" could not be bound.. Origen: Contacto_Proveedor

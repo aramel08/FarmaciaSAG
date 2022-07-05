@@ -1,0 +1,1 @@
+2022-06-28 01:27:10 -- Error: No se pudo cargar la tabla Excepción: com.microsoft.sqlserver.jdbc.SQLServerException: The multi-part identifier ".Id_Contacto" could not be bound.. Origen: Contacto_Proveedor

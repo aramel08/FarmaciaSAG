@@ -1,0 +1,1 @@
+2022-06-28 02:39:32 -- Error: No se pudo guardar el dato Excepción: com.microsoft.sqlserver.jdbc.SQLServerException: El índice 2 está fuera de intervalo.. Origen: Productos

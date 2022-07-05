@@ -1,0 +1,1 @@
+2022-06-28 01:07:38 -- Error: No se pudo editar el dato Excepción: com.microsoft.sqlserver.jdbc.SQLServerException: El índice 4 está fuera de intervalo.. Origen: Contacto_Proveedor

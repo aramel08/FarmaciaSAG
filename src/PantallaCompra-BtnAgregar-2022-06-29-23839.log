@@ -1,0 +1,1 @@
+2022-06-29 11:08:39 -- Error: No se pudo agregar el productoExcepción: com.microsoft.sqlserver.jdbc.SQLServerException: El índice 7 está fuera de intervalo.. Origen: PantallaCompras

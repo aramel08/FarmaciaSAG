@@ -1,0 +1,1 @@
+2022-06-28 01:50:21 -- Error: No se pudo buscar el dato Excepción: com.microsoft.sqlserver.jdbc.SQLServerException: The multi-part identifier ".Id_Detalle_Almacen" could not be bound.. Origen: DetalleAlmacen

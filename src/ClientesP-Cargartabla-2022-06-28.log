@@ -1,0 +1,1 @@
+2022-06-28 01:03:52 -- Error: No se pudo cargar el registro Excepción: com.microsoft.sqlserver.jdbc.SQLServerException: The multi-part identifier ".Id_Cliente" could not be bound.. Origen: Clientes

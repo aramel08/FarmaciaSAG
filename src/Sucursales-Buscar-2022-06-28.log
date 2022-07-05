@@ -1,0 +1,1 @@
+2022-06-28 03:26:00 -- Error: No se pudo buscar el dato Excepción: com.microsoft.sqlserver.jdbc.SQLServerException: The multi-part identifier ".Id_Sucursal" could not be bound.. Origen: Sucursales

@@ -1,0 +1,1 @@
+2022-06-28 11:43:58 -- Error: No se pudo agregar datosExcepción: com.microsoft.sqlserver.jdbc.SQLServerException: El índice 7 está fuera de intervalo.. Origen: Factura

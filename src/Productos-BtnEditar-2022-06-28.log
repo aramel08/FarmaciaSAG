@@ -1,0 +1,1 @@
+2022-06-28 02:42:07 -- Error: No se pudo editar el dato Excepción: com.microsoft.sqlserver.jdbc.SQLServerException: El índice 12 está fuera de intervalo.. Origen: Productos

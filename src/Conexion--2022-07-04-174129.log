@@ -1,0 +1,1 @@
+2022-07-04 05:41:29 -- No se pudo establecer la conexión con la base de datoscom.microsoft.sqlserver.jdbc.SQLServerException: Login failed for user 'sa'. ClientConnectionId:84ddb6aa-1dbd-4ea6-9c87-eea102b74713
