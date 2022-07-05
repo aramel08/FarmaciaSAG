@@ -1,0 +1,175 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" pageWidth="860" pageHeight="842" columnWidth="820" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+	<parameter name="Usuario" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[Select CP.Id_Contacto,PROV.Nombre_Empresa,CP.Nombre_Contacto,CP.Telefono,CP.[E-mail], E.Estado
+                    From Contacto_Proveedor as CP
+                    INNER JOIN Proveedor AS PROV ON CP.Id_Proveedor= PROV.Id_Proveedor
+                    INNER JOIN Estado AS E ON E.Id_Estado = CP.Id_Estado
+                    Order By CP.Id_Contacto]]>
+	</queryString>
+	<field name="Id_Contacto" class="java.lang.Integer">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="Nombre_Empresa" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="Nombre_Contacto" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="Telefono" class="java.lang.Integer">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="E-mail" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="Estado" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch">
+			<image>
+				<reportElement x="4" y="0" width="227" height="79"/>
+				<imageExpression class="java.lang.String"><![CDATA["C:\\Users\\arame\\Desktop\\SAGFarmacia\\src\\componentes\\LOGOSAG(2).png"]]></imageExpression>
+			</image>
+			<staticText>
+				<reportElement x="595" y="16" width="219" height="29"/>
+				<textElement textAlignment="Center">
+					<font fontName="Georgia" size="24"/>
+				</textElement>
+				<text><![CDATA[FARMACIA SAG]]></text>
+			</staticText>
+			<textField pattern="dd/MM/yyyy h.mm a">
+				<reportElement x="698" y="59" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.util.Date"><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="51" splitType="Stretch">
+			<staticText>
+				<reportElement x="244" y="7" width="341" height="29" forecolor="#0099FF"/>
+				<textElement textAlignment="Center">
+					<font fontName="Georgia" size="16" isBold="true"/>
+				</textElement>
+				<text><![CDATA[REPORTE CONTACTO PROVEEDOR]]></text>
+			</staticText>
+			<line>
+				<reportElement x="4" y="35" width="810" height="1" forecolor="#FF9900"/>
+			</line>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="23" splitType="Stretch">
+			<staticText>
+				<reportElement mode="Opaque" x="4" y="0" width="75" height="18" forecolor="#000000" backcolor="#FFCC66"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[ID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="79" y="0" width="152" height="18" forecolor="#000000" backcolor="#FFCC66"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[EMPRESA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="231" y="0" width="161" height="18" forecolor="#000000" backcolor="#FFCC66"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[NOMBRE CONTACTO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="392" y="0" width="123" height="18" forecolor="#000000" backcolor="#FFCC66"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[TELÉFONO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="688" y="0" width="126" height="18" forecolor="#000000" backcolor="#FFCC66"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[ESTADO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="515" y="0" width="173" height="18" isPrintInFirstWholeBand="true" forecolor="#000000" backcolor="#FFCC66"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[E-MAIL]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="23" splitType="Stretch">
+			<textField>
+				<reportElement x="4" y="0" width="35" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$F{Id_Contacto}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="79" y="0" width="152" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{Nombre_Empresa}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="231" y="0" width="161" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{Nombre_Contacto}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="392" y="0" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$F{Telefono}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="515" y="0" width="140" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{E-mail}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="688" y="0" width="110" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{Estado}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="54" splitType="Stretch">
+			<textField>
+				<reportElement x="392" y="27" width="100" height="20"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{Usuario}]]></textFieldExpression>
+			</textField>
+			<staticText>
+				<reportElement x="325" y="27" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[Generado por:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="325" y="13" width="80" height="20"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA["Pagina "+$V{PAGE_NUMBER}+" de"]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="4" y="13" width="810" height="1" forecolor="#FF9900"/>
+			</line>
+			<textField evaluationTime="Report">
+				<reportElement x="405" y="13" width="40" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+</jasperReport>

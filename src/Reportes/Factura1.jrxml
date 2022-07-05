@@ -1,36 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
 	<queryString>
-		<![CDATA[SELEct * from Factura]]>
+		<![CDATA[SELECT
+     Factura."Id_Factura" AS Factura_Id_Factura,
+     Factura."Id_Cliente" AS Factura_Id_Cliente,
+     Factura."Fecha_Factura" AS Factura_Fecha_Factura,
+     Factura."Hora" AS Factura_Hora,
+     Factura."Num_Factura" AS Factura_Num_Factura,
+     Factura."Id_Empleado" AS Factura_Id_Empleado,
+     Factura."Id_Tipo_Pago" AS Factura_Id_Tipo_Pago,
+     Factura."Id_Parametro" AS Factura_Id_Parametro,
+     Factura."Num_Tarjeta" AS Factura_Num_Tarjeta,
+     Factura."montotarjeta" AS Factura_montotarjeta
+FROM
+     "dbo"."Factura" Factura]]>
 	</queryString>
-	<field name="Id_Factura" class="java.lang.Integer">
+	<field name="Factura_Id_Factura" class="java.lang.Integer">
 		<fieldDescription><![CDATA[]]></fieldDescription>
 	</field>
-	<field name="Id_Cliente" class="java.lang.Integer">
+	<field name="Factura_Id_Cliente" class="java.lang.Integer">
 		<fieldDescription><![CDATA[]]></fieldDescription>
 	</field>
-	<field name="Fecha_Factura" class="java.sql.Date">
+	<field name="Factura_Fecha_Factura" class="java.sql.Date">
 		<fieldDescription><![CDATA[]]></fieldDescription>
 	</field>
-	<field name="Hora" class="java.sql.Time">
+	<field name="Factura_Hora" class="java.sql.Time">
 		<fieldDescription><![CDATA[]]></fieldDescription>
 	</field>
-	<field name="Num_Factura" class="java.lang.String">
+	<field name="Factura_Num_Factura" class="java.lang.String">
 		<fieldDescription><![CDATA[]]></fieldDescription>
 	</field>
-	<field name="Id_Empleado" class="java.lang.Integer">
+	<field name="Factura_Id_Empleado" class="java.lang.Integer">
 		<fieldDescription><![CDATA[]]></fieldDescription>
 	</field>
-	<field name="Id_Tipo_Pago" class="java.lang.Integer">
+	<field name="Factura_Id_Tipo_Pago" class="java.lang.Integer">
 		<fieldDescription><![CDATA[]]></fieldDescription>
 	</field>
-	<field name="Id_Parametro" class="java.lang.Integer">
+	<field name="Factura_Id_Parametro" class="java.lang.Integer">
 		<fieldDescription><![CDATA[]]></fieldDescription>
 	</field>
-	<field name="Num_Tarjeta" class="java.lang.String">
+	<field name="Factura_Num_Tarjeta" class="java.lang.String">
 		<fieldDescription><![CDATA[]]></fieldDescription>
 	</field>
-	<field name="montotarjeta" class="java.math.BigDecimal">
+	<field name="Factura_montotarjeta" class="java.math.BigDecimal">
 		<fieldDescription><![CDATA[]]></fieldDescription>
 	</field>
 	<filterExpression><![CDATA[$F{Id_Factura}$F{Id_Factura}=$F{Id_Factura}]]></filterExpression>
@@ -43,7 +55,7 @@
 				<reportElement x="0" y="0" width="331" height="140"/>
 			</rectangle>
 			<rectangle radius="10">
-				<reportElement x="342" y="0" width="213" height="140"/>
+				<reportElement x="341" y="0" width="213" height="140"/>
 			</rectangle>
 			<staticText>
 				<reportElement x="100" y="8" width="219" height="29"/>
@@ -97,7 +109,7 @@
 				<text><![CDATA[Fecha Emisión:]]></text>
 			</staticText>
 			<rectangle>
-				<reportElement x="266" y="174" width="288" height="20"/>
+				<reportElement x="267" y="174" width="288" height="20"/>
 			</rectangle>
 			<rectangle>
 				<reportElement x="0" y="234" width="100" height="20"/>
@@ -250,81 +262,49 @@
 				<text><![CDATA[La factura es beneficio de todos, exijala.]]></text>
 			</staticText>
 			<textField>
-				<reportElement x="307" y="197" width="230" height="20"/>
+				<reportElement x="267" y="174" width="77" height="20"/>
 				<textElement/>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{RTN}]]></textFieldExpression>
+				<textFieldExpression class="java.lang.String"><![CDATA[Tipo:Pago]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="407" y="54" width="147" height="20"/>
-				<textElement/>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{CAI}]]></textFieldExpression>
-			</textField>
-			<textField pattern="dd MMMMM yyyy">
-				<reportElement x="427" y="14" width="100" height="20"/>
-				<textElement/>
-				<textFieldExpression class="java.util.Date"><![CDATA[$F{Fecha_Inicio}]]></textFieldExpression>
-			</textField>
-			<textField pattern="dd MMMMM yyyy">
-				<reportElement x="427" y="34" width="100" height="20"/>
-				<textElement/>
-				<textFieldExpression class="java.util.Date"><![CDATA[$F{Fecha_Final}]]></textFieldExpression>
-			</textField>
-			<textField isBlankWhenNull="true">
-				<reportElement x="366" y="108" width="171" height="20"/>
+				<reportElement x="341" y="108" width="213" height="160"/>
 				<textElement/>
 				<textFieldExpression class="java.lang.String"><![CDATA[$F{Factura_Num_Factura}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="52" y="154" width="199" height="20"/>
-				<textElement/>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{Empleados_NombreE}]]></textFieldExpression>
-			</textField>
-			<textField>
-				<reportElement x="79" y="174" width="187" height="20"/>
+				<reportElement x="238" y="175" width="100" height="20"/>
 				<textElement/>
 				<textFieldExpression class="java.util.Date"><![CDATA[$F{Factura_Fecha_Factura}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="79" y="194" width="77" height="20"/>
+				<reportElement x="299" y="288" width="100" height="20"/>
 				<textElement/>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{Cliente_Nombre_Cliente}]]></textFieldExpression>
+				<textFieldExpression class="java.sql.Time"><![CDATA[$F{Factura_Hora}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="166" y="194" width="100" height="20"/>
+				<reportElement x="375" y="85" width="100" height="20"/>
 				<textElement/>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{Cliente_Apellido_Cliente}]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$F{Factura_Id_Factura}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="342" y="177" width="100" height="20"/>
+				<reportElement x="269" y="268" width="100" height="20"/>
 				<textElement/>
-				<textFieldExpression class="java.lang.String"><![CDATA[$F{Tipo_Pago_Tipo_Pago}]]></textFieldExpression>
-			</textField>
-			<staticText>
-				<reportElement x="266" y="176" width="56" height="20"/>
-				<textElement>
-					<font fontName="Georgia"/>
-				</textElement>
-				<text><![CDATA[Tipo Pago:]]></text>
-			</staticText>
-			<textField pattern="h.mm a">
-				<reportElement x="319" y="157" width="100" height="20"/>
-				<textElement/>
-				<textFieldExpression class="java.sql.Time"><![CDATA[$F{Hora}]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$F{Factura_Id_Empleado}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="0" y="254" width="100" height="202"/>
+				<reportElement x="294" y="339" width="100" height="20"/>
 				<textElement/>
-				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{DetalleFactura_Cantidad}]]></textFieldExpression>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$F{Factura_Id_Tipo_Pago}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="440" y="160" width="100" height="188"/>
+				<reportElement x="262" y="349" width="100" height="20"/>
 				<textElement/>
-				<textFieldExpression class="java.lang.Integer"><![CDATA[$F{Id_Factura}]]></textFieldExpression>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{Factura_Num_Tarjeta}]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="366" y="154" width="100" height="194"/>
+				<reportElement x="445" y="308" width="100" height="20"/>
 				<textElement/>
-				<textFieldExpression class="java.sql.Time"><![CDATA[$F{Hora}]]></textFieldExpression>
+				<textFieldExpression class="java.math.BigDecimal"><![CDATA[$F{Factura_montotarjeta}]]></textFieldExpression>
 			</textField>
 		</band>
 	</title>

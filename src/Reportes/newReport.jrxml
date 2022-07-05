@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" pageWidth="595" pageHeight="842" columnWidth="535" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+	<queryString>
+		<![CDATA[SELECT
+     Factura."Fecha_Factura" AS Factura_Fecha_Factura,
+     Factura."Hora" AS Factura_Hora,
+     Factura."Num_Factura" AS Factura_Num_Factura,
+     DetalleFactura."Precio_Unitario" AS DetalleFactura_Precio_Unitario,
+     DetalleFactura."Cantidad" AS DetalleFactura_Cantidad,
+     DetalleFactura."Descuento" AS DetalleFactura_Descuento,
+     DetalleFactura."Impuesto" AS DetalleFactura_Impuesto,
+     Cliente."RTN" AS Cliente_RTN,
+     Productos."Nombre_Producto" AS Productos_Nombre_Producto,
+     Parametro_Factura."CAI" AS Parametro_Factura_CAI,
+     Parametro_Factura."Rango_Inicial" AS Parametro_Factura_Rango_Inicial,
+     Parametro_Factura."Rango_Final" AS Parametro_Factura_Rango_Final,
+     Empleados."NombreE" AS Empleados_NombreE,
+     Parametro_Factura."Fecha_Final" AS Parametro_Factura_Fecha_Final
+FROM
+     "dbo"."Factura" Factura INNER JOIN "dbo"."DetalleFactura" DetalleFactura ON Factura."Id_Factura" = DetalleFactura."Id_Factura"
+     INNER JOIN "dbo"."Descuento_Factura" Descuento_Factura ON Factura."Id_Factura" = Descuento_Factura."Id_Factura"
+     INNER JOIN "dbo"."Cliente" Cliente ON Factura."Id_Cliente" = Cliente."Id_Cliente"
+     INNER JOIN "dbo"."Parametro_Factura" Parametro_Factura ON Factura."Id_Parametro" = Parametro_Factura."Id_Parametro_Factura"
+     INNER JOIN "dbo"."Empleados" Empleados ON Factura."Id_Empleado" = Empleados."Id_Empleado"
+     INNER JOIN "dbo"."Productos" Productos ON DetalleFactura."Id_Producto" = Productos."Id_Producto"
+GROUP BY
+     Factura."Fecha_Factura",
+     Factura."Hora",
+     Factura."Num_Factura",
+     DetalleFactura."Precio_Unitario",
+     DetalleFactura."Cantidad",
+     DetalleFactura."Descuento",
+     DetalleFactura."Impuesto",
+     Descuento_Factura."Valor",
+     Cliente."Nombre_Cliente",
+     Cliente."Apellido_Cliente",
+     Cliente."RTN",
+     Productos."Nombre_Producto",
+     Parametro_Factura."CAI",
+     Parametro_Factura."Fecha_Final",
+     Parametro_Factura."Rango_Inicial",
+     Parametro_Factura."Rango_Final",
+     Empleados."NombreE"]]>
+	</queryString>
+	<variable name="Tipo_Pago_A_Tipo_Pago_1" class="java.lang.Integer" resetType="Column" calculation="Count">
+		<variableExpression><![CDATA[$F{Tipo_Pago_A_Tipo_Pago}]]></variableExpression>
+	</variable>
+	<variable name="DetalleFactura_Impuesto_1" class="java.math.BigDecimal" resetType="Column" calculation="Sum">
+		<variableExpression><![CDATA[$F{DetalleFactura_Impuesto}]]></variableExpression>
+	</variable>
+	<variable name="DetalleFactura_Id_Producto_1" class="java.lang.Integer" resetType="Page" calculation="Sum">
+		<variableExpression><![CDATA[$F{DetalleFactura_Id_Producto}]]></variableExpression>
+	</variable>
+	<filterExpression><![CDATA[$P{Factura}]]></filterExpression>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="90" splitType="Stretch"/>
+	</title>
+	<pageHeader>
+		<band height="35" splitType="Stretch"/>
+	</pageHeader>
+	<columnHeader>
+		<band height="61" splitType="Stretch"/>
+	</columnHeader>
+	<detail>
+		<band height="125" splitType="Stretch"/>
+	</detail>
+	<columnFooter>
+		<band height="45" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>

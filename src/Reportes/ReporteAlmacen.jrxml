@@ -1,0 +1,204 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="report name" pageWidth="950" pageHeight="842" columnWidth="910" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20">
+	<parameter name="Usuario" class="java.lang.String"/>
+	<queryString>
+		<![CDATA[Select A.Id_Almacen,A.Ubicacion,A.Capacidad_Maxima,A.Capacidad_Minima,A.Capacidad_Optima,A.Capacidad_Actual,A.Num_Estante,E.Estado
+                    From Almacen as A
+                    INNER JOIN Estado AS E ON A.Id_Estado = E.Id_Estado
+                    Order By A.Id_Almacen]]>
+	</queryString>
+	<field name="Id_Almacen" class="java.lang.Integer">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="Ubicacion" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="Capacidad_Maxima" class="java.lang.Integer">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="Capacidad_Minima" class="java.lang.Integer">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="Capacidad_Optima" class="java.lang.Integer">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="Capacidad_Actual" class="java.lang.Integer">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="Num_Estante" class="java.lang.Integer">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<field name="Estado" class="java.lang.String">
+		<fieldDescription><![CDATA[]]></fieldDescription>
+	</field>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="79" splitType="Stretch">
+			<staticText>
+				<reportElement x="691" y="11" width="219" height="29"/>
+				<textElement textAlignment="Center">
+					<font fontName="Georgia" size="24"/>
+				</textElement>
+				<text><![CDATA[FARMACIA SAG]]></text>
+			</staticText>
+			<image>
+				<reportElement x="4" y="0" width="227" height="79"/>
+				<imageExpression class="java.lang.String"><![CDATA["C:\\Users\\arame\\Desktop\\SAGFarmacia\\src\\componentes\\LOGOSAG(2).png"]]></imageExpression>
+			</image>
+			<textField pattern="dd/MM/yyyy h.mm a">
+				<reportElement x="798" y="59" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.util.Date"><![CDATA[new java.util.Date()]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="35" splitType="Stretch">
+			<staticText>
+				<reportElement x="345" y="6" width="198" height="29" forecolor="#0099FF"/>
+				<textElement textAlignment="Center">
+					<font fontName="Georgia" size="16" isBold="true"/>
+				</textElement>
+				<text><![CDATA[REPORTE ALMACEN]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="61" splitType="Stretch">
+			<staticText>
+				<reportElement mode="Opaque" x="4" y="43" width="75" height="18" forecolor="#000000" backcolor="#FFCC66"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[ID]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="79" y="43" width="179" height="18" forecolor="#000000" backcolor="#FFCC66"/>
+				<textElement>
+					<font size="10"/>
+				</textElement>
+				<text><![CDATA[UBICACIÓN]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="258" y="43" width="116" height="18" forecolor="#000000" backcolor="#FFCC66"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[CAP. MÁXIMA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="374" y="43" width="124" height="18" isPrintInFirstWholeBand="true" forecolor="#000000" backcolor="#FFCC66"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[CAP. MÍNIMA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="498" y="43" width="116" height="18" forecolor="#000000" backcolor="#FFCC66"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[CAP . OPTIMA]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="614" y="43" width="110" height="18" forecolor="#000000" backcolor="#FFCC66"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[CAP. ACTUAL]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="714" y="43" width="96" height="18" forecolor="#000000" backcolor="#FFCC66"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[No. ESTANTES]]></text>
+			</staticText>
+			<staticText>
+				<reportElement mode="Opaque" x="810" y="43" width="75" height="18" forecolor="#000000" backcolor="#FFCC66"/>
+				<textElement>
+					<font size="12"/>
+				</textElement>
+				<text><![CDATA[ESTADO]]></text>
+			</staticText>
+			<line>
+				<reportElement x="4" y="18" width="906" height="1" forecolor="#FF9900"/>
+			</line>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="22" splitType="Stretch">
+			<textField>
+				<reportElement x="4" y="0" width="57" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$F{Id_Almacen}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="79" y="0" width="152" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{Ubicacion}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="258" y="0" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$F{Capacidad_Maxima}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="374" y="0" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$F{Capacidad_Minima}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="498" y="0" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$F{Capacidad_Optima}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="614" y="0" width="89" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$F{Capacidad_Actual}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="714" y="0" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.Integer"><![CDATA[$F{Num_Estante}]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="810" y="0" width="100" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[$F{Estado}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<pageFooter>
+		<band height="54" splitType="Stretch">
+			<textField>
+				<reportElement x="374" y="13" width="80" height="20"/>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression class="java.lang.String"><![CDATA["Pagina "+$V{PAGE_NUMBER}+" de"]]></textFieldExpression>
+			</textField>
+			<textField evaluationTime="Report">
+				<reportElement x="458" y="14" width="40" height="20"/>
+				<textElement/>
+				<textFieldExpression class="java.lang.String"><![CDATA[" " + $V{PAGE_NUMBER}]]></textFieldExpression>
+			</textField>
+			<line>
+				<reportElement x="4" y="13" width="906" height="1" forecolor="#FF9900"/>
+			</line>
+			<staticText>
+				<reportElement x="374" y="34" width="100" height="20"/>
+				<textElement/>
+				<text><![CDATA[Generado por:]]></text>
+			</staticText>
+			<textField>
+				<reportElement x="443" y="33" width="100" height="20"/>
+				<textElement>
+					<font size="12" isBold="true"/>
+				</textElement>
+				<textFieldExpression class="java.lang.String"><![CDATA[$P{Usuario}]]></textFieldExpression>
+			</textField>
+		</band>
+	</pageFooter>
+</jasperReport>
