@@ -5,6 +5,7 @@
  */
 package Conexion;
 
+import Logs.log;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -13,22 +14,29 @@ import java.sql.SQLException;
  *
  * @author Allisson Castro
  */
-public class Conexion {
-     public static Connection getConexion(){
+public class Conexion {         
+   
+    
+    public static Connection getConexion() {                  
         
-        String conexionUrl= "jdbc:sqlserver://localhost:1433;"
-               + "database=FarmaciaSAG;"
-               + "user=sa;"
-               + "password=1234;"
-               +"loginTimeout=30;";
+        log lo = new log();
+        String con1 = "Conexion";    
+        String con2 = ""; 
+            
         
-        try{
-            Connection con = DriverManager.getConnection(conexionUrl);
-                    return con;
-        } catch(SQLException ex){
+        String conexionUrl = "jdbc:sqlserver://localhost:1433;"                
+                + "database=FarmaciaSAG;"
+                + "user=sa;"
+                + "password=1234;"
+                + "loginTimeout=30;";
+
+        try {                                  
+            Connection con = DriverManager.getConnection(conexionUrl);          
+            return con;
+        } catch (SQLException ex) {                                                
+            lo.LogBitacora("No se pudo establecer la conexión con la base de datos" + ex,con1, con2);            
             System.out.println(ex.toString());
             return null;
         }
     }
-    
 }

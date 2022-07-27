@@ -1,0 +1,1 @@
+2022-07-26 01:03:35--Error: No se pudo guardar el registro Excepción: com.microsoft.sqlserver.jdbc.SQLServerException: Incorrect syntax near ','.. Origen: Clientes

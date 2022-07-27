@@ -1,0 +1,1 @@
+2022-07-26 01:01:37--Error: No se pudo cargar documento Excepción: com.microsoft.sqlserver.jdbc.SQLServerException: Invalid column name 'Documento'.. Origen: CargarTDocumento

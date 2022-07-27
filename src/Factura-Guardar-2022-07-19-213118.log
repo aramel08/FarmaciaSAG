@@ -1,0 +1,1 @@
+2022-07-19 09:31:18 -- Error: No se pudo guardar la facturaExcepción: com.microsoft.sqlserver.jdbc.SQLServerException: The INSERT statement conflicted with the FOREIGN KEY constraint "FK_Factura_Tipo_Pago". The conflict occurred in database "FarmaciaSAG", table "dbo.Tipo_Pago", column 'Id_Tipo_Pago'.. Origen: Factura

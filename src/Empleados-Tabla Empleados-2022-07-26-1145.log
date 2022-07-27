@@ -1,0 +1,1 @@
+2022-07-26 01:01:45--Error: No se pudo cargar tabla Excepción: com.microsoft.sqlserver.jdbc.SQLServerException: El nombre de columna Id_Estado no es válido.. Origen: Empleados1

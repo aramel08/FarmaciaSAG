@@ -1,0 +1,1 @@
+2022-07-04 09:06:43 -- Error: No se pudo guardar la facturaExcepción: com.microsoft.sqlserver.jdbc.SQLServerException: El índice 10 está fuera de intervalo.. Origen: Factura

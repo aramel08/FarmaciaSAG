@@ -1,0 +1,1 @@
+2022-07-21 02:23:42--Error: No se pudo buscar el dato Excepción: com.microsoft.sqlserver.jdbc.SQLServerException: The multi-part identifier ".Id_Sueldo_Historico" could not be bound.. Origen: SueldoHistorico

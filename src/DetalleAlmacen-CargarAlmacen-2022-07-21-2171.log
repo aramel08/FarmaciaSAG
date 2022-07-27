@@ -1,0 +1,1 @@
+2022-07-21 02:17:01--Error: No se pudo cargar almacen Excepción: com.microsoft.sqlserver.jdbc.SQLServerException: Invalid column name 'Ubicacion'.. Origen: CargarAlmacen
