@@ -43,18 +43,34 @@ public class DetalleAlmacen extends javax.swing.JFrame {
      */
     log lo = new log();
     String detallea = "DetalleAlmacen";
+    public static String Id_ContactoProveedor = "0";
+    int agregari;
+    int guardari;
+    int editari;
+    int cancelari;
+    int reportesi;
+    int activoi;
+    int inactivoi;
+    int anulari;
+    int buscari;
+    int crearcomprai;
+    int historicoi;
+    String userName;
+
     public DetalleAlmacen() {
         initComponents();
         usuario.setText(Login.txtUsuario.getText());
         cargartabla();
         Inhabillitar();
+        habilitarroles();
+         
         DetalleAlmacen.CargarAlmacen A = new DetalleAlmacen.CargarAlmacen();
         comboAlmacen.setModel(A.getvalues());
         DetalleAlmacen.CargarProducto p = new DetalleAlmacen.CargarProducto();
         comboProducto.setModel(p.getvalues());
         AutoCompleteDecorator.decorate(comboAlmacen);
         AutoCompleteDecorator.decorate(comboProducto);
-
+       userName = usuario.getText();
     }
 
     @Override
@@ -340,94 +356,121 @@ public class DetalleAlmacen extends javax.swing.JFrame {
     }//GEN-LAST:event_botonRegresarDAMouseClicked
 
     private void botonAgregarDAMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_botonAgregarDAMouseClicked
-        Habilitar();
-        botonGuardarDA.isEnabled();
-        botonCancelarDA.isEnabled();
+        if (botonAgregarDA.isEnabled()) {
+            Habilitar();
+            if (guardari == 1) {
+                botonGuardarDA.isEnabled();
+                //BotonCancelarPro.isEnabled();   
+            }
+            if (cancelari == 1) {
+                //BotonGuardarPro.isEnabled();
+                botonCancelarDA.isEnabled();
+            }
+        } else {
+
+            JOptionPane.showMessageDialog(null, "Esta acción no se encuentra disponible para tu usuario", "ERROR", JOptionPane.ERROR_MESSAGE);
+             lo.LogUsuarios(detallea, "Boton Agregar", userName);
+                    
+        }
+
     }//GEN-LAST:event_botonAgregarDAMouseClicked
 
     private void botonEditarDAMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_botonEditarDAMouseClicked
-        ObtenerIDAlmacen();
-        ObtenerIDProducto();
-        String editar ="BtnEditar";
-        if (comboAlmacen.getSelectedIndex() == 0) {
-            JOptionPane.showMessageDialog(null, "Seleccione Almacen");
-
-        } else if (comboProducto.getSelectedIndex() == 0) {
-            JOptionPane.showMessageDialog(null, "Seleccione un Producto");
-        } else if (txtCapacidadDA.getText().equals("Ingrese Capacidad")) {
-            JOptionPane.showMessageDialog(null, "Ingrese Capacidad");
-        } else if (txtDescripcionDA.getText().equals("Ingrese Descripción")) {
-            JOptionPane.showMessageDialog(null, "Ingrese una Dirección");
-        } else {
-            int Id = Integer.parseInt(txtIdDetalleAL.getText());
-            int Almacen = Integer.parseInt(txtIdAlmacen.getText());
-            int Producto = Integer.parseInt(txtIdProducto.getText());
-            String Capacidad = txtCapacidadDA.getText();
-            String Descripcion = txtDescripcionDA.getText();
-
-            try {
-                Connection con = Conexion.getConexion();
-                PreparedStatement ps = con.prepareStatement("Update Detalle_Almacen set Id_Almacen=?, Id_Producto=?,Capacidad=?,Descripcion=? Where Id_Detalle_Almacen=?");
-                ps.setInt(1, Almacen);
-                ps.setInt(2, Producto);
-                ps.setString(3, Capacidad);
-                ps.setString(4, Descripcion);
-                ps.setInt(5, Id);
-
-                ps.executeUpdate();
-                JOptionPane.showMessageDialog(null, "Registro Actualizado");
-
-                cargartabla();
-                Limpiar();
-                Inhabillitar();
-
-            } catch (SQLException ex) {
-                 lo.LogBitacora("Error: No se pudo editar el dato " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(),detallea, editar);
-                JOptionPane.showMessageDialog(null, ex.toString());
-            }
-        }
-
-    }//GEN-LAST:event_botonEditarDAMouseClicked
-
-    private void botonGuardarDAMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_botonGuardarDAMouseClicked
-        ObtenerIDAlmacen();
-        ObtenerIDProducto();
-        String guardar = "Btnguardar";
-        if ((comboAlmacen.getSelectedIndex() == 0) || comboProducto.getSelectedIndex() == 0 || txtCapacidadDA.getText().equals("Ingrese Capacidad") || txtDescripcionDA.getText().equals("Ingrese Descripción")) {
+        if (botonEditarDA.isEnabled()) {
+            ObtenerIDAlmacen();
+            ObtenerIDProducto();
+            String editar = "BtnEditar";
             if (comboAlmacen.getSelectedIndex() == 0) {
                 JOptionPane.showMessageDialog(null, "Seleccione Almacen");
+
             } else if (comboProducto.getSelectedIndex() == 0) {
                 JOptionPane.showMessageDialog(null, "Seleccione un Producto");
             } else if (txtCapacidadDA.getText().equals("Ingrese Capacidad")) {
                 JOptionPane.showMessageDialog(null, "Ingrese Capacidad");
             } else if (txtDescripcionDA.getText().equals("Ingrese Descripción")) {
-                JOptionPane.showMessageDialog(null, "Ingrese una Descripciom");
+                JOptionPane.showMessageDialog(null, "Ingrese una Dirección");
+            } else {
+                int Id = Integer.parseInt(txtIdDetalleAL.getText());
+                int Almacen = Integer.parseInt(txtIdAlmacen.getText());
+                int Producto = Integer.parseInt(txtIdProducto.getText());
+                String Capacidad = txtCapacidadDA.getText();
+                String Descripcion = txtDescripcionDA.getText();
+
+                try {
+                    Connection con = Conexion.getConexion();
+                    PreparedStatement ps = con.prepareStatement("Update Detalle_Almacen set Id_Almacen=?, Id_Producto=?,Capacidad=?,Descripcion=? Where Id_Detalle_Almacen=?");
+                    ps.setInt(1, Almacen);
+                    ps.setInt(2, Producto);
+                    ps.setString(3, Capacidad);
+                    ps.setString(4, Descripcion);
+                    ps.setInt(5, Id);
+
+                    ps.executeUpdate();
+                    JOptionPane.showMessageDialog(null, "Registro Actualizado");
+
+                    cargartabla();
+                    Limpiar();
+                    Inhabillitar();
+
+                } catch (SQLException ex) {
+                    lo.LogBitacora("Error: No se pudo editar el dato " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), detallea, editar);
+                    JOptionPane.showMessageDialog(null, ex.toString());
+                }
             }
         } else {
-            int Almacen = Integer.parseInt(txtIdAlmacen.getText());
-            int Productos = Integer.parseInt(txtIdProducto.getText());
-            String Capacidad = txtCapacidadDA.getText();
-            String Descripcion = txtDescripcionDA.getText();
 
-            try {
-                Connection con = Conexion.getConexion();
-                PreparedStatement ps = con.prepareStatement("Insert into Detalle_Almacen ( Id_Almacen,Id_Producto,Capacidad,Descripcion) VALUES(?,?,?,?)");
-                ps.setInt(1, Almacen);
-                ps.setInt(2, Productos);
-                ps.setString(3, Capacidad);
-                ps.setString(4, Descripcion);
-                ps.executeUpdate();
+            JOptionPane.showMessageDialog(null, "Esta acción no se encuentra disponible para tu usuario", "ERROR", JOptionPane.ERROR_MESSAGE);
+                         lo.LogUsuarios(detallea, "Boton Editar", userName);
 
-                JOptionPane.showMessageDialog(null, "Registro guardado");
-                cargartabla();
+        }
+    }//GEN-LAST:event_botonEditarDAMouseClicked
 
-                //Limpiar();
-                Inhabillitar();
+    private void botonGuardarDAMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_botonGuardarDAMouseClicked
+        if (botonGuardarDA.isEnabled()) {
+            ObtenerIDAlmacen();
+            ObtenerIDProducto();
+            String guardar = "Btnguardar";
+            if ((comboAlmacen.getSelectedIndex() == 0) || comboProducto.getSelectedIndex() == 0 || txtCapacidadDA.getText().equals("Ingrese Capacidad") || txtDescripcionDA.getText().equals("Ingrese Descripción")) {
+                if (comboAlmacen.getSelectedIndex() == 0) {
+                    JOptionPane.showMessageDialog(null, "Seleccione Almacen");
+                } else if (comboProducto.getSelectedIndex() == 0) {
+                    JOptionPane.showMessageDialog(null, "Seleccione un Producto");
+                } else if (txtCapacidadDA.getText().equals("Ingrese Capacidad")) {
+                    JOptionPane.showMessageDialog(null, "Ingrese Capacidad");
+                } else if (txtDescripcionDA.getText().equals("Ingrese Descripción")) {
+                    JOptionPane.showMessageDialog(null, "Ingrese una Descripciom");
+                }
+            } else {
+                int Almacen = Integer.parseInt(txtIdAlmacen.getText());
+                int Productos = Integer.parseInt(txtIdProducto.getText());
+                String Capacidad = txtCapacidadDA.getText();
+                String Descripcion = txtDescripcionDA.getText();
 
-            } catch (SQLException ex) {
-                 lo.LogBitacora("Error: No se pudo guardar el dato " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(),detallea, guardar);
-                JOptionPane.showMessageDialog(null, ex.toString());
+                try {
+                    Connection con = Conexion.getConexion();
+                    PreparedStatement ps = con.prepareStatement("Insert into Detalle_Almacen ( Id_Almacen,Id_Producto,Capacidad,Descripcion) VALUES(?,?,?,?)");
+                    ps.setInt(1, Almacen);
+                    ps.setInt(2, Productos);
+                    ps.setString(3, Capacidad);
+                    ps.setString(4, Descripcion);
+                    ps.executeUpdate();
+
+                    JOptionPane.showMessageDialog(null, "Registro guardado");
+                    cargartabla();
+
+                    //Limpiar();
+                    Inhabillitar();
+
+                } catch (SQLException ex) {
+                    lo.LogBitacora("Error: No se pudo guardar el dato " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), detallea, guardar);
+                    JOptionPane.showMessageDialog(null, ex.toString());
+                }
             }
+        } else {
+
+            JOptionPane.showMessageDialog(null, "Esta acción no se encuentra disponible para tu usuario", "ERROR", JOptionPane.ERROR_MESSAGE);
+                         lo.LogUsuarios(detallea, "Boton Guardar", userName);
+
         }
     }//GEN-LAST:event_botonGuardarDAMouseClicked
 
@@ -459,16 +502,21 @@ public class DetalleAlmacen extends javax.swing.JFrame {
                 Habilitar();
             }
         } catch (SQLException ex) {
-             lo.LogBitacora("Error: No se pudo cargar tabla " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(),detallea,tablad);
+            lo.LogBitacora("Error: No se pudo cargar tabla " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), detallea, tablad);
             JOptionPane.showMessageDialog(null, ex.toString());
         }
     }//GEN-LAST:event_TablaDetalleAlmacenMouseClicked
 
     private void botonCancelarDAMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_botonCancelarDAMouseClicked
-        Limpiar();
-        Inhabillitar();
-        botonEditarDA.setEnabled(Boolean.FALSE);
-        botonGuardarDA.setEnabled(Boolean.FALSE);
+      if (botonCancelarDA.isEnabled()) {
+            // Limpiar();
+            //Inhabillitar();
+            botonCancelarDA.setEnabled(Boolean.FALSE);
+            botonCancelarDA.setEnabled(Boolean.FALSE);
+        } else {
+            JOptionPane.showMessageDialog(null, "Esta acción no se encuentra disponible para tu usuario", "ERROR", JOptionPane.ERROR_MESSAGE);
+            lo.LogUsuarios(detallea, "Boton Cancelar", userName);
+        }
 
     }//GEN-LAST:event_botonCancelarDAMouseClicked
 
@@ -679,8 +727,8 @@ public class DetalleAlmacen extends javax.swing.JFrame {
         ResultSet rs;
         ResultSetMetaData rsmd;
         int columnas;
-        
-        String cargart ="CargarTabla";
+
+        String cargart = "CargarTabla";
 
         try {
             Connection con = Conexion.getConexion();
@@ -702,7 +750,7 @@ public class DetalleAlmacen extends javax.swing.JFrame {
             }
 
         } catch (SQLException ex) {
-             lo.LogBitacora("Error: No se pudo cargar el dato " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(),detallea,cargart);
+            lo.LogBitacora("Error: No se pudo cargar el dato " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), detallea, cargart);
             JOptionPane.showMessageDialog(null, ex.toString());
         }
 
@@ -736,7 +784,7 @@ public class DetalleAlmacen extends javax.swing.JFrame {
 
     private void ObtenerIDAlmacen() {
         String Nombre = comboAlmacen.getSelectedItem().toString();
-        String obtenerA ="ObtenerIdAlmacen";
+        String obtenerA = "ObtenerIdAlmacen";
         try {
             ResultSet rs;
             Connection con = Conexion.getConexion();
@@ -749,7 +797,7 @@ public class DetalleAlmacen extends javax.swing.JFrame {
             }
 
         } catch (SQLException ex) {
-             lo.LogBitacora("Error: No se pudo obtener el id almacen " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(),detallea,obtenerA);
+            lo.LogBitacora("Error: No se pudo obtener el id almacen " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), detallea, obtenerA);
             JOptionPane.showMessageDialog(null, ex.toString());
         }
     }
@@ -769,14 +817,14 @@ public class DetalleAlmacen extends javax.swing.JFrame {
             }
 
         } catch (SQLException ex) {
-             lo.LogBitacora("Error: No se pudo obtener el id producto " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(),detallea, obtenerP);
+            lo.LogBitacora("Error: No se pudo obtener el id producto " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), detallea, obtenerP);
             JOptionPane.showMessageDialog(null, ex.toString());
         }
 
     }
 
     private void buscarData(String valor) {
-        String buscar ="Buscar";
+        String buscar = "Buscar";
         String[] titulos = {"Id Detalle Almacen", "Ubicacion", "Producto", "Capacidad", "Descipcion"};
         String[] registros = new String[13];
         String sql = "Select DA.Id_Detalle_Almacen,AL.Ubicacion,P.Nombre_Producto,DA.Capacidad,DA.Descripcion\n"
@@ -807,7 +855,7 @@ public class DetalleAlmacen extends javax.swing.JFrame {
             TablaDetalleAlmacen.setModel(model);
             // anchoColumnas();
         } catch (SQLException ex) {
-             lo.LogBitacora("Error: No se pudo buscar el dato " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(),detallea,buscar);
+            lo.LogBitacora("Error: No se pudo buscar el dato " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), detallea, buscar);
             Logger.getLogger(Clientes.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -853,7 +901,7 @@ public class DetalleAlmacen extends javax.swing.JFrame {
                 con.close();
                 rs.close();
             } catch (Exception e) {
-                 lo.LogBitacora("Error: No se pudo cargar el producto " + "Excepción: " + e + ". Origen: " + this.getClass().getSimpleName(), detallea, cargarp);
+                lo.LogBitacora("Error: No se pudo cargar el producto " + "Excepción: " + e + ". Origen: " + this.getClass().getSimpleName(), detallea, cargarp);
                 System.out.println(e);
             }
             return modelo;
@@ -863,7 +911,7 @@ public class DetalleAlmacen extends javax.swing.JFrame {
     public class CargarAlmacen {
 
         public DefaultComboBoxModel getvalues() {
-            String cargara ="CargarAlmacen";
+            String cargara = "CargarAlmacen";
 
             DefaultComboBoxModel modelo = new DefaultComboBoxModel();
             try {
@@ -885,4 +933,104 @@ public class DetalleAlmacen extends javax.swing.JFrame {
         }
     }
 
+    public void habilitarroles() {
+        try {
+
+            PreparedStatement ps;
+            ResultSet rs;
+            Connection con = Conexion.getConexion();
+            ps = con.prepareStatement("Select PU.Agregar, PU.Guardar, PU.Cancelar, PU.Editar, PU.Activo, PU.Inactivo, PU.Reporte, PU.Anular, PU.CrearCompra, PU.Historicos, PU.Buscar\n"
+                    + "From PermisosUsuario AS PU\n"
+                    + "Inner Join Usuario as U on PU.IdUsuario=U.Id_Usuario\n"
+                    + "where PU.IdPermiso=? and U.Nombre=?");
+            ps.setInt(1,19);
+            ps.setString(2, usuario.getText());
+            rs = ps.executeQuery();
+            System.out.println(usuario.getText());
+
+            while (rs.next()) {
+                agregari = rs.getInt("Agregar");
+                guardari = rs.getInt("Guardar");
+                cancelari = rs.getInt("Cancelar");
+                editari = rs.getInt("Editar");
+                activoi = rs.getInt("Activo");
+                inactivoi = rs.getInt("Inactivo");
+                reportesi = rs.getInt("Reporte");
+                anulari = rs.getInt("Anular");
+                crearcomprai = rs.getInt("CrearCompra");
+                historicoi = rs.getInt("Historicos");
+                buscari = rs.getInt("Buscar");
+                System.out.print(agregari + " " + guardari + " " + cancelari);
+
+            }
+        } catch (SQLException ex) {
+            //lo.LogBitacora("Error: No se pudo seleccionar la tabla" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), proveedores, tablap);
+            JOptionPane.showMessageDialog(null, ex.toString());
+        }
+        if (agregari == 1) {
+            botonAgregarDA.setEnabled(Boolean.TRUE);
+        } else if (agregari == 0) {
+            botonAgregarDA.setEnabled(Boolean.FALSE);
+            botonAgregarDA.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/obstruido (1).png")));
+        }
+
+        if (guardari == 1) {
+            botonGuardarDA.setEnabled(Boolean.TRUE);
+        } else if (guardari == 0) {
+            botonGuardarDA.setEnabled(Boolean.FALSE);
+            botonGuardarDA.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/obstruido (1).png")));
+
+        }
+        if (editari == 1) {
+            botonEditarDA.setEnabled(Boolean.TRUE);
+        } else {
+            botonEditarDA.setEnabled(Boolean.FALSE);
+            botonEditarDA.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/obstruido (1).png")));
+        }
+
+        if (cancelari == 1) {
+            botonCancelarDA.setEnabled(Boolean.TRUE);
+
+        } else {
+            botonCancelarDA.setEnabled(Boolean.FALSE);
+            botonCancelarDA.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/obstruido (1).png")));
+        }
+        if (reportesi == 1) {
+            reporte.setVisible(Boolean.TRUE);
+
+        } else {
+            reporte.setVisible(Boolean.FALSE);
+            //jLabel2.setEnabled(Boolean.TRUE);
+        }
+        if (buscari == 1) {
+            txtBuscarDetalle.setEnabled(Boolean.TRUE);
+        } else {
+            txtBuscarDetalle.setEnabled(Boolean.FALSE);
+            txtBuscarDetalle.setText("NO DISPONIBLE");
+        }
+        /* if (anulari == 1) {
+            Anular.setSelected(Boolean.TRUE);
+        } else {
+            Anular.setSelected(Boolean.FALSE);
+        }*/
+//        if (activoi == 1) {
+//            //BotonActivoPro.setVisible(Boolean.TRUE);
+//        } else {
+//            BotonActivoCont.setVisible(Boolean.FALSE);
+//        }
+//        if (inactivoi == 1) {
+//            //BotonInactivoPro.setVisible(Boolean.TRUE);
+//        } else {
+//            BotonInactivoCont.setVisible(Boolean.FALSE);
+    }
+    /*if (historicoi == 1) {
+            Historico.setSelected(Boolean.TRUE);
+        } else {
+            Historico.setSelected(Boolean.FALSE);
+        }
+        if (crearcomprai == 1) {
+            CrearCompra.setSelected(Boolean.TRUE);
+        } else {
+            CrearCompra.setSelected(Boolean.FALSE);
+        }*/
 }

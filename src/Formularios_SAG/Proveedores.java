@@ -24,6 +24,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.swing.Icon;
 import javax.swing.JOptionPane;
 import javax.swing.table.DefaultTableModel;
 import net.sf.jasperreports.engine.JRException;
@@ -42,13 +43,27 @@ public class Proveedores extends javax.swing.JFrame {
     String proveedores = "Proveedores";
 
     public static String Id_Proveedor = "0";
+    int agregari;
+    int guardari;
+    int editari;
+    int cancelari;
+    int reportesi;
+    int activoi;
+    int inactivoi;
+    int anulari;
+    int buscari;
+    int crearcomprai;
+    int historicoi;
+    String userName;
 
     public Proveedores() {
         initComponents();
+        usuario.setText(Login.txtUsuario.getText());
+        habilitarroles();
         cargartabla();
         Inhabillitar();
+        userName = usuario.getText();
         txtId_Proveedor.setVisible(Boolean.FALSE);
-        usuario.setText(Login.txtUsuario.getText());
 
     }
 
@@ -103,25 +118,31 @@ public class Proveedores extends javax.swing.JFrame {
                 BotonRegresarProMouseClicked(evt);
             }
         });
-        getContentPane().add(BotonRegresarPro, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 40, 120, 40));
+        getContentPane().add(BotonRegresarPro, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 50, 120, 40));
 
+        BotonAgregarPro.setBackground(new java.awt.Color(153, 0, 51));
+        BotonAgregarPro.setFont(new java.awt.Font("Georgia", 1, 12)); // NOI18N
+        BotonAgregarPro.setForeground(new java.awt.Color(153, 0, 0));
         BotonAgregarPro.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        BotonAgregarPro.setEnabled(false);
         BotonAgregarPro.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 BotonAgregarProMouseClicked(evt);
             }
         });
-        getContentPane().add(BotonAgregarPro, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 140, 120, 40));
+        getContentPane().add(BotonAgregarPro, new org.netbeans.lib.awtextra.AbsoluteConstraints(290, 140, 130, 40));
 
         BotonEditarPro.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        BotonEditarPro.setEnabled(false);
         BotonEditarPro.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 BotonEditarProMouseClicked(evt);
             }
         });
-        getContentPane().add(BotonEditarPro, new org.netbeans.lib.awtextra.AbsoluteConstraints(460, 140, 120, 40));
+        getContentPane().add(BotonEditarPro, new org.netbeans.lib.awtextra.AbsoluteConstraints(450, 140, 130, 40));
 
         BotonContactoPro.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        BotonContactoPro.setEnabled(false);
         BotonContactoPro.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 BotonContactoProMouseClicked(evt);
@@ -130,6 +151,7 @@ public class Proveedores extends javax.swing.JFrame {
         getContentPane().add(BotonContactoPro, new org.netbeans.lib.awtextra.AbsoluteConstraints(620, 140, 120, 40));
 
         BotonGuardarPro.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        BotonGuardarPro.setEnabled(false);
         BotonGuardarPro.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 BotonGuardarProMouseClicked(evt);
@@ -138,12 +160,13 @@ public class Proveedores extends javax.swing.JFrame {
         getContentPane().add(BotonGuardarPro, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 620, 90, 40));
 
         BotonCancelarPro.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        BotonCancelarPro.setEnabled(false);
         BotonCancelarPro.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 BotonCancelarProMouseClicked(evt);
             }
         });
-        getContentPane().add(BotonCancelarPro, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 630, 80, 30));
+        getContentPane().add(BotonCancelarPro, new org.netbeans.lib.awtextra.AbsoluteConstraints(160, 620, 80, 40));
 
         txtNombreEmpresaPro.setBackground(new java.awt.Color(240, 240, 240));
         txtNombreEmpresaPro.setFont(new java.awt.Font("Georgia", 0, 12)); // NOI18N
@@ -399,6 +422,7 @@ public class Proveedores extends javax.swing.JFrame {
         getContentPane().add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 650, 70, -1));
 
         BotonProducto_Proveedor.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
+        BotonProducto_Proveedor.setEnabled(false);
         BotonProducto_Proveedor.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 BotonProducto_ProveedorMouseClicked(evt);
@@ -462,51 +486,70 @@ public class Proveedores extends javax.swing.JFrame {
     }
 
     private void BotonAgregarProMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonAgregarProMouseClicked
-        Habilitar();
-        BotonGuardarPro.isEnabled();
-        BotonCancelarPro.isEnabled();
+        if (BotonAgregarPro.isEnabled()) {
+            Habilitar();
+            if (guardari == 1) {
+                BotonGuardarPro.isEnabled();
+                //BotonCancelarPro.isEnabled();   
+            }
+            if (cancelari == 1) {
+                //BotonGuardarPro.isEnabled();
+                BotonCancelarPro.isEnabled();
+            }
+        } else {
+
+            JOptionPane.showMessageDialog(null, "Esta acción no se encuentra disponible para tu usuario", "ERROR", JOptionPane.ERROR_MESSAGE);
+            lo.LogUsuarios(proveedores, "Boton Agregar", userName);
+        }
+
     }//GEN-LAST:event_BotonAgregarProMouseClicked
 
     private void BotonGuardarProMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonGuardarProMouseClicked
-        String guardar = "BtnGuardar";
-        if (txtNombreEmpresaPro.getText().equals("Ingrese Nombre de la Empresa")) {
-            JOptionPane.showMessageDialog(null, "Debe ingresar un nombre de Empresa", "Advertencia", JOptionPane.WARNING_MESSAGE);
-        } else if (txtRTNPro.getText().equals("Ingrese RTN")) {
-            JOptionPane.showMessageDialog(null, "Debe ingresar un RTN", "Advertencia", JOptionPane.WARNING_MESSAGE);
-        } else if (ComboCiudadPro.getSelectedIndex() == 0) {
-            JOptionPane.showMessageDialog(null, "Seleccione una ciudad", "Advertencia", JOptionPane.WARNING_MESSAGE);
-        } else if (txtDireccionPro.getText().equals("Ingrese Dirección") || (txtDireccionPro.getText().equals(""))) {
-            JOptionPane.showMessageDialog(null, "Debe ingresar una direccion", "Advertencia", JOptionPane.WARNING_MESSAGE);
-        } else if (txtTelefonoPro.getText().equals("Ingrese Teléfono")) {
-            JOptionPane.showMessageDialog(null, "Debe ingresar un telefono", "Advertencia", JOptionPane.WARNING_MESSAGE);
-        } else {
-            String NombreEm = txtNombreEmpresaPro.getText();
-            String RTN = txtRTNPro.getText();
-            String Ciudad = ComboCiudadPro.getSelectedItem().toString();
-            String Direccion = txtDireccionPro.getText();
-            String Telefono = txtTelefonoPro.getText();
+        if (BotonGuardarPro.isEnabled()) {
+            String guardar = "BtnGuardar";
+            if (txtNombreEmpresaPro.getText().equals("Ingrese Nombre de la Empresa")) {
+                JOptionPane.showMessageDialog(null, "Debe ingresar un nombre de Empresa", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            } else if (txtRTNPro.getText().equals("Ingrese RTN")) {
+                JOptionPane.showMessageDialog(null, "Debe ingresar un RTN", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            } else if (ComboCiudadPro.getSelectedIndex() == 0) {
+                JOptionPane.showMessageDialog(null, "Seleccione una ciudad", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            } else if (txtDireccionPro.getText().equals("Ingrese Dirección") || (txtDireccionPro.getText().equals(""))) {
+                JOptionPane.showMessageDialog(null, "Debe ingresar una direccion", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            } else if (txtTelefonoPro.getText().equals("Ingrese Teléfono")) {
+                JOptionPane.showMessageDialog(null, "Debe ingresar un telefono", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            } else {
+                String NombreEm = txtNombreEmpresaPro.getText();
+                String RTN = txtRTNPro.getText();
+                String Ciudad = ComboCiudadPro.getSelectedItem().toString();
+                String Direccion = txtDireccionPro.getText();
+                String Telefono = txtTelefonoPro.getText();
 
-            try {
-                Connection con = Conexion.getConexion();
-                PreparedStatement ps = con.prepareStatement("Insert into Proveedor (Nombre_Empresa, RTN,Ciudad,Direccion, Telefono,Id_Estado) VALUES(?,?,?,?,?,?)");
-                ps.setString(1, NombreEm);
-                ps.setString(2, RTN);
-                ps.setString(3, Ciudad);
-                ps.setString(4, Direccion);
-                ps.setString(5, Telefono);
-                ps.setInt(6, 1);
-                ps.executeUpdate();
+                try {
+                    Connection con = Conexion.getConexion();
+                    PreparedStatement ps = con.prepareStatement("Insert into Proveedor (Nombre_Empresa, RTN,Ciudad,Direccion, Telefono,Id_Estado) VALUES(?,?,?,?,?,?)");
+                    ps.setString(1, NombreEm);
+                    ps.setString(2, RTN);
+                    ps.setString(3, Ciudad);
+                    ps.setString(4, Direccion);
+                    ps.setString(5, Telefono);
+                    ps.setInt(6, 1);
+                    ps.executeUpdate();
 
-                JOptionPane.showMessageDialog(null, "Registro guardado");
-                cargartabla();
-                Limpiar();
-                Inhabillitar();
+                    JOptionPane.showMessageDialog(null, "Registro guardado");
+                    cargartabla();
+                    Limpiar();
+                    Inhabillitar();
 
-            } catch (SQLException ex) {
-                lo.LogBitacora("Error: No se pudo guardar el dato " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), proveedores, guardar);
-                JOptionPane.showMessageDialog(null, ex.toString());
+                } catch (SQLException ex) {
+                    lo.LogBitacora("Error: No se pudo guardar el dato " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), proveedores, guardar);
+                    JOptionPane.showMessageDialog(null, ex.toString());
+                }
             }
+        } else {
+            JOptionPane.showMessageDialog(null, "Esta acción no se encuentra disponible para tu usuario", "ERROR", JOptionPane.ERROR_MESSAGE);
+            lo.LogUsuarios(proveedores, "Boton Guardar", userName);
         }
+
 
     }//GEN-LAST:event_BotonGuardarProMouseClicked
 
@@ -534,16 +577,28 @@ public class Proveedores extends javax.swing.JFrame {
                 txtDireccionPro.setText(rs.getString("Direccion"));
                 txtTelefonoPro.setText(rs.getString("Telefono"));
 
-                if (rs.getString("Id_Estado").equals("1")) {
-                    BotonActivoPro.setSelected(true);
-                } else if (rs.getString("Id_Estado").equals("2")) {
-                    BotonInactivoPro.setSelected(true);
-
+                if (activoi == 1) {
+                    BotonActivoPro.setVisible(Boolean.TRUE);
+                    if (rs.getString("Id_Estado").equals("1")) {
+                        BotonActivoPro.setSelected(true);
+                    }
+                } else {
+                    BotonActivoPro.setVisible(Boolean.FALSE);
                 }
+                if (inactivoi == 1) {
+                    BotonInactivoPro.setVisible(Boolean.TRUE);
+                    if (rs.getString("Id_Estado").equals("2")) {
+                        BotonInactivoPro.setSelected(true);
+
+                    }
+                } else {
+                    BotonInactivoPro.setVisible(Boolean.FALSE);
+                }
+
                 Id_Proveedor = txtId_Proveedor.getText();
 
-                BotonActivoPro.setVisible(Boolean.TRUE);
-                BotonInactivoPro.setVisible(Boolean.TRUE);
+                //BotonActivoPro.setVisible(Boolean.TRUE);
+                //BotonInactivoPro.setVisible(Boolean.TRUE);
                 //id = txtId_Proveedor.getText();
                 Habilitar();
             }
@@ -554,46 +609,59 @@ public class Proveedores extends javax.swing.JFrame {
     }//GEN-LAST:event_TablaProveedorMouseClicked
 
     private void BotonEditarProMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonEditarProMouseClicked
-        String editar = "BtnEditar";
-        if (txtNombreEmpresaPro.getText().equals("Ingrese Nombre de la Empresa") || txtRTNPro.getText().equals("Ingrese RTN") || ComboCiudadPro.equals("Seleccione Ciudad") || txtDireccionPro.getText().equals("Ingrese Dirección") || txtTelefonoPro.getText().equals("Ingrese Teléfono")) {
-            JOptionPane.showMessageDialog(null, "No se puede Guardar datos vacios");
-        } else {
-            int IdProveedor = Integer.parseInt(txtId_Proveedor.getText());
-            String NombreEmpresa = txtNombreEmpresaPro.getText();
-            String RTN = txtRTNPro.getText();
-            String Ciudad = ComboCiudadPro.getSelectedItem().toString();
-            String Direccion = txtDireccionPro.getText();
-            String Telefono = txtTelefonoPro.getText();
 
-            try {
-                Connection con = Conexion.getConexion();
-                PreparedStatement ps = con.prepareStatement("Update Proveedor set Nombre_Empresa=?, RTN=?,Ciudad=?,Direccion=?,Telefono=? Where Id_Proveedor=?");
-                ps.setString(1, NombreEmpresa);
-                ps.setString(2, RTN);
-                ps.setString(3, Ciudad);
-                ps.setString(4, Direccion);
-                ps.setString(5, Telefono);
-                ps.setInt(6, IdProveedor);
+        if (editari == 1) {
+            String editar = "BtnEditar";
+            if (txtNombreEmpresaPro.getText().equals("Ingrese Nombre de la Empresa") || txtRTNPro.getText().equals("Ingrese RTN") || ComboCiudadPro.equals("Seleccione Ciudad") || txtDireccionPro.getText().equals("Ingrese Dirección") || txtTelefonoPro.getText().equals("Ingrese Teléfono")) {
+                JOptionPane.showMessageDialog(null, "No se puede Guardar datos vacios");
+            } else {
+                int IdProveedor = Integer.parseInt(txtId_Proveedor.getText());
+                String NombreEmpresa = txtNombreEmpresaPro.getText();
+                String RTN = txtRTNPro.getText();
+                String Ciudad = ComboCiudadPro.getSelectedItem().toString();
+                String Direccion = txtDireccionPro.getText();
+                String Telefono = txtTelefonoPro.getText();
 
-                ps.executeUpdate();
-                JOptionPane.showMessageDialog(null, "Registro Actualizado");
+                try {
+                    Connection con = Conexion.getConexion();
+                    PreparedStatement ps = con.prepareStatement("Update Proveedor set Nombre_Empresa=?, RTN=?,Ciudad=?,Direccion=?,Telefono=? Where Id_Proveedor=?");
+                    ps.setString(1, NombreEmpresa);
+                    ps.setString(2, RTN);
+                    ps.setString(3, Ciudad);
+                    ps.setString(4, Direccion);
+                    ps.setString(5, Telefono);
+                    ps.setInt(6, IdProveedor);
 
-                cargartabla();
-                Limpiar();
-                Inhabillitar();
+                    ps.executeUpdate();
+                    JOptionPane.showMessageDialog(null, "Registro Actualizado");
 
-            } catch (SQLException ex) {
-                lo.LogBitacora("Error: No se pudo editar el dato " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), proveedores, editar);
-                JOptionPane.showMessageDialog(null, ex.toString());
+                    cargartabla();
+                    Limpiar();
+                    Inhabillitar();
+
+                } catch (SQLException ex) {
+                    lo.LogBitacora("Error: No se pudo editar el dato " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), proveedores, editar);
+                    JOptionPane.showMessageDialog(null, ex.toString());
+                }
             }
+        } else {
+            JOptionPane.showMessageDialog(null, "Esta acción no se encuentra disponible para tu usuario", "ERROR", JOptionPane.ERROR_MESSAGE);
+            lo.LogUsuarios(proveedores, "Boton Editar", userName);
         }
+
     }//GEN-LAST:event_BotonEditarProMouseClicked
 
     private void BotonCancelarProMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonCancelarProMouseClicked
-        Limpiar();
-        Inhabillitar();
-        BotonEditarPro.setEnabled(Boolean.FALSE);
-        BotonGuardarPro.setEnabled(Boolean.FALSE);
+        if (BotonCancelarPro.isEnabled()) {
+            Limpiar();
+            Inhabillitar();
+            BotonEditarPro.setEnabled(Boolean.FALSE);
+            BotonGuardarPro.setEnabled(Boolean.FALSE);
+        } else {
+            JOptionPane.showMessageDialog(null, "Esta acción no se encuentra disponible para tu usuario", "ERROR", JOptionPane.ERROR_MESSAGE);
+            lo.LogUsuarios(proveedores, "Boton Cancelar", userName);
+        }
+
 
     }//GEN-LAST:event_BotonCancelarProMouseClicked
 
@@ -968,7 +1036,7 @@ public class Proveedores extends javax.swing.JFrame {
         ResultSet rs;
         ResultSetMetaData rsmd;
         int columnas;
-        String cargart="CargarTabla";
+        String cargart = "CargarTabla";
 
         try {
             Connection con = Conexion.getConexion();
@@ -1033,7 +1101,7 @@ public class Proveedores extends javax.swing.JFrame {
     }
 
     private void buscarData(String valor) {
-        String buscar ="Buscar";
+        String buscar = "Buscar";
         String[] titulos = {"ID", "Nombre Empresa", "RTN", "Ciudad", "Direccion", "Telefono", "Estado"};
         String[] registros = new String[13];
         String sql = "Select P.Id_Proveedor,P.Nombre_Empresa,P.RTN,P.Ciudad,P.Direccion,P.Telefono,E.Estado\n"
@@ -1100,5 +1168,107 @@ public class Proveedores extends javax.swing.JFrame {
             return false;
         }
 
+    }
+
+    public void habilitarroles() {
+        try {
+
+            PreparedStatement ps;
+            ResultSet rs;
+            Connection con = Conexion.getConexion();
+            ps = con.prepareStatement("Select PU.Agregar, PU.Guardar, PU.Cancelar, PU.Editar, PU.Activo, PU.Inactivo, PU.Reporte, PU.Anular, PU.CrearCompra, PU.Historicos, PU.Buscar\n"
+                    + "From PermisosUsuario AS PU\n"
+                    + "Inner Join Usuario as U on PU.IdUsuario=U.Id_Usuario\n"
+                    + "where PU.IdPermiso=? and U.Nombre=?");
+            ps.setInt(1, 3);
+            ps.setString(2, usuario.getText());
+            rs = ps.executeQuery();
+            System.out.println(usuario.getText());
+
+            while (rs.next()) {
+                agregari = rs.getInt("Agregar");
+                guardari = rs.getInt("Guardar");
+                cancelari = rs.getInt("Cancelar");
+                editari = rs.getInt("Editar");
+                activoi = rs.getInt("Activo");
+                inactivoi = rs.getInt("Inactivo");
+                reportesi = rs.getInt("Reporte");
+                anulari = rs.getInt("Anular");
+                crearcomprai = rs.getInt("CrearCompra");
+                historicoi = rs.getInt("Historicos");
+                buscari = rs.getInt("Buscar");
+                System.out.print(agregari + " " + guardari + " " + cancelari);
+
+            }
+        } catch (SQLException ex) {
+            //lo.LogBitacora("Error: No se pudo seleccionar la tabla" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), proveedores, tablap);
+            JOptionPane.showMessageDialog(null, ex.toString());
+        }
+        if (agregari == 1) {
+            BotonAgregarPro.setEnabled(Boolean.TRUE);
+        } else if (agregari == 0) {
+            BotonAgregarPro.setEnabled(Boolean.FALSE);
+            BotonAgregarPro.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/obstruido (1).png")));
+        }
+
+        if (guardari == 1) {
+            BotonGuardarPro.setEnabled(Boolean.TRUE);
+        } else if (guardari == 0) {
+            BotonGuardarPro.setEnabled(Boolean.FALSE);
+            BotonGuardarPro.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/obstruido (1).png")));
+
+        }
+        if (editari == 1) {
+            BotonEditarPro.setEnabled(Boolean.TRUE);
+        } else {
+            BotonEditarPro.setEnabled(Boolean.FALSE);
+            BotonEditarPro.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/obstruido (1).png")));
+        }
+
+        if (cancelari == 1) {
+            BotonCancelarPro.setEnabled(Boolean.TRUE);
+
+        } else {
+            BotonCancelarPro.setEnabled(Boolean.FALSE);
+            BotonCancelarPro.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/obstruido (1).png")));
+        }
+        if (reportesi == 1) {
+            jLabel2.setVisible(Boolean.TRUE);
+
+        } else {
+            jLabel2.setVisible(Boolean.FALSE);
+            //jLabel2.setEnabled(Boolean.TRUE);
+        }
+        if (buscari == 1) {
+            txtBuscarPro.setEnabled(Boolean.TRUE);
+        } else {
+            txtBuscarPro.setEnabled(Boolean.FALSE);
+            txtBuscarPro.setText("NO DISPONIBLE");
+        }
+        /* if (anulari == 1) {
+            Anular.setSelected(Boolean.TRUE);
+        } else {
+            Anular.setSelected(Boolean.FALSE);
+        }*/
+        if (activoi == 1) {
+            //BotonActivoPro.setVisible(Boolean.TRUE);
+        } else {
+            BotonActivoPro.setVisible(Boolean.FALSE);
+        }
+        if (inactivoi == 1) {
+            //BotonInactivoPro.setVisible(Boolean.TRUE);
+        } else {
+            BotonInactivoPro.setVisible(Boolean.FALSE);
+        }
+        /*if (historicoi == 1) {
+            Historico.setSelected(Boolean.TRUE);
+        } else {
+            Historico.setSelected(Boolean.FALSE);
+        }
+        if (crearcomprai == 1) {
+            CrearCompra.setSelected(Boolean.TRUE);
+        } else {
+            CrearCompra.setSelected(Boolean.FALSE);
+        }*/
     }
 }

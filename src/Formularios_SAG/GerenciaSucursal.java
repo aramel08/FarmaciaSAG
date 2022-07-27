@@ -40,8 +40,21 @@ public class GerenciaSucursal extends javax.swing.JFrame {
      */
     log lo = new log();
     String gerencias = "Gerencia Sucusal";
+    int agregari;
+    int guardari;
+    int editari;
+    int cancelari;
+    int reportesi;
+    int activoi;
+    int inactivoi;
+    int anulari;
+    int buscari;
+    int crearcomprai;
+    int historicoi;
+    String userName;
 
     public GerenciaSucursal() {
+       
         initComponents();
         Calendar cal = Calendar.getInstance();
         cal.add(Calendar.DAY_OF_WEEK, -10);
@@ -53,6 +66,10 @@ public class GerenciaSucursal extends javax.swing.JFrame {
         Date mini = cale.getTime();
         Date max = new Date();
         Date maxi = calen.getTime();
+        usuario.setText(Login.txtUsuario.getText());
+        habilitarroles();
+        userName = usuario.getText();
+         
         CargarCargo ch = new CargarCargo();
         ComboNombreEmpleadoGS.setModel(ch.getvalues());
         CargarSucursal cs = new CargarSucursal();
@@ -226,7 +243,8 @@ public class GerenciaSucursal extends javax.swing.JFrame {
     }//GEN-LAST:event_txtBuscarProActionPerformed
 
     private void BotonEditarGSMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonEditarGSMouseClicked
-         String Editar="Editar Gerencia Sucursal";
+      if (BotonEditarGS.isEnabled()) {   
+        String Editar="Editar Gerencia Sucursal";
         if (FechaFinal.getDate().equals("")) {
             JOptionPane.showMessageDialog(null, "No se puede Actualizar datos vacios");
         } else {
@@ -249,11 +267,18 @@ public class GerenciaSucursal extends javax.swing.JFrame {
               lo.LogBitacora("Error: No se pudo actualizar la gerencia sucursal " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), gerencias,Editar);
 
                 JOptionPane.showMessageDialog(null, ex.toString());
+                 }
             }
+        } else {
+
+            JOptionPane.showMessageDialog(null, "Esta acción no se encuentra disponible para tu usuario", "ERROR", JOptionPane.ERROR_MESSAGE);
+            lo.LogUsuarios(gerencias, "Boton Editar", userName);
         }
+           
     }//GEN-LAST:event_BotonEditarGSMouseClicked
 
     private void BotonGuardarGSMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonGuardarGSMouseClicked
+     if (BotonGuardarGS.isEnabled()) { 
         String GuardarSucursal="Guardar Sucursal";
         ObtenerID();
         ObtenerIdS();
@@ -283,17 +308,46 @@ public class GerenciaSucursal extends javax.swing.JFrame {
                lo.LogBitacora("Error: No se pudo guardar gerencia sucursal " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), gerencias,GuardarSucursal);
 
                 JOptionPane.showMessageDialog(null, ex.toString());
+                   }
             }
+        } else {
+
+            JOptionPane.showMessageDialog(null, "Esta acción no se encuentra disponible para tu usuario", "ERROR", JOptionPane.ERROR_MESSAGE);
+              lo.LogUsuarios(gerencias, "Boton Guardar", userName);
         }
+
+            
     }//GEN-LAST:event_BotonGuardarGSMouseClicked
 
     private void BotonAgregarGSMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonAgregarGSMouseClicked
-        Habilitar();
+       if (BotonAgregarGS.isEnabled()) {
+            Habilitar();
+            if (guardari == 1) {
+                BotonGuardarGS.isEnabled();
+                //BotonCancelarPro.isEnabled();   
+            }
+            if (cancelari == 1) {
+                //BotonGuardarPro.isEnabled();
+                BotonCancelarGS.isEnabled();
+            }
+        } else {
+
+            JOptionPane.showMessageDialog(null, "Esta acción no se encuentra disponible para tu usuario", "ERROR", JOptionPane.ERROR_MESSAGE);
+              lo.LogUsuarios(gerencias, "Boton Agregar", userName);
+        }
+       
     }//GEN-LAST:event_BotonAgregarGSMouseClicked
 
     private void BotonCancelarGSMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonCancelarGSMouseClicked
+       if(BotonCancelarGS.isEnabled()){
         Limpiar();
         Inhabillitar();
+        BotonEditarGS.setEnabled(Boolean.FALSE);
+        BotonGuardarGS.setEnabled(Boolean.FALSE);   
+       }else{
+           JOptionPane.showMessageDialog(null, "Esta acción no se encuentra disponible para tu usuario", "ERROR", JOptionPane.ERROR_MESSAGE);
+             lo.LogUsuarios(gerencias, "Boton Cancelar", userName);
+       }
     }//GEN-LAST:event_BotonCancelarGSMouseClicked
 
     private void TablaGerenciaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_TablaGerenciaMouseClicked
@@ -571,6 +625,98 @@ public class GerenciaSucursal extends javax.swing.JFrame {
 
             JOptionPane.showMessageDialog(null, ex.toString());
         }
+    }
+    public void habilitarroles() {
+        try {
+
+            PreparedStatement ps;
+            ResultSet rs;
+            Connection con = Conexion.getConexion();
+            ps = con.prepareStatement("Select PU.Agregar, PU.Guardar, PU.Cancelar, PU.Editar, PU.Activo, PU.Inactivo, PU.Reporte, PU.Anular, PU.CrearCompra, PU.Historicos, PU.Buscar\n"
+                    + "From PermisosUsuario AS PU\n"
+                    + "Inner Join Usuario as U on PU.IdUsuario=U.Id_Usuario\n"
+                    + "where PU.IdPermiso=? and U.Nombre=?");
+            ps.setInt(1,21);
+            ps.setString(2, usuario.getText());
+            rs = ps.executeQuery();
+            System.out.println(usuario.getText());
+
+            while (rs.next()) {
+                agregari = rs.getInt("Agregar");
+                guardari = rs.getInt("Guardar");
+                cancelari = rs.getInt("Cancelar");
+                editari = rs.getInt("Editar");
+                activoi = rs.getInt("Activo");
+                inactivoi = rs.getInt("Inactivo");
+                reportesi = rs.getInt("Reporte");
+                anulari = rs.getInt("Anular");
+                crearcomprai = rs.getInt("CrearCompra");
+                historicoi = rs.getInt("Historicos");
+                buscari = rs.getInt("Buscar");
+                System.out.print(agregari + " " + guardari + " " + cancelari);
+
+            }
+        } catch (SQLException ex) {
+            //lo.LogBitacora("Error: No se pudo seleccionar la tabla" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), proveedores, tablap);
+            JOptionPane.showMessageDialog(null, ex.toString());
+        }
+        if (agregari == 1) {
+            BotonAgregarGS.setEnabled(Boolean.TRUE);
+        } else if (agregari == 0) {
+            BotonAgregarGS.setEnabled(Boolean.FALSE);
+            BotonAgregarGS.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/obstruido (1).png")));
+        }
+
+        if (guardari == 1) {
+            BotonGuardarGS.setEnabled(Boolean.TRUE);
+        } else if (guardari == 0) {
+            BotonGuardarGS.setEnabled(Boolean.FALSE);
+            BotonGuardarGS.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/obstruido (1).png")));
+
+        }
+        if (editari == 1) {
+            BotonEditarGS.setEnabled(Boolean.TRUE);
+        } else {
+            BotonEditarGS.setEnabled(Boolean.FALSE);
+            BotonEditarGS.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/obstruido (1).png")));
+        }
+
+        if (cancelari == 1) {
+            BotonCancelarGS.setEnabled(Boolean.TRUE);
+
+        } else {
+            BotonCancelarGS.setEnabled(Boolean.FALSE);
+            BotonCancelarGS.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/obstruido (1).png")));
+        }
+        if (reportesi == 1) {
+            reporte.setVisible(Boolean.TRUE);
+
+        } else {
+            reporte.setVisible(Boolean.FALSE);
+            //jLabel2.setEnabled(Boolean.TRUE);
+        }
+        if (buscari == 1) {
+            txtBuscarPro.setEnabled(Boolean.TRUE);
+        } else {
+            txtBuscarPro.setEnabled(Boolean.FALSE);
+            txtBuscarPro.setText("NO DISPONIBLE");
+        }
+        /* if (anulari == 1) {
+            Anular.setSelected(Boolean.TRUE);
+        } else {
+            Anular.setSelected(Boolean.FALSE);
+        }*/
+        
+        /*if (historicoi == 1) {
+            Historico.setSelected(Boolean.TRUE);
+        } else {
+            Historico.setSelected(Boolean.FALSE);
+        }
+        if (crearcomprai == 1) {
+            CrearCompra.setSelected(Boolean.TRUE);
+        } else {
+            CrearCompra.setSelected(Boolean.FALSE);
+        }*/
     }
 
 }

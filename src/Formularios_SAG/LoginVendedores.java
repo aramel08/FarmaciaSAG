@@ -6,6 +6,9 @@
 package Formularios_SAG;
 
 import Conexion.Conexion;
+import static Formularios_SAG.Login.txtContrasena;
+import static Formularios_SAG.Login.txtUsuario;
+import static Formularios_SAG.Login.usuario;
 import Logs.log;
 import encriptacion.Encode;
 import java.awt.Image;
@@ -14,6 +17,7 @@ import java.awt.event.KeyEvent;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.sql.Statement;
 import javax.swing.JOptionPane;
 
@@ -24,6 +28,7 @@ import javax.swing.JOptionPane;
 public class LoginVendedores extends javax.swing.JFrame {
 
     log lo = new log();
+     String login = "Login";
     String LoginV = "Login Vendedor";
 
     /**
@@ -64,7 +69,7 @@ public class LoginVendedores extends javax.swing.JFrame {
                 BotonIngresarMouseClicked(evt);
             }
         });
-        getContentPane().add(BotonIngresar, new org.netbeans.lib.awtextra.AbsoluteConstraints(841, 486, 270, 70));
+        getContentPane().add(BotonIngresar, new org.netbeans.lib.awtextra.AbsoluteConstraints(860, 490, 270, 70));
 
         txtContrasenaV.setFont(new java.awt.Font("Georgia", 0, 18)); // NOI18N
         txtContrasenaV.setBorder(null);
@@ -74,11 +79,10 @@ public class LoginVendedores extends javax.swing.JFrame {
                 txtContrasenaVKeyReleased(evt);
             }
         });
-        getContentPane().add(txtContrasenaV, new org.netbeans.lib.awtextra.AbsoluteConstraints(859, 330, 320, 50));
+        getContentPane().add(txtContrasenaV, new org.netbeans.lib.awtextra.AbsoluteConstraints(870, 330, 320, 50));
 
         txtUsuarioV.setFont(new java.awt.Font("Georgia", 0, 18)); // NOI18N
         txtUsuarioV.setBorder(null);
-        txtUsuarioV.setOpaque(false);
         txtUsuarioV.addFocusListener(new java.awt.event.FocusAdapter() {
             public void focusGained(java.awt.event.FocusEvent evt) {
                 txtUsuarioVFocusGained(evt);
@@ -87,7 +91,12 @@ public class LoginVendedores extends javax.swing.JFrame {
                 txtUsuarioVFocusLost(evt);
             }
         });
-        getContentPane().add(txtUsuarioV, new org.netbeans.lib.awtextra.AbsoluteConstraints(860, 190, 320, 70));
+        txtUsuarioV.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtUsuarioVActionPerformed(evt);
+            }
+        });
+        getContentPane().add(txtUsuarioV, new org.netbeans.lib.awtextra.AbsoluteConstraints(870, 200, 330, 60));
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/Pantalla Login V.png"))); // NOI18N
         getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
@@ -97,16 +106,16 @@ public class LoginVendedores extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     public boolean resultado = false;
-
-    public boolean validarVendedor() {
-        String validarV="Validar vendedor";
+    public static String usuario;
+    public boolean validarAdministradores() {
         Conexion cc = new Conexion();
         Connection cn = cc.getConexion();
         Encode encode = new Encode();
         String secretKey = "farmaciaSAG";
-        String vendedor = txtUsuarioV.getText();
+        String admin = txtUsuarioV.getText();
         String pass = String.valueOf(txtContrasenaV.getPassword());
-        String sql = "SELECT * FROM Empleados WHERE Usuario = '" + vendedor + "'";
+        String sql = "SELECT * FROM Usuario WHERE Nombre = '" + admin + "'";
+        String validar = "Validar";
 
         if (txtUsuarioV.getText().isEmpty() && txtContrasenaV.getText().isEmpty() || txtUsuarioV.getText().isEmpty() || txtContrasenaV.getText().isEmpty()) {
             JOptionPane.showMessageDialog(null, "Debes escribir un usuario y una contraseña", "Advertencia", JOptionPane.WARNING_MESSAGE);
@@ -117,7 +126,98 @@ public class LoginVendedores extends javax.swing.JFrame {
                 ResultSet rs = st.executeQuery(sql);
 
                 if (rs.next()) {
-                    String usuario = rs.getString("usuario");
+                    usuario = rs.getString("Nombre");
+                    int intentos = Integer.parseInt(rs.getString("Intentos"));
+                    if (rs.getString("Intentos").equals("0")) {
+                        JOptionPane.showMessageDialog(null, "Usuario inactivo, comuniquese con el administrador del sistema para restablecer su usuario", "Acceso denegado", JOptionPane.ERROR_MESSAGE);
+                        txtContrasenaV.setText("");
+
+                    } else if (encode.deecnode(secretKey, rs.getString("Contraseña")).equals(pass)) {
+                        resultado = true;
+                        Operaciones2 ad = new Operaciones2();
+                        ad.setVisible(true);
+                        this.dispose();
+                        try {
+                            String sqlRestar = "UPDATE Usuario SET Intentos = ? WHERE Usuario.Nombre = ? ";
+                            PreparedStatement pst = (PreparedStatement) cn.prepareStatement(sqlRestar);
+                            pst.setString(1, String.valueOf("3"));
+                            pst.setString(2, admin);
+                            pst.execute();
+
+                        } catch (Exception e) {
+                            //lo.LogBitacora("Error: No se pudieron actualizar los intentos. " + "Excepción: " + e + ". Origen: " + this.getClass().getSimpleName(), login, validar);
+                            System.out.println(e.getMessage());
+                        }
+                    } else {
+                        --intentos;
+                        if (intentos == 0) {
+                            JOptionPane.showMessageDialog(null, "Ha excedido el número de intentos para ingresar \n" + "Su usuario ha sido deshabilitado", "Acceso denegado", JOptionPane.ERROR_MESSAGE);
+                            txtUsuarioV.setText("");
+                            txtContrasenaV.setText("");
+                            try {
+                                String sqlEstado = "UPDATE Usuario SET Intentos = ? WHERE Usuario.Nombre = ? ";
+                                PreparedStatement pst = (PreparedStatement) cn.prepareStatement(sqlEstado);
+                                pst.setString(1, String.valueOf(intentos));
+                                pst.setString(2, admin);
+                                pst.execute();
+
+                            } catch (Exception e) {
+                                //lo.LogBitacora("No se pudieron restar los intentos " + e.getMessage(), login, validar);
+                                System.out.println(e.getMessage());
+                            }
+                        } else {
+                            try {
+                                String sqlEstado = "UPDATE Usuario SET Intentos = ? WHERE Usuario.Nombre = ? ";
+                                PreparedStatement pst = (PreparedStatement) cn.prepareStatement(sqlEstado);
+                                pst.setString(1, String.valueOf(intentos));
+                                pst.setString(2, admin);
+                                pst.execute();
+
+                            } catch (Exception e) {
+                                lo.LogBitacora("Usuario o clave incorrecta  " + e +
+                                " . Origen: " + this.getClass().getSimpleName(), login, validar);
+                                System.out.println(e.getMessage());
+                            }
+                            JOptionPane.showMessageDialog(null, "Usuario o clave incorrecta, te quedan " + intentos + " intentos", "Advertencia", JOptionPane.WARNING_MESSAGE);
+                            txtContrasenaV.setText("");
+                        }
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(null, "Asegurate de usar un usuario y una contraseña correctos", "Advertencia", JOptionPane.WARNING_MESSAGE);
+                }
+                
+            } catch (SQLException e) {
+                JOptionPane.showMessageDialog(null, "No se pudo establecer la conexión con la base de datos", "Error", JOptionPane.ERROR_MESSAGE);
+                //lo.LogBitacora("Error: No se pudo establecer la conexión con la base de datos. " + "Excepción: " + e, login, validar);
+                System.out.println(e.getMessage());
+                txtUsuarioV.setText("");
+                txtContrasenaV.setText("");
+            }
+        }
+        return resultado;
+    }
+
+    /*public boolean validarVendedor() {
+        String validarV="Validar vendedor";
+        Conexion cc = new Conexion();
+        Connection cn = cc.getConexion();
+        Encode encode = new Encode();
+        String secretKey = "farmaciaSAG";
+        String vendedor = txtUsuarioV.getText();
+        String pass = String.valueOf(txtContrasenaV.getPassword());
+        String sql = "SELECT * FROM Usuario WHERE Nombre = '" + vendedor + "'";
+        //String sql = "SELECT * FROM Empleados WHERE Usuario = '" + vendedor + "'";
+
+        if (txtUsuarioV.getText().isEmpty() && txtContrasenaV.getText().isEmpty() || txtUsuarioV.getText().isEmpty() || txtContrasenaV.getText().isEmpty()) {
+            JOptionPane.showMessageDialog(null, "Debes escribir un usuario y una contraseña", "Advertencia", JOptionPane.WARNING_MESSAGE);
+
+        } else {
+            try {
+                Statement st = cn.createStatement();
+                ResultSet rs = st.executeQuery(sql);
+
+                if (rs.next()) {
+                    String usuario = rs.getString("Nombre");
                     int intentos = Integer.parseInt(rs.getString("Intentos"));
                     if (rs.getString("Intentos").equals("0")) {
                         JOptionPane.showMessageDialog(null, "Usuario inactivo, comuniquese con el administrador del sistema para restablecer su usuario", "Acceso denegado", JOptionPane.ERROR_MESSAGE);
@@ -194,11 +294,12 @@ public class LoginVendedores extends javax.swing.JFrame {
             }
         }
         return resultado;
-    }
+    }*/
 
 
     private void BotonIngresarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonIngresarMouseClicked
-        validarVendedor();
+        //validarVendedor();
+        validarAdministradores();
     }//GEN-LAST:event_BotonIngresarMouseClicked
 
     private void txtUsuarioVFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtUsuarioVFocusGained
@@ -212,9 +313,14 @@ public class LoginVendedores extends javax.swing.JFrame {
     private void txtContrasenaVKeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtContrasenaVKeyReleased
         if (evt.getKeyCode() == KeyEvent.VK_ENTER) {
 //            validarVendedor();
+              validarAdministradores();
         }
 
     }//GEN-LAST:event_txtContrasenaVKeyReleased
+
+    private void txtUsuarioVActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtUsuarioVActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtUsuarioVActionPerformed
 
     /**
      * @param args the command line arguments

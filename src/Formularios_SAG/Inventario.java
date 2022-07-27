@@ -34,21 +34,37 @@ import net.sf.jasperreports.view.JasperViewer;
  * @author Allisson Castro
  */
 public class Inventario extends javax.swing.JFrame {
+
     log lo = new log();
     String inventario = "Inventario";
     /**
      * Creates new form Inventario
      */
-     @Override
+    String Estado;
+    String EstadoDC;
+    int agregari;
+    int guardari;
+    int editari;
+    int cancelari;
+    int reportesi;
+    int activoi;
+    int inactivoi;
+    int anulari;
+    int buscari;
+    int crearcomprai;
+    int historicoi;
+
+    @Override
     public Image getIconImage() {
         Image retValue = Toolkit.getDefaultToolkit().getImage(ClassLoader.getSystemResource("componentes/LOGOSAG(2).png"));
         return retValue;
     }
-    
+
     public Inventario() {
         initComponents();
         cargartabla();
         usuario.setText(Login.txtUsuario.getText());
+        habilitarroles();
     }
 
     /**
@@ -212,16 +228,16 @@ public class Inventario extends javax.swing.JFrame {
     }//GEN-LAST:event_botonRegresarIMouseClicked
 
     private void reporteMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_reporteMouseClicked
-        
+
         JasperReport reporte;
         HashMap hm = new HashMap();
         hm.put("Usuario", usuario.getText());
-        try{
+        try {
             Connection con = Conexion.getConexion();
             reporte = JasperCompileManager.compileReport("src/Reportes/ReporteInventario.jrxml");
             JasperPrint jp = JasperFillManager.fillReport(reporte, hm, con);
-            JasperViewer.viewReport(jp,true);
-            ReportView view= new ReportView(jp,false);
+            JasperViewer.viewReport(jp, true);
+            ReportView view = new ReportView(jp, false);
             view.setVisible(true);
         } catch (JRException ex) {
             Logger.getLogger(Clientes.class.getName()).log(Level.SEVERE, null, ex);
@@ -275,7 +291,7 @@ public class Inventario extends javax.swing.JFrame {
     // End of variables declaration//GEN-END:variables
 
     private void cargartabla() {
-        String CargarT="Cargar tabla inventario";
+        String CargarT = "Cargar tabla inventario";
         DefaultTableModel modeloTabla = (DefaultTableModel) TablaInventario.getModel();
         modeloTabla.setRowCount(0);
 
@@ -304,14 +320,14 @@ public class Inventario extends javax.swing.JFrame {
             }
 
         } catch (SQLException ex) {
-          lo.LogBitacora("Error: No se pudo cargar tabla inventario" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), inventario,CargarT);
+            lo.LogBitacora("Error: No se pudo cargar tabla inventario" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), inventario, CargarT);
 
             JOptionPane.showMessageDialog(null, ex.toString());
         }
     }
 
     void buscarData(String valor) {
-        String Buscar="Buscar inventario";
+        String Buscar = "Buscar inventario";
         String[] titulos = {"ID", "Nombre Producto", "Existencia Inicial", "Entradas", "Salidas", "Stock"};
         String[] registros = new String[13];
         String sql = "SELECT I.Id_inventario,P.Nombre_Producto,I.[Existencia Inicial],I.Entradas,I.Salidas,I.Stock\n"
@@ -341,9 +357,59 @@ public class Inventario extends javax.swing.JFrame {
             TablaInventario.setModel(model);
             // anchoColumnas();
         } catch (SQLException ex) {
-          lo.LogBitacora("Error: No se pudo buscar inventario " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), inventario,Buscar);
+            lo.LogBitacora("Error: No se pudo buscar inventario " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), inventario, Buscar);
 
             Logger.getLogger(Clientes.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+
+    public void habilitarroles() {
+        try {
+
+            PreparedStatement ps;
+            ResultSet rs;
+            Connection con = Conexion.getConexion();
+            ps = con.prepareStatement("Select PU.Agregar, PU.Guardar, PU.Cancelar, PU.Editar, PU.Activo, PU.Inactivo, PU.Reporte, PU.Anular, PU.CrearCompra, PU.Historicos, PU.Buscar\n"
+                    + "From PermisosUsuario AS PU\n"
+                    + "Inner Join Usuario as U on PU.IdUsuario=U.Id_Usuario\n"
+                    + "where PU.IdPermiso=? and U.Nombre=?");
+            ps.setInt(1, 20);
+            ps.setString(2, usuario.getText());
+            rs = ps.executeQuery();
+            System.out.println(usuario.getText());
+
+            while (rs.next()) {
+                agregari = rs.getInt("Agregar");
+                guardari = rs.getInt("Guardar");
+                cancelari = rs.getInt("Cancelar");
+                editari = rs.getInt("Editar");
+                activoi = rs.getInt("Activo");
+                inactivoi = rs.getInt("Inactivo");
+                reportesi = rs.getInt("Reporte");
+                anulari = rs.getInt("Anular");
+                crearcomprai = rs.getInt("CrearCompra");
+                historicoi = rs.getInt("Historicos");
+                buscari = rs.getInt("Buscar");
+                System.out.print(agregari + " " + guardari + " " + cancelari);
+
+            }
+        } catch (SQLException ex) {
+            //lo.LogBitacora("Error: No se pudo seleccionar la tabla" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), proveedores, tablap);
+            JOptionPane.showMessageDialog(null, ex.toString());
+        }
+        if (reportesi == 1) {
+            reporte.setVisible(Boolean.TRUE);
+
+        } else {
+            reporte.setVisible(Boolean.FALSE);
+            //jLabel2.setEnabled(Boolean.TRUE);
+        }
+        if (buscari == 1) {
+            txtBuscarI.setEnabled(Boolean.TRUE);
+        } else {
+            txtBuscarI.setEnabled(Boolean.FALSE);
+            txtBuscarI.setText("NO DISPONIBLE");
+        }
+    }
 }
+

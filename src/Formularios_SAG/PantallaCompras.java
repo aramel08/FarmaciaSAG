@@ -7,6 +7,7 @@ package Formularios_SAG;
 
 import Conexion.Conexion;
 import static Formularios_SAG.Empleados.Id_emp;
+import static Formularios_SAG.Factura.Usuario;
 import Logs.log;
 import java.awt.Color;
 import java.awt.Image;
@@ -30,8 +31,24 @@ import org.jdesktop.swingx.autocomplete.AutoCompleteDecorator;
  * @author Allisson Castro
  */
 public class PantallaCompras extends javax.swing.JFrame {
-     log lo = new log();
+
+    log lo = new log();
     String comprasp = "PantallaCompra";
+
+    int agregari;
+    int guardari;
+    int editari;
+    int cancelari;
+    int reportesi;
+    int activoi;
+    int inactivoi;
+    int anulari;
+    int buscari;
+    int crearcomprai;
+    int historicoi;
+    int eliminari;
+    int aprobari;
+    String userName;
 
     public static String Detalle = "";
 
@@ -45,7 +62,7 @@ public class PantallaCompras extends javax.swing.JFrame {
         Conexion cc = new Conexion();
         Connection cn = cc.getConexion();
         boolean resultado = true;
-        String verificar ="verificar";
+        String verificar = "verificar";
         String sql = "SELECT " + columna + " FROM " + tabla + " WHERE " + columna + " = '" + campo + "'";
 
         try {
@@ -59,7 +76,7 @@ public class PantallaCompras extends javax.swing.JFrame {
                 }
             }
         } catch (Exception e) {
-            lo.LogBitacora("Error: No se pudo verificar datos existentes" + "Excepción: " + e + ". Origen: " + this.getClass().getSimpleName(),comprasp, verificar);
+            lo.LogBitacora("Error: No se pudo verificar datos existentes" + "Excepción: " + e + ". Origen: " + this.getClass().getSimpleName(), comprasp, verificar);
             JOptionPane.showMessageDialog(null, "No se pudo verificar\n" + e.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
         return resultado;
@@ -69,11 +86,13 @@ public class PantallaCompras extends javax.swing.JFrame {
         initComponents();
         txtidCompra.setText(RegistroCompras.Id_Comp);
         usuario.setText(Login.txtUsuario.getText());
+        habilitarroles();
         if (txtidCompra.getText() != "0") {
             cargarcampose();
             habilitarDetalle();
             cargarFact();
             ComboEstado.setEnabled(Boolean.TRUE);
+            userName = usuario.getText();
 
             //CargarProductor cp = new PantallaCompras.CargarProductor();
             //  ComboProductos.setModel(cp.getvalues());
@@ -363,6 +382,12 @@ public class PantallaCompras extends javax.swing.JFrame {
             }
         });
         getContentPane().add(botonRegresar, new org.netbeans.lib.awtextra.AbsoluteConstraints(31, 20, 130, 40));
+
+        BotonCancelar.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                BotonCancelarMouseClicked(evt);
+            }
+        });
         getContentPane().add(BotonCancelar, new org.netbeans.lib.awtextra.AbsoluteConstraints(820, 260, 130, 40));
 
         BotonGuardar.setBackground(java.awt.Color.lightGray);
@@ -636,189 +661,217 @@ public class PantallaCompras extends javax.swing.JFrame {
     }//GEN-LAST:event_FechaEntregaFocusLost
 
     private void BotonGuardarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonGuardarMouseClicked
-        String guardar="BtnGuardar";
-        ObtenerID();
-        Calendar Cal = Calendar.getInstance();
-        String fec = Cal.get(Cal.HOUR_OF_DAY) + ":" + Cal.get(Cal.MINUTE) + ":" + Cal.get(Cal.SECOND);
-        if (txtNumeroFactura.getText().equals("Ingrese Número Factura") || ComboEstado.equals("Seleccione Estado") || ComboProveedor.equals("Seleccione Proveedor")
-                || txtDescripcion.getText().equals("Ingrese Descripción") || txtDescuento.getText().equals("Ingrese Descuento") || txtTotalCompra.getText().equals("Ingrese Total")
-                || FechaCompra.getDate().equals("") || FechaEntrega.getDate().equals("") || FechaVencimiento.getDate().equals("")) {
-            JOptionPane.showMessageDialog(null, "No se puede Guardar datos vacios");
-            if (FechaCompra.getDate().equals("")) {
-                JOptionPane.showMessageDialog(null, "Debe ingresar fecha de compra");
-            } else if (FechaEntrega.getDate().equals("")) {
-                JOptionPane.showMessageDialog(null, "Debe ingresar fecha de entrega");
-            } else if (FechaVencimiento.getDate().equals("")) {
-                JOptionPane.showMessageDialog(null, "Debe ingresar fecha de Vencimiento");
-            } else if (ComboProveedor.equals("Seleccione Proveedor")) {
-                JOptionPane.showMessageDialog(null, "Debe seleccionar un proveedor");
-            } else if (txtNumeroFactura.getText().equals("Ingrese Número Factura")) {
-                JOptionPane.showMessageDialog(null, "Debe ingresar número de factura");
-            } else if (ComboEstado.getSelectedItem().equals("Seleccione Estado")) {
-                JOptionPane.showMessageDialog(null, "Debe Seleccionar Estado");
-            } else if (txtDescripcion.getText().equals("Ingrese Descripción")) {
-                JOptionPane.showMessageDialog(null, "Debe ingresar Descripción");
-            } else if (txtDescuento.getText().equals("Ingrese Descuento")) {
-                JOptionPane.showMessageDialog(null, "Debe ingresar Descuento");
-            } else if (txtTotalCompra.getText().equals("Ingrese Total")) {
-                JOptionPane.showMessageDialog(null, "Debe ingresar el total de la compra");
+        if (BotonGuardar.isEnabled()) {
+            String guardar = "BtnGuardar";
+            ObtenerID();
+            Calendar Cal = Calendar.getInstance();
+            String fec = Cal.get(Cal.HOUR_OF_DAY) + ":" + Cal.get(Cal.MINUTE) + ":" + Cal.get(Cal.SECOND);
+            if (txtNumeroFactura.getText().equals("Ingrese Número Factura") || ComboEstado.equals("Seleccione Estado") || ComboProveedor.equals("Seleccione Proveedor")
+                    || txtDescripcion.getText().equals("Ingrese Descripción") || txtDescuento.getText().equals("Ingrese Descuento") || txtTotalCompra.getText().equals("Ingrese Total")
+                    || FechaCompra.getDate().equals("") || FechaEntrega.getDate().equals("") || FechaVencimiento.getDate().equals("")) {
+                JOptionPane.showMessageDialog(null, "No se puede Guardar datos vacios");
+                if (FechaCompra.getDate().equals("")) {
+                    JOptionPane.showMessageDialog(null, "Debe ingresar fecha de compra");
+                } else if (FechaEntrega.getDate().equals("")) {
+                    JOptionPane.showMessageDialog(null, "Debe ingresar fecha de entrega");
+                } else if (FechaVencimiento.getDate().equals("")) {
+                    JOptionPane.showMessageDialog(null, "Debe ingresar fecha de Vencimiento");
+                } else if (ComboProveedor.equals("Seleccione Proveedor")) {
+                    JOptionPane.showMessageDialog(null, "Debe seleccionar un proveedor");
+                } else if (txtNumeroFactura.getText().equals("Ingrese Número Factura")) {
+                    JOptionPane.showMessageDialog(null, "Debe ingresar número de factura");
+                } else if (ComboEstado.getSelectedItem().equals("Seleccione Estado")) {
+                    JOptionPane.showMessageDialog(null, "Debe Seleccionar Estado");
+                } else if (txtDescripcion.getText().equals("Ingrese Descripción")) {
+                    JOptionPane.showMessageDialog(null, "Debe ingresar Descripción");
+                } else if (txtDescuento.getText().equals("Ingrese Descuento")) {
+                    JOptionPane.showMessageDialog(null, "Debe ingresar Descuento");
+                } else if (txtTotalCompra.getText().equals("Ingrese Total")) {
+                    JOptionPane.showMessageDialog(null, "Debe ingresar el total de la compra");
+                }
+            } else {
+                String Numerofactura = txtNumeroFactura.getText();
+                String Descripcion = txtDescripcion.getText();
+                String Descuento = txtDescuento.getText();
+                String tcompra = txtTotalCompra.getText();
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                String FechaCom = sdf.format(FechaCompra.getDate());
+                String FechaEnt = sdf.format(FechaEntrega.getDate());
+                String Fechavenc = sdf.format(FechaVencimiento.getDate());
+                int Prov = Integer.parseInt(txtIdProv.getText());
+
+                try {
+                    Connection con = Conexion.getConexion();
+                    PreparedStatement ps = con.prepareStatement("Insert into Compras (Id_Proveedor, Num_Factura,Fecha_Compra,Fecha_Entrega, Fecha_Vencimiento, Descripcion,Descuento,Total_Compra,Id_EstadoC) VALUES(?,?,?,?,?,?,?,?,?)");
+                    ps.setInt(1, Prov);
+                    ps.setString(2, Numerofactura);
+                    ps.setString(3, FechaCom);
+                    ps.setString(4, FechaEnt);
+                    ps.setString(5, Fechavenc);
+                    ps.setString(6, Descripcion);
+                    ps.setString(7, Descuento);
+                    ps.setString(8, tcompra);
+                    ps.setInt(9, ComboEstado.getSelectedIndex());
+                    ps.executeUpdate();
+
+                    JOptionPane.showMessageDialog(null, "Registro guardado");
+                    //Inhabillitar();
+                    cargarFact();
+                    habilitarDetalle();
+                    CargarProductor cp = new PantallaCompras.CargarProductor();
+                    ComboProductos.setModel(cp.getvalues());
+
+                } catch (SQLException ex) {
+                    lo.LogBitacora("Error: No se pudo guardar los datos" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), comprasp, guardar);
+                    JOptionPane.showMessageDialog(null, ex.toString());
+                }
             }
         } else {
-            String Numerofactura = txtNumeroFactura.getText();
-            String Descripcion = txtDescripcion.getText();
-            String Descuento = txtDescuento.getText();
-            String tcompra = txtTotalCompra.getText();
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-            String FechaCom = sdf.format(FechaCompra.getDate());
-            String FechaEnt = sdf.format(FechaEntrega.getDate());
-            String Fechavenc = sdf.format(FechaVencimiento.getDate());
-            int Prov = Integer.parseInt(txtIdProv.getText());
-
-            try {
-                Connection con = Conexion.getConexion();
-                PreparedStatement ps = con.prepareStatement("Insert into Compras (Id_Proveedor, Num_Factura,Fecha_Compra,Fecha_Entrega, Fecha_Vencimiento, Descripcion,Descuento,Total_Compra,Id_EstadoC) VALUES(?,?,?,?,?,?,?,?,?)");
-                ps.setInt(1, Prov);
-                ps.setString(2, Numerofactura);
-                ps.setString(3, FechaCom);
-                ps.setString(4, FechaEnt);
-                ps.setString(5, Fechavenc);
-                ps.setString(6, Descripcion);
-                ps.setString(7, Descuento);
-                ps.setString(8, tcompra);
-                ps.setInt(9, ComboEstado.getSelectedIndex());
-                ps.executeUpdate();
-
-                JOptionPane.showMessageDialog(null, "Registro guardado");
-                //Inhabillitar();
-                cargarFact();
-                habilitarDetalle();
-                CargarProductor cp = new PantallaCompras.CargarProductor();
-                ComboProductos.setModel(cp.getvalues());
-
-            } catch (SQLException ex) {
-                lo.LogBitacora("Error: No se pudo guardar los datos" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(),comprasp,guardar);
-                JOptionPane.showMessageDialog(null, ex.toString());
-            }
+            JOptionPane.showMessageDialog(null, "Esta acción no se encuentra disponible para tu usuario", "ERROR", JOptionPane.ERROR_MESSAGE);
+            lo.LogUsuarios(comprasp, "Boton Editar", userName);
         }
+
+
     }//GEN-LAST:event_BotonGuardarMouseClicked
 
     private void BotonEditarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonEditarMouseClicked
-        String editar ="BtnEditar";
-        String Numerofactura = txtNumeroFactura.getText();
+        if (BotonEditar.isEnabled()) {
+            if (editari == 1) {
+                String editar = "BtnEditar";
+                String Numerofactura = txtNumeroFactura.getText();
 //        String Hora = txtHora.getText();
-        String Descripcion = txtDescripcion.getText();
-        String Descuento = txtDescuento.getText();
-        String tcompra = txtTotalCompra.getText();
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-        String FechaCom = sdf.format(FechaCompra.getDate());
-        String FechaEnt = sdf.format(FechaEntrega.getDate());
-        String Fechavenc = sdf.format(FechaVencimiento.getDate());
-        int Prov = Integer.parseInt(txtIdProv.getText());
-        int Id_Compra = Integer.parseInt(txtidCompra.getText());
-        String Estado = "";
+                String Descripcion = txtDescripcion.getText();
+                String Descuento = txtDescuento.getText();
+                String tcompra = txtTotalCompra.getText();
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                String FechaCom = sdf.format(FechaCompra.getDate());
+                String FechaEnt = sdf.format(FechaEntrega.getDate());
+                String Fechavenc = sdf.format(FechaVencimiento.getDate());
+                int Prov = Integer.parseInt(txtIdProv.getText());
+                int Id_Compra = Integer.parseInt(txtidCompra.getText());
+                String Estado = "";
 
-        try {
-            Connection con = Conexion.getConexion();
-            PreparedStatement ps = con.prepareStatement("Update Compras set Id_Proveedor=?, Num_Factura=?,Fecha_Compra=?,Fecha_Entrega=?, Fecha_Vencimiento=?,Id_EstadoC=?, Descripcion=?,Descuento=?,Total_Compra=? where Id_Compra=?");
-            ps.setInt(1, Prov);
-            ps.setString(2, Numerofactura);
-            ps.setString(3, FechaCom);
-            ps.setString(4, FechaEnt);
-            ps.setString(5, Fechavenc);
-            ps.setInt(6, ComboEstado.getSelectedIndex());
-            ps.setString(7, Descripcion);
-            ps.setString(8, Descuento);
-            ps.setString(9, tcompra);
-            ps.setInt(10, Id_Compra);
-            ps.executeUpdate();
+                try {
+                    Connection con = Conexion.getConexion();
+                    PreparedStatement ps = con.prepareStatement("Update Compras set Id_Proveedor=?, Num_Factura=?,Fecha_Compra=?,Fecha_Entrega=?, Fecha_Vencimiento=?,Id_EstadoC=?, Descripcion=?,Descuento=?,Total_Compra=? where Id_Compra=?");
+                    ps.setInt(1, Prov);
+                    ps.setString(2, Numerofactura);
+                    ps.setString(3, FechaCom);
+                    ps.setString(4, FechaEnt);
+                    ps.setString(5, Fechavenc);
+                    ps.setInt(6, ComboEstado.getSelectedIndex());
+                    ps.setString(7, Descripcion);
+                    ps.setString(8, Descuento);
+                    ps.setString(9, tcompra);
+                    ps.setInt(10, Id_Compra);
+                    ps.executeUpdate();
 
-            JOptionPane.showMessageDialog(null, "Registro guardado");
-            //Inhabillitar();
-            CargarProductor cp = new PantallaCompras.CargarProductor();
-            ComboProductos.setModel(cp.getvalues());
+                    JOptionPane.showMessageDialog(null, "Registro guardado");
+                    //Inhabillitar();
+                    CargarProductor cp = new PantallaCompras.CargarProductor();
+                    ComboProductos.setModel(cp.getvalues());
 
-        } catch (SQLException ex) {
-            lo.LogBitacora("Error: No se pudo eitar los datos" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(),comprasp, editar);
-            JOptionPane.showMessageDialog(null, ex.toString());
+                } catch (SQLException ex) {
+                    lo.LogBitacora("Error: No se pudo eitar los datos" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), comprasp, editar);
+                    JOptionPane.showMessageDialog(null, ex.toString());
+
+                }
+            } else {
+                JOptionPane.showMessageDialog(null, "Esta acción no se encuentra disponible para tu usuario", "ERROR", JOptionPane.ERROR_MESSAGE);
+                lo.LogUsuarios(comprasp, "Boton Guardar", userName);
+            }
         }
+
     }//GEN-LAST:event_BotonEditarMouseClicked
 
     private void BotonAgregarCMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonAgregarCMouseClicked
-        String agregar ="BtnAgregar";
-        ObtenerIdProd();
-        if (txtNumeroFacturaC.getText().equals("Ingrese Número Factura") || txtCostoUnitario.getText().equals("Ingrese Costo Unitario") || ComboProductos.equals("Seleccione Productos")
-                || txtCantidad.getText().equals("Ingrese Cantidad") || txtISV.getText().equals("Ingrese ISV") || txtDescuento.getText().equals("Ingrese Descuento")) {
-            JOptionPane.showMessageDialog(null, "No se puede Guardar datos vacios");
-            if (ComboProductos.equals("Seleccione Productos")) {
-                JOptionPane.showMessageDialog(null, "Debe seleccionar un producto");
-            } else if (txtNumeroFacturaC.getText().equals("Ingrese Número Factura")) {
-                JOptionPane.showMessageDialog(null, "Debe ingresar número de factura");
-            } else if (ComboEstado.getSelectedItem().equals("Seleccione Estado")) {
-                JOptionPane.showMessageDialog(null, "Debe ingresar Hora");
-            } else if (txtCostoUnitario.getText().equals("Ingrese Costo Unitario")) {
-                JOptionPane.showMessageDialog(null, "Debe ingresar Costo Unitario");
-            } else if (txtCantidad.getText().equals("Ingrese Cantidad")) {
-                JOptionPane.showMessageDialog(null, "Debe ingresar Cantidad");
-            } else if (txtISV.getText().equals("Ingrese ISV")) {
-                JOptionPane.showMessageDialog(null, "Debe ingresar el impuesto");
-            } else if (txtDescuento.getText().equals("Ingrese Descuento")) {
-                JOptionPane.showMessageDialog(null, "Debe ingresar el descuento");
+        if (BotonAgregarC.isEnabled()) {
+            String agregar = "BtnAgregar";
+            ObtenerIdProd();
+            if (txtNumeroFacturaC.getText().equals("Ingrese Número Factura") || txtCostoUnitario.getText().equals("Ingrese Costo Unitario") || ComboProductos.equals("Seleccione Productos")
+                    || txtCantidad.getText().equals("Ingrese Cantidad") || txtISV.getText().equals("Ingrese ISV") || txtDescuento.getText().equals("Ingrese Descuento")) {
+                JOptionPane.showMessageDialog(null, "No se puede Guardar datos vacios");
+                if (ComboProductos.equals("Seleccione Productos")) {
+                    JOptionPane.showMessageDialog(null, "Debe seleccionar un producto");
+                } else if (txtNumeroFacturaC.getText().equals("Ingrese Número Factura")) {
+                    JOptionPane.showMessageDialog(null, "Debe ingresar número de factura");
+                } else if (ComboEstado.getSelectedItem().equals("Seleccione Estado")) {
+                    JOptionPane.showMessageDialog(null, "Debe ingresar Hora");
+                } else if (txtCostoUnitario.getText().equals("Ingrese Costo Unitario")) {
+                    JOptionPane.showMessageDialog(null, "Debe ingresar Costo Unitario");
+                } else if (txtCantidad.getText().equals("Ingrese Cantidad")) {
+                    JOptionPane.showMessageDialog(null, "Debe ingresar Cantidad");
+                } else if (txtISV.getText().equals("Ingrese ISV")) {
+                    JOptionPane.showMessageDialog(null, "Debe ingresar el impuesto");
+                } else if (txtDescuento.getText().equals("Ingrese Descuento")) {
+                    JOptionPane.showMessageDialog(null, "Debe ingresar el descuento");
+                }
+            } else {
+                int idcompra = Integer.parseInt(txtidCompra.getText());
+                String costou = txtCostoUnitario.getText();
+                String Descripcion = txtDescripcion.getText();
+                String Descuento = txtDescuentoC.getText();
+                String cantidad = txtCantidad.getText();
+                String ISv = txtISV.getText();
+                int Prod = Integer.parseInt(txtIdProducto.getText());
+                int IDDT = 1;
+                if (ComboEstado.getSelectedIndex() == 1) {
+                    IDDT = 1;
+                } else if (ComboEstado.getSelectedIndex() == 2) {
+                    IDDT = 2;
+                }
+                try {
+                    Connection con = Conexion.getConexion();
+                    PreparedStatement ps = con.prepareStatement("Insert Into Detalle_Compra(Id_Compra,Id_Producto,Costo_Unitario,Descuento,Cantidad,ISV,Id_EstadoDC) Values (?,?,?,?,?,?,?)");
+                    ps.setInt(1, idcompra);
+                    ps.setInt(2, Prod);
+                    ps.setString(3, costou);
+                    ps.setString(4, Descuento);
+                    ps.setString(5, cantidad);
+                    ps.setString(6, ISv);
+                    ps.setInt(7, IDDT);
+                    ps.executeUpdate();
+                    JOptionPane.showMessageDialog(null, "Registro guardado");
+                    //Inhabillitar();
+                    cargartabla();
+
+                } catch (SQLException ex) {
+                    lo.LogBitacora("Error: No se pudo agregar el producto" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), comprasp, agregar);
+                    JOptionPane.showMessageDialog(null, ex.toString());
+                }
             }
         } else {
-            int idcompra = Integer.parseInt(txtidCompra.getText());
-            String costou = txtCostoUnitario.getText();
-            String Descripcion = txtDescripcion.getText();
-            String Descuento = txtDescuentoC.getText();
-            String cantidad = txtCantidad.getText();
-            String ISv = txtISV.getText();
-            int Prod = Integer.parseInt(txtIdProducto.getText());
-            int IDDT = 1;
-            if (ComboEstado.getSelectedIndex() == 1) {
-                IDDT = 1;
-            } else if (ComboEstado.getSelectedIndex() == 2) {
-                IDDT = 2;
-            }
-            try {
-                Connection con = Conexion.getConexion();
-                PreparedStatement ps = con.prepareStatement("Insert Into Detalle_Compra(Id_Compra,Id_Producto,Costo_Unitario,Descuento,Cantidad,ISV,Id_EstadoDC) Values (?,?,?,?,?,?,?)");
-                ps.setInt(1, idcompra);
-                ps.setInt(2, Prod);
-                ps.setString(3, costou);
-                ps.setString(4, Descuento);
-                ps.setString(5, cantidad);
-                ps.setString(6, ISv);
-                ps.setInt(7, IDDT);
-                ps.executeUpdate();
-                JOptionPane.showMessageDialog(null, "Registro guardado");
-                //Inhabillitar();
-                cargartabla();
-
-            } catch (SQLException ex) {
-                lo.LogBitacora("Error: No se pudo agregar el producto" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(),comprasp,agregar);
-                JOptionPane.showMessageDialog(null, ex.toString());
-            }
+            JOptionPane.showMessageDialog(null, "Esta acción no se encuentra disponible para tu usuario", "ERROR", JOptionPane.ERROR_MESSAGE);
+            lo.LogUsuarios(comprasp, "Boton Guardar", userName);
         }
+
     }//GEN-LAST:event_BotonAgregarCMouseClicked
 
     private void BotonEliminarCMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonEliminarCMouseClicked
-        String eliminar ="BtnEliminar";
-        int id_Detalle = Integer.parseInt(txtIdDetalle.getText());
-        try {
-            ResultSet rs;
-            Connection con = Conexion.getConexion();
-            PreparedStatement ps = con.prepareStatement("Delete Detalle_Compra where Id_Detalle_Compra=?");
-            ps.setInt(1, id_Detalle);
-            rs = ps.executeQuery();
-            JOptionPane.showMessageDialog(null, "Registro Eliminado");
-            cargartabla();
-        } catch (SQLException ex) {
-            lo.LogBitacora("Error: No se pudo eliminar los datos" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(),comprasp,eliminar);
-            JOptionPane.showMessageDialog(null, ex.toString());
+        if (BotonEliminarC.isEnabled()) {
+            String eliminar = "BtnEliminar";
+            int id_Detalle = Integer.parseInt(txtIdDetalle.getText());
+            try {
+                ResultSet rs;
+                Connection con = Conexion.getConexion();
+                PreparedStatement ps = con.prepareStatement("Delete Detalle_Compra where Id_Detalle_Compra=?");
+                ps.setInt(1, id_Detalle);
+                rs = ps.executeQuery();
+                JOptionPane.showMessageDialog(null, "Registro Eliminado");
+                cargartabla();
+            } catch (SQLException ex) {
+                lo.LogBitacora("Error: No se pudo eliminar los datos" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), comprasp, eliminar);
+                JOptionPane.showMessageDialog(null, ex.toString());
+            }
+        } else {
+
+            JOptionPane.showMessageDialog(null, "Esta acción no se encuentra disponible para tu usuario", "ERROR", JOptionPane.ERROR_MESSAGE);
+            lo.LogUsuarios(comprasp, "Boton Eliminar", userName);
         }
     }//GEN-LAST:event_BotonEliminarCMouseClicked
 
     private void tablacompraMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tablacompraMouseClicked
-        String tablac ="TablaCompra";
+        String tablac = "TablaCompra";
         try {
             int fila = tablacompra.getSelectedRow();
             int id = Integer.parseInt(tablacompra.getValueAt(fila, 0).toString());
@@ -847,32 +900,38 @@ public class PantallaCompras extends javax.swing.JFrame {
             BotonEditarC.setEnabled(Boolean.TRUE);
 
         } catch (SQLException ex) {
-            lo.LogBitacora("Error: No se pudo cargar la tabla compra" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(),comprasp,tablac);
+            lo.LogBitacora("Error: No se pudo cargar la tabla compra" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), comprasp, tablac);
             JOptionPane.showMessageDialog(null, ex.toString());
         }
     }//GEN-LAST:event_tablacompraMouseClicked
 
     private void BotonEditarCMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonEditarCMouseClicked
-        String edit ="btnEditar";
-        if (BotonEditarC.isEnabled() == false) {
-            JOptionPane.showMessageDialog(null, "Selecciona un registro de la tabla", "Advertencia", JOptionPane.WARNING_MESSAGE);
-        }
-        else if (Detalle.equals("1")) {
-            try {
-                Connection con = Conexion.getConexion();
-                PreparedStatement ps = con.prepareStatement("Update Detalle_Compra set Id_EstadoDC=2 where Id_Detalle_Compra=?");
-                ps.setInt(1, Integer.parseInt(txtIdDetalle.getText()));
-                ps.executeUpdate();
-                JOptionPane.showMessageDialog(null, "Registro Aprobado");
-                cargartabla();
+        if (editari == 1) {
+            String edit = "btnEditar";
+            if (BotonEditarC.isEnabled() == false) {
+                JOptionPane.showMessageDialog(null, "Selecciona un registro de la tabla", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            } else if (Detalle.equals("1")) {
+                try {
+                    Connection con = Conexion.getConexion();
+                    PreparedStatement ps = con.prepareStatement("Update Detalle_Compra set Id_EstadoDC=2 where Id_Detalle_Compra=?");
+                    ps.setInt(1, Integer.parseInt(txtIdDetalle.getText()));
+                    ps.executeUpdate();
+                    JOptionPane.showMessageDialog(null, "Registro Aprobado");
+                    cargartabla();
+                    BotonEditarC.setEnabled(Boolean.FALSE);
+                } catch (SQLException ex) {
+                    lo.LogBitacora("Error: No se pudo editar los datos" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), comprasp, edit);
+                    JOptionPane.showMessageDialog(null, ex.toString());
+
+                }
+            } else if (Detalle.equals("2")) {
+                JOptionPane.showMessageDialog(null, "Este registro ya fue aprobado", "Mensaje", JOptionPane.INFORMATION_MESSAGE);
                 BotonEditarC.setEnabled(Boolean.FALSE);
-            } catch (SQLException ex) {
-                lo.LogBitacora("Error: No se pudo editar los datos" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(),comprasp,edit);
-                JOptionPane.showMessageDialog(null, ex.toString());
             }
-        } else if (Detalle.equals("2")) {
-            JOptionPane.showMessageDialog(null, "Este registro ya fue aprobado", "Mensaje", JOptionPane.INFORMATION_MESSAGE);
-            BotonEditarC.setEnabled(Boolean.FALSE);
+
+        } else {
+            JOptionPane.showMessageDialog(null, "Esta acción no se encuentra disponible para tu usuario", "ERROR", JOptionPane.ERROR_MESSAGE);
+            lo.LogUsuarios(comprasp, "Boton Editar", userName);
         }
     }//GEN-LAST:event_BotonEditarCMouseClicked
 
@@ -1247,6 +1306,19 @@ public class PantallaCompras extends javax.swing.JFrame {
     private void txtCostoUnitarioActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtCostoUnitarioActionPerformed
         // TODO add your handling code here:
     }//GEN-LAST:event_txtCostoUnitarioActionPerformed
+
+    private void BotonCancelarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonCancelarMouseClicked
+        if (BotonCancelar.isEnabled()) {
+            // Limpiar();
+            //Inhabillitar();
+            BotonCancelar.setEnabled(Boolean.FALSE);
+            BotonCancelar.setEnabled(Boolean.FALSE);
+        } else {
+            JOptionPane.showMessageDialog(null, "Esta acción no se encuentra disponible para tu usuario", "ERROR", JOptionPane.ERROR_MESSAGE);
+            lo.LogUsuarios(comprasp, "Boton Cancelar", userName);
+        }
+
+    }//GEN-LAST:event_BotonCancelarMouseClicked
     public void validarNumeros(java.awt.event.KeyEvent e) {
         if (e.getKeyChar() >= 33 && e.getKeyChar() <= 47
                 || e.getKeyChar() >= 58 && e.getKeyChar() <= 238) {
@@ -1330,7 +1402,7 @@ public class PantallaCompras extends javax.swing.JFrame {
     // End of variables declaration//GEN-END:variables
 
     private void cargartabla() {
-        String cargart ="CargarTabla";
+        String cargart = "CargarTabla";
         DefaultTableModel modeloTabla = (DefaultTableModel) tablacompra.getModel();
         modeloTabla.setRowCount(0);
         int id = Integer.parseInt(txtidCompra.getText());
@@ -1361,7 +1433,7 @@ public class PantallaCompras extends javax.swing.JFrame {
 
             // JOptionPane.showMessageDialog(null, "Registro guardado");
         } catch (SQLException ex) {
-            lo.LogBitacora("Error: No se pudo cargar la tabla" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(),comprasp,cargart);
+            lo.LogBitacora("Error: No se pudo cargar la tabla" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), comprasp, cargart);
             JOptionPane.showMessageDialog(null, ex.toString());
         }
     }
@@ -1373,7 +1445,7 @@ public class PantallaCompras extends javax.swing.JFrame {
     public class CargarProveedor {
 
         public DefaultComboBoxModel getvalues() {
-            String cargarp ="CargarProveedor";
+            String cargarp = "CargarProveedor";
 
             DefaultComboBoxModel modelo = new DefaultComboBoxModel();
             try {
@@ -1388,7 +1460,7 @@ public class PantallaCompras extends javax.swing.JFrame {
                 con.close();
                 rs.close();
             } catch (Exception e) {
-                lo.LogBitacora("Error: No se pudo cargar los datos del proveedor" + "Excepción: " + e + ". Origen: " + this.getClass().getSimpleName(),comprasp, cargarp);
+                lo.LogBitacora("Error: No se pudo cargar los datos del proveedor" + "Excepción: " + e + ". Origen: " + this.getClass().getSimpleName(), comprasp, cargarp);
                 System.out.println(e);
             }
             return modelo;
@@ -1398,7 +1470,7 @@ public class PantallaCompras extends javax.swing.JFrame {
     public class CargarProductor {
 
         public DefaultComboBoxModel getvalues() {
-            String cargarpro ="CargarProducto";
+            String cargarpro = "CargarProducto";
             int Prove = Integer.parseInt(txtIdProv.getText());
             DefaultComboBoxModel modelo = new DefaultComboBoxModel();
             try {
@@ -1417,7 +1489,7 @@ public class PantallaCompras extends javax.swing.JFrame {
                 con.close();
                 rs.close();
             } catch (Exception e) {
-                lo.LogBitacora("Error: No se pudo cargar los productos" + "Excepción: " + e + ". Origen: " + this.getClass().getSimpleName(),comprasp,cargarpro);
+                lo.LogBitacora("Error: No se pudo cargar los productos" + "Excepción: " + e + ". Origen: " + this.getClass().getSimpleName(), comprasp, cargarpro);
                 System.out.println(e);
             }
             return modelo;
@@ -1427,7 +1499,7 @@ public class PantallaCompras extends javax.swing.JFrame {
     public class CargarEstado {
 
         public DefaultComboBoxModel getvalues() {
-            String cargare="CargarEstado";
+            String cargare = "CargarEstado";
             DefaultComboBoxModel modelo = new DefaultComboBoxModel();
             try {
                 ResultSet rs;
@@ -1441,7 +1513,7 @@ public class PantallaCompras extends javax.swing.JFrame {
                 con.close();
                 rs.close();
             } catch (Exception e) {
-                lo.LogBitacora("Error: No se pudo cargar el estado" + "Excepción: " + e + ". Origen: " + this.getClass().getSimpleName(),comprasp,cargare);
+                lo.LogBitacora("Error: No se pudo cargar el estado" + "Excepción: " + e + ". Origen: " + this.getClass().getSimpleName(), comprasp, cargare);
                 System.out.println(e);
             }
             return modelo;
@@ -1486,7 +1558,7 @@ public class PantallaCompras extends javax.swing.JFrame {
 
     public void cargarFact() {
         String Factura = txtNumeroFactura.getText();
-        String cargarf ="CargarFactura";
+        String cargarf = "CargarFactura";
         try {
             ResultSet rs;
             Connection con = Conexion.getConexion();
@@ -1500,13 +1572,13 @@ public class PantallaCompras extends javax.swing.JFrame {
             }
 
         } catch (SQLException ex) {
-            lo.LogBitacora("Error: No se pudo cargar factura" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(),comprasp,cargarf);
+            lo.LogBitacora("Error: No se pudo cargar factura" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), comprasp, cargarf);
             JOptionPane.showMessageDialog(null, ex.toString());
         }
     }
 
     public int cargarcampose() {
-        String cargarcamp ="cargarCampo";
+        String cargarcamp = "cargarCampo";
         int id = Integer.parseInt(txtidCompra.getText());
         int resultado = 1;
         try {
@@ -1536,7 +1608,7 @@ public class PantallaCompras extends javax.swing.JFrame {
             cargartabla();
 
         } catch (SQLException ex) {
-            lo.LogBitacora("Error: No se pudo cargar el campo" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(),comprasp,cargarcamp);
+            lo.LogBitacora("Error: No se pudo cargar el campo" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), comprasp, cargarcamp);
             JOptionPane.showMessageDialog(null, ex.getMessage());
             resultado = 0;
         }
@@ -1552,4 +1624,112 @@ public class PantallaCompras extends javax.swing.JFrame {
         txtCantidad.setEnabled(Boolean.TRUE);
     }
 
+    public void habilitarroles() {
+        try {
+
+            PreparedStatement ps;
+            ResultSet rs;
+            Connection con = Conexion.getConexion();
+            ps = con.prepareStatement("Select PU.Agregar, PU.Guardar, PU.Cancelar, PU.Editar, PU.Activo, PU.Inactivo, PU.Reporte, PU.Anular, PU.CrearCompra, PU.Historicos, PU.Buscar, PU.Eliminar, PU.Aprobar\n"
+                    + "From PermisosUsuario AS PU\n"
+                    + "Inner Join Usuario as U on PU.IdUsuario=U.Id_Usuario\n"
+                    + "where PU.IdPermiso=? and U.Nombre=?");
+            ps.setInt(1, 22);
+            ps.setString(2, usuario.getText());
+            rs = ps.executeQuery();
+            //System.out.println(Usuario.getText());
+
+            while (rs.next()) {
+                agregari = rs.getInt("Agregar");
+                guardari = rs.getInt("Guardar");
+                cancelari = rs.getInt("Cancelar");
+                editari = rs.getInt("Editar");
+                activoi = rs.getInt("Activo");
+                inactivoi = rs.getInt("Inactivo");
+                reportesi = rs.getInt("Reporte");
+                anulari = rs.getInt("Anular");
+                crearcomprai = rs.getInt("CrearCompra");
+                historicoi = rs.getInt("Historicos");
+                buscari = rs.getInt("Buscar");
+                eliminari = rs.getInt("Eliminar");
+                aprobari = rs.getInt("Aprobar");
+                System.out.print(agregari + " " + guardari + " " + cancelari);
+
+            }
+        } catch (SQLException ex) {
+            //lo.LogBitacora("Error: No se pudo seleccionar la tabla" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), proveedores, tablap);
+            JOptionPane.showMessageDialog(null, ex.toString());
+        }
+        if (agregari == 1) {
+            BotonAgregarC.setEnabled(Boolean.TRUE);
+        } else if (agregari == 0) {
+            BotonAgregarC.setEnabled(Boolean.FALSE);
+            BotonAgregarC.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/obstruido (1).png")));
+        }
+
+        if (guardari == 1) {
+            BotonGuardar.setEnabled(Boolean.TRUE);
+        } else if (guardari == 0) {
+            BotonGuardar.setEnabled(Boolean.FALSE);
+            BotonGuardar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/obstruido (1).png")));
+        }
+
+            if (eliminari == 1) {
+                BotonEliminarC.setEnabled(Boolean.TRUE);
+            } else if (eliminari == 0) {
+                BotonEliminarC.setEnabled(Boolean.FALSE);
+                BotonEliminarC.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/obstruido (1).png")));
+
+            }
+            if (editari == 1) {
+                BotonEditar.setEnabled(Boolean.TRUE);
+            } else {
+                BotonEditar.setEnabled(Boolean.FALSE);
+                BotonEditar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/obstruido (1).png")));
+            }
+
+            if (cancelari == 1) {
+                BotonCancelar.setEnabled(Boolean.TRUE);
+
+            } else {
+                BotonCancelar.setEnabled(Boolean.FALSE);
+                BotonCancelar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/obstruido (1).png")));
+
+            }
+            if (buscari == 1) {
+                BotonBuscar.setEnabled(Boolean.TRUE);
+            } else {
+                BotonBuscar.setEnabled(Boolean.FALSE);
+                BotonBuscar.setText("NO DISPONIBLE");
+            }
+
+            if (eliminari == 1) {
+                BotonEliminarC.setEnabled(Boolean.TRUE);
+            } else {
+                BotonEliminarC.setEnabled(Boolean.FALSE);
+                BotonEliminarC.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/obstruido (1).png")));
+
+            }
+            if (aprobari == 1) {
+                BotonEditarC.setEnabled(Boolean.TRUE);
+            } else {
+                BotonEditarC.setEnabled(Boolean.FALSE);
+                BotonEditarC.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/obstruido (1).png")));
+
+            }
+
+            /*if (historicoi == 1) {
+            Historico.setSelected(Boolean.TRUE);
+        } else {
+            Historico.setSelected(Boolean.FALSE);
+        }
+        if (crearcomprai == 1) {
+            CrearCompra.setSelected(Boolean.TRUE);
+        } else {
+            CrearCompra.setSelected(Boolean.FALSE);
+        }*/
+        }
+    
 }
+
+    

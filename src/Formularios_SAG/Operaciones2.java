@@ -70,6 +70,7 @@ public class Operaciones2 extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
+        jSpinField1 = new com.toedter.components.JSpinField();
         txtHoraF = new javax.swing.JFormattedTextField();
         BotonGuardarO = new javax.swing.JLabel();
         BotonCancelarO = new javax.swing.JLabel();
@@ -699,6 +700,7 @@ public class Operaciones2 extends javax.swing.JFrame {
     private javax.swing.JLabel BotonRegresarO;
     private javax.swing.JComboBox<String> ComboCajaO;
     private javax.swing.JLabel jLabel1;
+    private com.toedter.components.JSpinField jSpinField1;
     private com.toedter.calendar.JDateChooser txtFecha;
     private javax.swing.JFormattedTextField txtHoraF;
     private javax.swing.JTextField txtHoraI;

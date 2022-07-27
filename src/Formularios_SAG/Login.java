@@ -195,7 +195,7 @@ public class Login extends javax.swing.JFrame {
                 } else {
                     JOptionPane.showMessageDialog(null, "Asegurate de usar un usuario y una contraseña correctos", "Advertencia", JOptionPane.WARNING_MESSAGE);
                 }
-
+                
             } catch (SQLException e) {
                 JOptionPane.showMessageDialog(null, "No se pudo establecer la conexión con la base de datos", "Error", JOptionPane.ERROR_MESSAGE);
                 lo.LogBitacora("Error: No se pudo establecer la conexión con la base de datos. " + "Excepción: " + e, login, validar);
@@ -267,6 +267,7 @@ public class Login extends javax.swing.JFrame {
         });
 
     }
+  
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables

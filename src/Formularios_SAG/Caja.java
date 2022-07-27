@@ -44,15 +44,32 @@ public class Caja extends javax.swing.JFrame {
      */
     String caja = "Caja";
     log lo = new log();
+    public static String Id_Caja = "0";
+
+    int agregari;
+    int guardari;
+    int editari;
+    int cancelari;
+    int reportesi;
+    int activoi;
+    int inactivoi;
+    int anulari;
+    int buscari;
+    int crearcomprai;
+    int historicoi;
+    String userName;
 
     public Caja() {
         initComponents();
         usuario.setText(Login.txtUsuario.getText());
         cargartabla();
         Inhabillitar();
+        habilitarroles();
         CargarSucursal S = new Caja.CargarSucursal();
         comboSucursalSS.setModel(S.getvalues());
         AutoCompleteDecorator.decorate(comboSucursalSS);
+        userName = usuario.getText();
+        txtIdCaja.setVisible(Boolean.FALSE);
 
     }
 
@@ -370,86 +387,116 @@ public class Caja extends javax.swing.JFrame {
     }//GEN-LAST:event_botonRegresarCaMouseClicked
 
     private void botonAgregarCaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_botonAgregarCaMouseClicked
-        Habilitar();
-        botonGuardarCa.isEnabled();
-        botonCancelarCa.isEnabled();
+
+        if (botonAgregarCa.isEnabled()) {
+            Habilitar();
+            if (guardari == 1) {
+                botonGuardarCa.isEnabled();
+                //BotonCancelarPro.isEnabled();   
+            }
+            if (cancelari == 1) {
+                //BotonGuardarPro.isEnabled();
+                botonCancelarCa.isEnabled();
+            }
+        } else {
+
+            JOptionPane.showMessageDialog(null, "Esta acción no se encuentra disponible para tu usuario", "ERROR", JOptionPane.ERROR_MESSAGE);
+            lo.LogUsuarios(caja, "Boton Agregar", userName);
+        }
     }//GEN-LAST:event_botonAgregarCaMouseClicked
 
     private void botonEditarCaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_botonEditarCaMouseClicked
-        String Editar = "BtnEditar";
-        ObtenerSucursal();
-        if (txtNumeroCaja.getText().equals("Ingrese Número de Caja") || comboSucursalSS.equals("Seleccione Sucursal")) {
-            JOptionPane.showMessageDialog(null, "No se puede Guardar datos vacios");
-        } else {
-            int Idca = Integer.parseInt(txtIdCaja.getText());
-            int NumCa = Integer.parseInt(txtNumeroCaja.getText());
-            int Sucursal = Integer.parseInt(txtId_Sucursal.getText());
+        if (editari == 1) {
+            String Editar = "BtnEditar";
+            ObtenerSucursal();
+            if (txtNumeroCaja.getText().equals("Ingrese Número de Caja") || comboSucursalSS.equals("Seleccione Sucursal")) {
+                JOptionPane.showMessageDialog(null, "No se puede Guardar datos vacios");
+            } else {
+                int Idca = Integer.parseInt(txtIdCaja.getText());
+                int NumCa = Integer.parseInt(txtNumeroCaja.getText());
+                int Sucursal = Integer.parseInt(txtId_Sucursal.getText());
 
-            try {
-                Connection con = Conexion.getConexion();
-                PreparedStatement ps = con.prepareStatement("Update Caja set Num_Caja=?,Id_Sucursal=? Where Id_Caja=?");
-                ps.setInt(1, NumCa);
-                ps.setInt(2, Sucursal);
-                ps.setInt(3, Idca);
+                try {
+                    Connection con = Conexion.getConexion();
+                    PreparedStatement ps = con.prepareStatement("Update Caja set Num_Caja=?,Id_Sucursal=? Where Id_Caja=?");
+                    ps.setInt(1, NumCa);
+                    ps.setInt(2, Sucursal);
+                    ps.setInt(3, Idca);
 
-                ps.executeUpdate();
-                JOptionPane.showMessageDialog(null, "Registro Actualizado");
+                    ps.executeUpdate();
+                    JOptionPane.showMessageDialog(null, "Registro Actualizado");
 
-                cargartabla();
-                Limpiar();
-                Inhabillitar();
+                    cargartabla();
+                    Limpiar();
+                    Inhabillitar();
 
-            } catch (SQLException ex) {
-                lo.LogBitacora("Error: No se pudo editar el registro " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), caja, Editar);
-                JOptionPane.showMessageDialog(null, ex.toString());
+                } catch (SQLException ex) {
+                    lo.LogBitacora("Error: No se pudo editar el registro " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), caja, Editar);
+                    JOptionPane.showMessageDialog(null, ex.toString());
+
+                }
             }
+        } else {
+            JOptionPane.showMessageDialog(null, "Esta acción no se encuentra disponible para tu usuario", "ERROR", JOptionPane.ERROR_MESSAGE);
+            lo.LogUsuarios(caja, "Boton Editar", userName);
         }
     }//GEN-LAST:event_botonEditarCaMouseClicked
 
     private void botonGuardarCaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_botonGuardarCaMouseClicked
-        String Guardar = "BtnGuardafr";
-        ObtenerSucursal();
-        if (txtNumeroCaja.getText().equals("Ingrese Número de Caja") && comboSucursalSS.getSelectedIndex() == 0) {
-            JOptionPane.showMessageDialog(null, "Debes llenar todos los campos", "Advertencia", JOptionPane.WARNING_MESSAGE);
-        } else {
-            if (txtNumeroCaja.getText().equals("Ingrese Número de Caja")) {
-                JOptionPane.showMessageDialog(null, "Debe ingresar un número de caja", "Advertencia", JOptionPane.WARNING_MESSAGE);
-            } else if (comboSucursalSS.getSelectedIndex() == 0) {
-                JOptionPane.showMessageDialog(null, "Seleccione una sucursal", "Advertencia", JOptionPane.WARNING_MESSAGE);
+        if (botonGuardarCa.isEnabled()) {
+            String Guardar = "BtnGuardafr";
+            ObtenerSucursal();
+            if (txtNumeroCaja.getText().equals("Ingrese Número de Caja") && comboSucursalSS.getSelectedIndex() == 0) {
+                JOptionPane.showMessageDialog(null, "Debes llenar todos los campos", "Advertencia", JOptionPane.WARNING_MESSAGE);
             } else {
+                if (txtNumeroCaja.getText().equals("Ingrese Número de Caja")) {
+                    JOptionPane.showMessageDialog(null, "Debe ingresar un número de caja", "Advertencia", JOptionPane.WARNING_MESSAGE);
+                } else if (comboSucursalSS.getSelectedIndex() == 0) {
+                    JOptionPane.showMessageDialog(null, "Seleccione una sucursal", "Advertencia", JOptionPane.WARNING_MESSAGE);
+                } else {
 
-                int Sucursal = Integer.parseInt(txtId_Sucursal.getText());
-                int NumCa = Integer.parseInt(txtNumeroCaja.getText());
+                    int Sucursal = Integer.parseInt(txtId_Sucursal.getText());
+                    int NumCa = Integer.parseInt(txtNumeroCaja.getText());
 
-                try {
-                    Connection con = Conexion.getConexion();
-                    PreparedStatement ps = con.prepareStatement("Insert into Caja (Id_Sucursal, Num_Caja,Id_Estado) VALUES(?,?,?)");
-                    ps.setInt(1, Sucursal);
-                    ps.setInt(2, NumCa);
-                    ps.setInt(3, 1);
-                    ps.executeUpdate();
+                    try {
+                        Connection con = Conexion.getConexion();
+                        PreparedStatement ps = con.prepareStatement("Insert into Caja (Id_Sucursal, Num_Caja,Id_Estado) VALUES(?,?,?)");
+                        ps.setInt(1, Sucursal);
+                        ps.setInt(2, NumCa);
+                        ps.setInt(3, 1);
+                        ps.executeUpdate();
 
-                    JOptionPane.showMessageDialog(null, "Registro guardado");
-                    cargartabla();
+                        JOptionPane.showMessageDialog(null, "Registro guardado");
+                        cargartabla();
 
-                    //Limpiar();
-                    Inhabillitar();
+                        //Limpiar();
+                        Inhabillitar();
 
-                } catch (SQLException ex) {
-                    lo.LogBitacora("Error: No se pudo guardar el registro " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), caja, Guardar);
+                    } catch (SQLException ex) {
+                        lo.LogBitacora("Error: No se pudo guardar el registro " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), caja, Guardar);
 
-                    JOptionPane.showMessageDialog(null, ex.toString());
+                        JOptionPane.showMessageDialog(null, ex.toString());
+                    }
                 }
             }
-
+        } else {
+            JOptionPane.showMessageDialog(null, "Esta acción no se encuentra disponible para tu usuario", "ERROR", JOptionPane.ERROR_MESSAGE);
+            lo.LogUsuarios(caja, "Boton Guardar", userName);
         }
+
+
     }//GEN-LAST:event_botonGuardarCaMouseClicked
 
     private void botonCancelarCaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_botonCancelarCaMouseClicked
-        Limpiar();
-        Inhabillitar();
-        botonEditarCa.setEnabled(Boolean.FALSE);
-        botonGuardarCa.setEnabled(Boolean.FALSE);
+        if (botonCancelarCa.isEnabled()) {
+            // Limpiar();
+            //Inhabillitar();
+            botonCancelarCa.setEnabled(Boolean.FALSE);
+            botonCancelarCa.setEnabled(Boolean.FALSE);
+        } else {
+            JOptionPane.showMessageDialog(null, "Esta acción no se encuentra disponible para tu usuario", "ERROR", JOptionPane.ERROR_MESSAGE);
+            lo.LogUsuarios(caja, "Boton Cancelar", userName);
+        }
 
     }//GEN-LAST:event_botonCancelarCaMouseClicked
 
@@ -461,7 +508,7 @@ public class Caja extends javax.swing.JFrame {
             PreparedStatement ps;
             ResultSet rs;
             Connection con = Conexion.getConexion();
-            ps = con.prepareStatement("Select .Id_Caja,C.Num_Caja,S.Nombre,E.Estado\n"
+            ps = con.prepareStatement("Select C.Id_Caja,C.Num_Caja,S.Nombre,E.Estado\n"
                     + "From Caja as C\n"
                     + "INNER JOIN Estado AS E ON E.Id_Estado = C.Id_Estado\n"
                     + "INNER JOIN Sucursal AS S ON C.Id_Sucursal = S.Id_Sucursal\n"
@@ -475,16 +522,28 @@ public class Caja extends javax.swing.JFrame {
                 txtNumeroCaja.setText(rs.getString("Num_Caja"));
                 comboSucursalSS.setSelectedItem(rs.getString("Nombre"));
 
-                if (rs.getString("Estado").equals("Activo")) {
-                    BotonActivoCa.setSelected(true);
-                } else if (rs.getString("Estado").equals("Inactivo")) {
-                    BotonInactivoCa.setSelected(true);
-
+                if (activoi == 1) {
+                    BotonActivoCa.setVisible(Boolean.TRUE);
+                    if (rs.getString("Id_Estado").equals("1")) {
+                        BotonActivoCa.setSelected(true);
+                    }
+                } else {
+                    BotonActivoCa.setVisible(Boolean.FALSE);
                 }
-                //IdCaja = txtIdCaja.getText();
+                if (inactivoi == 1) {
+                    BotonInactivoCa.setVisible(Boolean.TRUE);
+                    if (rs.getString("Id_Estado").equals("2")) {
+                        BotonInactivoCa.setSelected(true);
 
-                BotonActivoCa.setVisible(Boolean.TRUE);
-                BotonInactivoCa.setVisible(Boolean.TRUE);
+                    }
+                } else {
+                    BotonInactivoCa.setVisible(Boolean.FALSE);
+                }
+
+                Id_Caja = txtIdCaja.getText();
+
+                //BotonActivoPro.setVisible(Boolean.TRUE);
+                //BotonInactivoPro.setVisible(Boolean.TRUE);
                 //id = txtId_Proveedor.getText();
                 Habilitar();
             }
@@ -802,5 +861,107 @@ public class Caja extends javax.swing.JFrame {
 
             Logger.getLogger(Clientes.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+
+    private void habilitarroles() {
+        try {
+
+            PreparedStatement ps;
+            ResultSet rs;
+            Connection con = Conexion.getConexion();
+            ps = con.prepareStatement("Select PU.Agregar, PU.Guardar, PU.Cancelar, PU.Editar, PU.Activo, PU.Inactivo, PU.Reporte, PU.Anular, PU.CrearCompra, PU.Historicos, PU.Buscar\n"
+                    + "From PermisosUsuario AS PU\n"
+                    + "Inner Join Usuario as U on PU.IdUsuario=U.Id_Usuario\n"
+                    + "where PU.IdPermiso=? and U.Nombre=?");
+            ps.setInt(1, 16);
+            ps.setString(2, usuario.getText());
+            rs = ps.executeQuery();
+            System.out.println(usuario.getText());
+
+            while (rs.next()) {
+                agregari = rs.getInt("Agregar");
+                guardari = rs.getInt("Guardar");
+                cancelari = rs.getInt("Cancelar");
+                editari = rs.getInt("Editar");
+                activoi = rs.getInt("Activo");
+                inactivoi = rs.getInt("Inactivo");
+                reportesi = rs.getInt("Reporte");
+                anulari = rs.getInt("Anular");
+                crearcomprai = rs.getInt("CrearCompra");
+                historicoi = rs.getInt("Historicos");
+                buscari = rs.getInt("Buscar");
+                System.out.print(agregari + " " + guardari + " " + cancelari);
+
+            }
+        } catch (SQLException ex) {
+            //lo.LogBitacora("Error: No se pudo seleccionar la tabla" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), proveedores, tablap);
+            JOptionPane.showMessageDialog(null, ex.toString());
+        }
+        if (agregari == 1) {
+            botonAgregarCa.setEnabled(Boolean.TRUE);
+        } else if (agregari == 0) {
+            botonAgregarCa.setEnabled(Boolean.FALSE);
+            botonAgregarCa.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/obstruido (1).png")));
+        }
+
+        if (guardari == 1) {
+            botonGuardarCa.setEnabled(Boolean.TRUE);
+        } else if (guardari == 0) {
+            botonGuardarCa.setEnabled(Boolean.FALSE);
+            botonGuardarCa.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/obstruido (1).png")));
+
+        }
+        if (editari == 1) {
+            botonEditarCa.setEnabled(Boolean.TRUE);
+        } else {
+            botonEditarCa.setEnabled(Boolean.FALSE);
+            botonEditarCa.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/obstruido (1).png")));
+        }
+
+        if (cancelari == 1) {
+            botonCancelarCa.setEnabled(Boolean.TRUE);
+
+        } else {
+            botonCancelarCa.setEnabled(Boolean.FALSE);
+            botonCancelarCa.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/obstruido (1).png")));
+        }
+        if (reportesi == 1) {
+            reporte.setVisible(Boolean.TRUE);
+
+        } else {
+            reporte.setVisible(Boolean.FALSE);
+            //jLabel2.setEnabled(Boolean.TRUE);
+        }
+        if (buscari == 1) {
+            txtBuscarCa.setEnabled(Boolean.TRUE);
+        } else {
+            txtBuscarCa.setEnabled(Boolean.FALSE);
+            txtBuscarCa.setText("NO DISPONIBLE");
+        }
+        /* if (anulari == 1) {
+            Anular.setSelected(Boolean.TRUE);
+        } else {
+            Anular.setSelected(Boolean.FALSE);
+        }*/
+        if (activoi == 1) {
+            //BotonActivoPro.setVisible(Boolean.TRUE);
+        } else {
+            BotonActivoCa.setVisible(Boolean.FALSE);
+        }
+        if (inactivoi == 1) {
+            //BotonInactivoPro.setVisible(Boolean.TRUE);
+        } else {
+            BotonInactivoCa.setVisible(Boolean.FALSE);
+        }
+        /*if (historicoi == 1) {
+            Historico.setSelected(Boolean.TRUE);
+        } else {
+            Historico.setSelected(Boolean.FALSE);
+        }
+        if (crearcomprai == 1) {
+            CrearCompra.setSelected(Boolean.TRUE);
+        } else {
+            CrearCompra.setSelected(Boolean.FALSE);
+        }*/
     }
 }

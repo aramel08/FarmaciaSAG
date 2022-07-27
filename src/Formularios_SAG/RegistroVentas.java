@@ -37,6 +37,19 @@ public class RegistroVentas extends javax.swing.JFrame {
 
     log lo = new log();
     String RegistroV = "Registro Ventas";
+     String Estado;
+    String EstadoDC;
+    int agregari;
+    int guardari;
+    int editari;
+    int cancelari;
+    int reportesi;
+    int activoi;
+    int inactivoi;
+    int anulari;
+    int buscari;
+    int crearcomprai;
+    int historicoi;
 
     /**
      * Creates new form RegistroVentas
@@ -44,6 +57,7 @@ public class RegistroVentas extends javax.swing.JFrame {
     public RegistroVentas() {
         initComponents();
         usuario.setText(Login.txtUsuario.getText());
+        habilitarroles();
         anchoColumnas();
         cargartabla();
     }
@@ -229,6 +243,7 @@ public class RegistroVentas extends javax.swing.JFrame {
         getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, -1, -1));
 
         pack();
+        setLocationRelativeTo(null);
     }// </editor-fold>//GEN-END:initComponents
 @Override
     public Image getIconImage() {
@@ -468,4 +483,81 @@ public class RegistroVentas extends javax.swing.JFrame {
             Logger.getLogger(Sucursales.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+     public void habilitarroles() {
+        try {
+
+            PreparedStatement ps;
+            ResultSet rs;
+            Connection con = Conexion.getConexion();
+            ps = con.prepareStatement("Select PU.Agregar, PU.Guardar, PU.Cancelar, PU.Editar, PU.Activo, PU.Inactivo, PU.Reporte, PU.Anular, PU.CrearCompra, PU.Historicos, PU.Buscar\n"
+                    + "From PermisosUsuario AS PU\n"
+                    + "Inner Join Usuario as U on PU.IdUsuario=U.Id_Usuario\n"
+                    + "where PU.IdPermiso=? and U.Nombre=?");
+            ps.setInt(1, 8);
+            ps.setString(2, usuario.getText());
+            rs = ps.executeQuery();
+            System.out.println(usuario.getText());
+
+            while (rs.next()) {
+                agregari = rs.getInt("Agregar");
+                guardari = rs.getInt("Guardar");
+                cancelari = rs.getInt("Cancelar");
+                editari = rs.getInt("Editar");
+                activoi = rs.getInt("Activo");
+                inactivoi = rs.getInt("Inactivo");
+                reportesi = rs.getInt("Reporte");
+                anulari = rs.getInt("Anular");
+                crearcomprai = rs.getInt("CrearCompra");
+                historicoi = rs.getInt("Historicos");
+                buscari = rs.getInt("Buscar");
+                System.out.print(agregari + " " + guardari + " " + cancelari);
+
+            }
+        } catch (SQLException ex) {
+            //lo.LogBitacora("Error: No se pudo seleccionar la tabla" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), proveedores, tablap);
+            JOptionPane.showMessageDialog(null, ex.toString());
+        }
+        /*if (agregari == 1) {
+            BotonAgregarPro.setEnabled(Boolean.TRUE);
+        } else if (agregari == 0) {
+            BotonAgregarPro.setEnabled(Boolean.FALSE);
+            BotonAgregarPro.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/obstruido (1).png")));
+        }*/
+
+ /*if (guardari == 1) {
+            BotonGuardarPro.setEnabled(Boolean.TRUE);
+        } else if (guardari == 0) {
+            BotonGuardarPro.setEnabled(Boolean.FALSE);
+            BotonGuardarPro.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/obstruido (1).png")));
+
+        }*/
+       
+            //BotonEditarPro.setEnabled(Boolean.FALSE);
+            //BotonEditarPro.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/obstruido (1).png")));
+        
+
+        /*if (cancelari == 1) {
+            BotonCancelarPro.setEnabled(Boolean.TRUE);
+
+        } else {
+            BotonCancelarPro.setEnabled(Boolean.FALSE);
+            BotonCancelarPro.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/obstruido (1).png")));
+        }*/
+     
+         if (reportesi == 1) {
+            reporte.setVisible(Boolean.TRUE);
+
+        } else {
+            reporte.setVisible(Boolean.FALSE);
+        }
+        if (buscari == 1) {
+           txtBuscarV.setEnabled(Boolean.TRUE);
+        } else {
+            txtBuscarV.setEnabled(Boolean.FALSE);
+            txtBuscarV.setText("NO DISPONIBLE");
+        }
+       
+    
+    }
 }
+

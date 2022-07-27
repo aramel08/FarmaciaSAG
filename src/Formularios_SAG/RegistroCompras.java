@@ -42,6 +42,17 @@ public class RegistroCompras extends javax.swing.JFrame {
 
     String Estado;
     String EstadoDC;
+    int agregari;
+    int guardari;
+    int editari;
+    int cancelari;
+    int reportesi;
+    int activoi;
+    int inactivoi;
+    int anulari;
+    int buscari;
+    int crearcomprai;
+    int historicoi;
 
     @Override
     public Image getIconImage() {
@@ -53,6 +64,7 @@ public class RegistroCompras extends javax.swing.JFrame {
     public RegistroCompras() {
         initComponents();
         usuario.setText(Login.txtUsuario.getText());
+        habilitarroles();
         cargartabla();
         anchoColumnas();
         TablaDTC.setVisible(Boolean.FALSE);
@@ -244,6 +256,11 @@ public class RegistroCompras extends javax.swing.JFrame {
                 BuscarCFocusLost(evt);
             }
         });
+        BuscarC.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                BuscarCMouseClicked(evt);
+            }
+        });
         BuscarC.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyTyped(java.awt.event.KeyEvent evt) {
                 BuscarCKeyTyped(evt);
@@ -301,12 +318,17 @@ public class RegistroCompras extends javax.swing.JFrame {
     }//GEN-LAST:event_EditarMouseClicked
 
     private void jLabel1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jLabel1MouseClicked
-        Id_Comp = "0";
-        PantallaCompras PC = new PantallaCompras();
-        {
-            PC.setVisible(true);
-            dispose();
+        if (jLabel1.isEnabled()) {
+            Id_Comp = "0";
+            PantallaCompras PC = new PantallaCompras();
+            {
+                PC.setVisible(true);
+                dispose();
+            }
+        } else {
+          JOptionPane.showMessageDialog(null, "Esta acción no se encuentra disponible para tu usuario", "ERROR", JOptionPane.ERROR_MESSAGE);
         }
+
     }//GEN-LAST:event_jLabel1MouseClicked
 
     private void AnularMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_AnularMouseClicked
@@ -331,7 +353,7 @@ public class RegistroCompras extends javax.swing.JFrame {
                 JOptionPane.showMessageDialog(null, "Registro Anulado");
                 cargarTDetalle();
             } catch (SQLException ex) {
-                 lo.LogBitacora("Error: No se pudo anular la compra" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(),comprasr,anularc);
+                lo.LogBitacora("Error: No se pudo anular la compra" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), comprasr, anularc);
                 JOptionPane.showMessageDialog(null, ex.toString());
             }
         }
@@ -381,6 +403,10 @@ public class RegistroCompras extends javax.swing.JFrame {
             Logger.getLogger(Clientes.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_reporteMouseClicked
+
+    private void BuscarCMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BuscarCMouseClicked
+        // TODO add your handling code here:
+    }//GEN-LAST:event_BuscarCMouseClicked
 
     /**
      * @param args the command line arguments
@@ -442,7 +468,7 @@ public class RegistroCompras extends javax.swing.JFrame {
         ResultSet rs;
         ResultSetMetaData rsmd;
         int columnas;
-        String cargart="CargarTabla";
+        String cargart = "CargarTabla";
 
         try {
             Connection con = Conexion.getConexion();
@@ -465,14 +491,14 @@ public class RegistroCompras extends javax.swing.JFrame {
             }
 
         } catch (SQLException ex) {
-             lo.LogBitacora("Error: No se pudo cargar la tabla" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(),comprasr,cargart);
+            lo.LogBitacora("Error: No se pudo cargar la tabla" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), comprasr, cargart);
             JOptionPane.showMessageDialog(null, ex.toString());
         }
 
     }
 
     private void cargarTDetalle() {
-        String cargard="CargarDetalle";
+        String cargard = "CargarDetalle";
         barraEmpleado1.setVisible(true);
         TablaDTC.setVisible(true);
         DefaultTableModel modeloTabla = (DefaultTableModel) TablaDTC.getModel();
@@ -517,13 +543,13 @@ public class RegistroCompras extends javax.swing.JFrame {
             Id_Comp = TablaDEcompras.getValueAt(filaw, 0).toString();
 
         } catch (SQLException ex) {
-             lo.LogBitacora("Error: No se pudo cargar el detalle" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(),comprasr,cargard);
+            lo.LogBitacora("Error: No se pudo cargar el detalle" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), comprasr, cargard);
             JOptionPane.showMessageDialog(null, ex.toString());
         }
     }
 
     void buscarData(String valor) {
-        String buscar ="Buscar";
+        String buscar = "Buscar";
         String[] titulos = {"ID", "Factura", "Empresa", "Fecha", "Fecha Entrega", "Fecha Vencimiento", "Descripcion", "Descuento", "Total Compra", "Estado"};
         String[] registros = new String[13];
         String sql = "Select C.Id_Compra, C.Num_Factura,P.Nombre_Empresa, C.Fecha_Compra,C.Fecha_Entrega,C.Fecha_Vencimiento,C.Descripcion,C.Descuento,C.Total_Compra, E.Estado\n"
@@ -559,8 +585,112 @@ public class RegistroCompras extends javax.swing.JFrame {
             TablaDEcompras.setModel(model);
             anchoColumnas();
         } catch (SQLException ex) {
-             lo.LogBitacora("Error: No se pudo buscar los datos" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(),comprasr,buscar);
+            lo.LogBitacora("Error: No se pudo buscar los datos" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), comprasr, buscar);
             Logger.getLogger(Sucursales.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+
+    public void habilitarroles() {
+        try {
+
+            PreparedStatement ps;
+            ResultSet rs;
+            Connection con = Conexion.getConexion();
+            ps = con.prepareStatement("Select PU.Agregar, PU.Guardar, PU.Cancelar, PU.Editar, PU.Activo, PU.Inactivo, PU.Reporte, PU.Anular, PU.CrearCompra, PU.Historicos, PU.Buscar\n"
+                    + "From PermisosUsuario AS PU\n"
+                    + "Inner Join Usuario as U on PU.IdUsuario=U.Id_Usuario\n"
+                    + "where PU.IdPermiso=? and U.Nombre=?");
+            ps.setInt(1, 7);
+            ps.setString(2, usuario.getText());
+            rs = ps.executeQuery();
+            System.out.println(usuario.getText());
+
+            while (rs.next()) {
+                agregari = rs.getInt("Agregar");
+                guardari = rs.getInt("Guardar");
+                cancelari = rs.getInt("Cancelar");
+                editari = rs.getInt("Editar");
+                activoi = rs.getInt("Activo");
+                inactivoi = rs.getInt("Inactivo");
+                reportesi = rs.getInt("Reporte");
+                anulari = rs.getInt("Anular");
+                crearcomprai = rs.getInt("CrearCompra");
+                historicoi = rs.getInt("Historicos");
+                buscari = rs.getInt("Buscar");
+                System.out.print(agregari + " " + guardari + " " + cancelari);
+
+            }
+        } catch (SQLException ex) {
+            //lo.LogBitacora("Error: No se pudo seleccionar la tabla" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), proveedores, tablap);
+            JOptionPane.showMessageDialog(null, ex.toString());
+        }
+        /*if (agregari == 1) {
+            BotonAgregarPro.setEnabled(Boolean.TRUE);
+        } else if (agregari == 0) {
+            BotonAgregarPro.setEnabled(Boolean.FALSE);
+            BotonAgregarPro.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/obstruido (1).png")));
+        }*/
+
+ /*if (guardari == 1) {
+            BotonGuardarPro.setEnabled(Boolean.TRUE);
+        } else if (guardari == 0) {
+            BotonGuardarPro.setEnabled(Boolean.FALSE);
+            BotonGuardarPro.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/obstruido (1).png")));
+
+        }*/
+        if (editari == 1) {
+            Editar.setVisible(Boolean.TRUE);
+        } else {
+            Editar.setVisible(Boolean.FALSE);
+            //BotonEditarPro.setEnabled(Boolean.FALSE);
+            //BotonEditarPro.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/obstruido (1).png")));
+        }
+
+        /*if (cancelari == 1) {
+            BotonCancelarPro.setEnabled(Boolean.TRUE);
+
+        } else {
+            BotonCancelarPro.setEnabled(Boolean.FALSE);
+            BotonCancelarPro.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/obstruido (1).png")));
+        }*/
+        if (reportesi == 1) {
+            reporte.setVisible(Boolean.TRUE);
+
+        } else {
+            reporte.setVisible(Boolean.FALSE);
+            //jLabel2.setEnabled(Boolean.TRUE);
+        }
+        if (buscari == 1) {
+            BuscarC.setEnabled(Boolean.TRUE);
+        } else {
+            BuscarC.setEnabled(Boolean.FALSE);
+            BuscarC.setText("NO DISPONIBLE");
+        }
+        if (anulari == 1) {
+            Anular.setVisible(Boolean.TRUE);
+        } else {
+            Anular.setVisible(Boolean.FALSE);
+        }
+        /* if (activoi == 1) {
+            //BotonActivoPro.setVisible(Boolean.TRUE);
+        } else {
+            BotonActivoPro.setVisible(Boolean.FALSE);
+        }
+        if (inactivoi == 1) {
+            //BotonInactivoPro.setVisible(Boolean.TRUE);
+        } else {
+            BotonInactivoPro.setVisible(Boolean.FALSE);
+        }
+        /*if (historicoi == 1) {
+            Historico.setSelected(Boolean.TRUE);
+        } else {
+            Historico.setSelected(Boolean.FALSE);
+        }*/
+        if (crearcomprai == 1) {
+            jLabel1.setEnabled(Boolean.TRUE);
+        } else {
+            jLabel1.setEnabled(Boolean.FALSE);
+            jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/obstruido (1).png")));
         }
     }
 }

@@ -45,20 +45,36 @@ public class Sucursales extends javax.swing.JFrame {
      */
     log lo = new log();
     String sucursales = "Sucursales";
+    public static String IdSucursal = "0";
+    int agregari;
+    int guardari;
+    int editari;
+    int cancelari;
+    int reportesi;
+    int activoi;
+    int inactivoi;
+    int anulari;
+    int buscari;
+    int crearcomprai;
+    int historicoi;
+    String userName;
 
     @Override
     public Image getIconImage() {
         Image retValue = Toolkit.getDefaultToolkit().getImage(ClassLoader.getSystemResource("componentes/LOGOSAG(2).png"));
         return retValue;
     }
+    int npermiso;
 
     public Sucursales() {
         initComponents();
         usuario.setText(Login.txtUsuario.getText());
+        habilitarroles();
         cargartabla();
         txtIdS.setVisible(Boolean.FALSE);
         BotonActivoS.setVisible(Boolean.FALSE);
         BotonInactivoS.setVisible(Boolean.FALSE);
+        userName = usuario.getText();
     }
 
     boolean verificarDatosExistentes(String campo, String columna, String tabla, String mensaje) {
@@ -156,7 +172,7 @@ public class Sucursales extends javax.swing.JFrame {
                 botonAgregarSMouseClicked(evt);
             }
         });
-        getContentPane().add(botonAgregarS, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 140, 130, 50));
+        getContentPane().add(botonAgregarS, new org.netbeans.lib.awtextra.AbsoluteConstraints(310, 150, 130, 30));
 
         botonEditarS.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         botonEditarS.setEnabled(false);
@@ -165,7 +181,7 @@ public class Sucursales extends javax.swing.JFrame {
                 botonEditarSMouseClicked(evt);
             }
         });
-        getContentPane().add(botonEditarS, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 140, 140, 50));
+        getContentPane().add(botonEditarS, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 150, 130, 30));
 
         botonGerenciaS.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         botonGerenciaS.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -210,7 +226,7 @@ public class Sucursales extends javax.swing.JFrame {
                 botonGuardarSMouseClicked(evt);
             }
         });
-        getContentPane().add(botonGuardarS, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 630, 90, 30));
+        getContentPane().add(botonGuardarS, new org.netbeans.lib.awtextra.AbsoluteConstraints(30, 630, 90, 40));
 
         botonCancelarS.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         botonCancelarS.setEnabled(false);
@@ -219,7 +235,7 @@ public class Sucursales extends javax.swing.JFrame {
                 botonCancelarSMouseClicked(evt);
             }
         });
-        getContentPane().add(botonCancelarS, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 650, 100, 40));
+        getContentPane().add(botonCancelarS, new org.netbeans.lib.awtextra.AbsoluteConstraints(170, 630, 90, 40));
 
         txtNombreS.setFont(new java.awt.Font("Georgia", 0, 14)); // NOI18N
         txtNombreS.setForeground(new java.awt.Color(153, 153, 153));
@@ -456,58 +472,77 @@ public class Sucursales extends javax.swing.JFrame {
     }//GEN-LAST:event_botonRegresarSMouseClicked
 
     private void botonAgregarSMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_botonAgregarSMouseClicked
-        Habillitar();
-        botonGuardarS.isEnabled();
-        botonCancelarS.isEnabled();
+        if (botonAgregarS.isEnabled()) {
+            Habillitar();
+            if (guardari == 1) {
+                botonGuardarS.isEnabled();
+                //BotonCancelarPro.isEnabled();   
+            }
+            if (cancelari == 1) {
+                //BotonGuardarPro.isEnabled();
+                botonCancelarS.isEnabled();
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "Esta acción no se encuentra disponible para tu usuario", "ERROR", JOptionPane.ERROR_MESSAGE);
+            lo.LogUsuarios(sucursales, "Boton Agregar", userName);
+        }
 
     }//GEN-LAST:event_botonAgregarSMouseClicked
 
     private void botonEditarSMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_botonEditarSMouseClicked
-        String editar = "BtnEditar";
-        if (txtNombreS.getText().equals("Ingrese Nombre Sucursal") || txtTelefonoS.getText().equals("Ingrese Teléfono") || txtDireccionS.getText().equals("Ingrese Dirección")) {
-            JOptionPane.showMessageDialog(null, "No se puede Actualizar datos vacios");
-        } else {
-            int Id = Integer.parseInt(txtIdS.getText());
-            String Nombre = txtNombreS.getText();
-            String Ciudad = botonCiudadS.getSelectedItem().toString();
-            String Direccion = txtDireccionS.getText();
-            String Telefono = txtTelefonoS.getText();
-            String Estado = "";
+        if (botonEditarS.isEnabled()) {
+            String editar = "BtnEditar";
+            if (txtNombreS.getText().equals("Ingrese Nombre Sucursal") || txtTelefonoS.getText().equals("Ingrese Teléfono") || txtDireccionS.getText().equals("Ingrese Dirección")) {
+                JOptionPane.showMessageDialog(null, "No se puede Actualizar datos vacios");
+            } else {
+                int Id = Integer.parseInt(txtIdS.getText());
+                String Nombre = txtNombreS.getText();
+                String Ciudad = botonCiudadS.getSelectedItem().toString();
+                String Direccion = txtDireccionS.getText();
+                String Telefono = txtTelefonoS.getText();
+                String Estado = "";
 
-            /*if (BotonActivoS.isSelected() == true) {
+                /*if (BotonActivoS.isSelected() == true) {
                 Estado = "Activo";
             } else if (BotonInactivoS.isSelected() == true) {
                 Estado = "Inactivo";
             }*/
-            try {
-                Connection con = Conexion.getConexion();
-                PreparedStatement ps = con.prepareStatement("Update Sucursal set Nombre=?, Ciudad=?, Direccion=?, Telefono=? where Id_Sucursal =?");
-                ps.setString(1, Nombre);
-                ps.setString(2, Ciudad);
-                ps.setString(3, Direccion);
-                ps.setInt(4, Integer.valueOf(Telefono));
-                ps.setInt(5, Id);
-                ps.executeUpdate();
-                JOptionPane.showMessageDialog(null, "Registro Actualizado");
-                cargartabla();
-                Limpiar();
-                Inhabillitar();
+                try {
+                    Connection con = Conexion.getConexion();
+                    PreparedStatement ps = con.prepareStatement("Update Sucursal set Nombre=?, Ciudad=?, Direccion=?, Telefono=? where Id_Sucursal =?");
+                    ps.setString(1, Nombre);
+                    ps.setString(2, Ciudad);
+                    ps.setString(3, Direccion);
+                    ps.setInt(4, Integer.valueOf(Telefono));
+                    ps.setInt(5, Id);
+                    ps.executeUpdate();
+                    JOptionPane.showMessageDialog(null, "Registro Actualizado");
+                    cargartabla();
+                    Limpiar();
+                    Inhabillitar();
 
-            } catch (SQLException ex) {
-                lo.LogBitacora("Error: No se pudo editar el dato " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), sucursales, editar);
-                JOptionPane.showMessageDialog(null, ex.toString());
+                } catch (SQLException ex) {
+                    lo.LogBitacora("Error: No se pudo editar el dato " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), sucursales, editar);
+                    JOptionPane.showMessageDialog(null, ex.toString());
+                }
             }
+        } else {
+            JOptionPane.showMessageDialog(null, "Esta acción no se encuentra disponible para tu usuario", "ERROR", JOptionPane.ERROR_MESSAGE);
+            lo.LogUsuarios(sucursales, "Boton Editar", userName);
         }
+
     }//GEN-LAST:event_botonEditarSMouseClicked
 
     private void botonGerenciaSMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_botonGerenciaSMouseClicked
-        GerenciaSucursal GS = new GerenciaSucursal();
-        {
-            GS.setVisible(true);
-            dispose();
+        if (habilitarr(21) == 21) {
+            GerenciaSucursal GS = new GerenciaSucursal();
+            {
+                GS.setVisible(true);
+                dispose();
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "Este usuario No tiene Acceso a esta pantalla", "Advertencia", JOptionPane.WARNING_MESSAGE);
         }
-
-
     }//GEN-LAST:event_botonGerenciaSMouseClicked
 
     private void BotonActivoSActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BotonActivoSActionPerformed
@@ -552,39 +587,45 @@ public class Sucursales extends javax.swing.JFrame {
 
     private void botonGuardarSMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_botonGuardarSMouseClicked
         // TODO add your handling code here:
-        String guardar = "BtnGuardar";
-        String Nombre = txtNombreS.getText();
-        String Ciudad = botonCiudadS.getSelectedItem().toString();
-        String Direccion = txtDireccionS.getText();
-        String Telefono = txtTelefonoS.getText();
-        if (txtNombreS.getText().equals("Ingrese Nombre Sucursal")) {
-            JOptionPane.showMessageDialog(null, "Debe Ingresar Nombre Sucursal");
-        } else if (botonCiudadS.getSelectedIndex() == 0) {
-            JOptionPane.showMessageDialog(null, "Debe Ingresar Ciudad");
-        } else if (txtDireccionS.getText().equals("Ingrese Dirección")) {
-            JOptionPane.showMessageDialog(null, "Debe Ingresar Dirección");
-        } else if (txtTelefonoS.getText().equals("Ingrese Teléfono")) {
-            JOptionPane.showMessageDialog(null, "Debe Ingresar Teléfono");
-        } else {
-            try {
-                Connection con = Conexion.getConexion();
-                PreparedStatement ps = con.prepareStatement("Insert into Sucursal (Nombre, Ciudad, Direccion, Telefono, Id_Estado) VALUES(?,?,?,?,?)");
-                ps.setString(1, Nombre);
-                ps.setString(2, Ciudad);
-                ps.setString(3, Direccion);
-                ps.setInt(4, Integer.valueOf(Telefono));
-                ps.setInt(5, 1);
-                ps.executeUpdate();
-                JOptionPane.showMessageDialog(null, "Registro guardado");
-                cargartabla();
-                Limpiar();
-                Inhabillitar();
-                botonGuardarS.setEnabled(Boolean.FALSE);
-                botonCancelarS.setEnabled(Boolean.FALSE);
-            } catch (SQLException ex) {
-                lo.LogBitacora("Error: No se pudo guardar el dato " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), sucursales, guardar);
-                JOptionPane.showMessageDialog(null, ex.toString());
+        if (botonGuardarS.isEnabled()) {
+            String guardar = "BtnGuardar";
+            String Nombre = txtNombreS.getText();
+            String Ciudad = botonCiudadS.getSelectedItem().toString();
+            String Direccion = txtDireccionS.getText();
+            String Telefono = txtTelefonoS.getText();
+            if (txtNombreS.getText().equals("Ingrese Nombre Sucursal")) {
+                JOptionPane.showMessageDialog(null, "Debe Ingresar Nombre Sucursal");
+            } else if (botonCiudadS.getSelectedIndex() == 0) {
+                JOptionPane.showMessageDialog(null, "Debe Ingresar Ciudad");
+            } else if (txtDireccionS.getText().equals("Ingrese Dirección")) {
+                JOptionPane.showMessageDialog(null, "Debe Ingresar Dirección");
+            } else if (txtTelefonoS.getText().equals("Ingrese Teléfono")) {
+                JOptionPane.showMessageDialog(null, "Debe Ingresar Teléfono");
+            } else {
+                try {
+                    Connection con = Conexion.getConexion();
+                    PreparedStatement ps = con.prepareStatement("Insert into Sucursal (Nombre, Ciudad, Direccion, Telefono, Id_Estado) VALUES(?,?,?,?,?)");
+                    ps.setString(1, Nombre);
+                    ps.setString(2, Ciudad);
+                    ps.setString(3, Direccion);
+                    ps.setInt(4, Integer.valueOf(Telefono));
+                    ps.setInt(5, 1);
+                    ps.executeUpdate();
+                    JOptionPane.showMessageDialog(null, "Registro guardado");
+                    cargartabla();
+                    Limpiar();
+                    Inhabillitar();
+                    botonGuardarS.setEnabled(Boolean.FALSE);
+                    botonCancelarS.setEnabled(Boolean.FALSE);
+                } catch (SQLException ex) {
+                    lo.LogBitacora("Error: No se pudo guardar el dato " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), sucursales, guardar);
+                    JOptionPane.showMessageDialog(null, ex.toString());
+                }
             }
+        } else {
+
+            JOptionPane.showMessageDialog(null, "Esta acción no se encuentra disponible para tu usuario", "ERROR", JOptionPane.ERROR_MESSAGE);
+            lo.LogUsuarios(sucursales, "Boton Guardar", userName);
 
         }
 
@@ -610,15 +651,27 @@ public class Sucursales extends javax.swing.JFrame {
                 botonCiudadS.setSelectedItem(rs.getString("Ciudad"));
                 txtDireccionS.setText(rs.getString("Direccion"));
                 txtTelefonoS.setText(rs.getString("Telefono"));
-                if (rs.getString("Id_Estado").equals("1")) {
-                    BotonActivoS.setSelected(true);
-                } else if (rs.getString("Id_Estado").equals("2")) {
-                    BotonInactivoS.setSelected(true);
+                if (activoi == 1) {
+                    BotonActivoS.setVisible(Boolean.TRUE);
+                    if (rs.getString("Id_Estado").equals("1")) {
+                        BotonActivoS.setSelected(true);
+                    }
+                } else {
+                    BotonActivoS.setVisible(Boolean.FALSE);
+                }
+                if (inactivoi == 1) {
+                    BotonInactivoS.setVisible(Boolean.TRUE);
+                    if (rs.getString("Id_Estado").equals("2")) {
+                        BotonInactivoS.setSelected(true);
+
+                    }
+                } else {
+                    BotonInactivoS.setVisible(Boolean.FALSE);
                 }
             }
 
-            BotonActivoS.setVisible(Boolean.TRUE);
-            BotonInactivoS.setVisible(Boolean.TRUE);
+            //BotonActivoS.setVisible(Boolean.TRUE);
+            //BotonInactivoS.setVisible(Boolean.TRUE);
             botonEditarS.isEnabled();
             botonCancelarS.isEnabled();
             botonGuardarS.enable(Boolean.FALSE);
@@ -628,15 +681,20 @@ public class Sucursales extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, ex.toString());
         }
 
+
     }//GEN-LAST:event_tablasucursalMouseClicked
 
     private void botonCancelarSMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_botonCancelarSMouseClicked
 
-        Limpiar();
-        Inhabillitar();
-        botonEditarS.setEnabled(Boolean.FALSE);
-        botonGuardarS.setEnabled(Boolean.FALSE);
-
+        if (botonCancelarS.isEnabled()) {
+            // Limpiar();
+            //Inhabillitar();
+            botonCancelarS.setEnabled(Boolean.FALSE);
+            botonCancelarS.setEnabled(Boolean.FALSE);
+        } else {
+            JOptionPane.showMessageDialog(null, "Esta acción no se encuentra disponible para tu usuario", "ERROR", JOptionPane.ERROR_MESSAGE);
+            lo.LogUsuarios(sucursales, "Boton Cancelar", userName);
+        }
 
     }//GEN-LAST:event_botonCancelarSMouseClicked
 
@@ -861,10 +919,14 @@ public class Sucursales extends javax.swing.JFrame {
     }//GEN-LAST:event_botonCiudadSActionPerformed
 
     private void BotonCajaSMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonCajaSMouseClicked
-        Caja GS = new Caja();
-        {
-            GS.setVisible(true);
-            dispose();
+        if (habilitarr(16) == 16) {
+            Caja GS = new Caja();
+            {
+                GS.setVisible(true);
+                dispose();
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "Este usuario No tiene Acceso a esta pantalla", "Advertencia", JOptionPane.WARNING_MESSAGE);
         }
     }//GEN-LAST:event_BotonCajaSMouseClicked
 
@@ -872,7 +934,7 @@ public class Sucursales extends javax.swing.JFrame {
         JasperReport reporte;
         HashMap hm = new HashMap();
         hm.put("Usuario", usuario.getText());
-        
+
         try {
             Connection con = Conexion.getConexion();
             reporte = JasperCompileManager.compileReport("src/Reportes/ReporteSucursal.jrxml");
@@ -880,8 +942,10 @@ public class Sucursales extends javax.swing.JFrame {
             JasperViewer.viewReport(jp, true);
             ReportView view = new ReportView(jp, false);
             view.setVisible(true);
+
         } catch (JRException ex) {
-            Logger.getLogger(Clientes.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Clientes.class
+                    .getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_reporteMouseClicked
 
@@ -915,7 +979,7 @@ public class Sucursales extends javax.swing.JFrame {
 
             // JOptionPane.showMessageDialog(null, "Registro guardado");
         } catch (SQLException ex) {
-            lo.LogBitacora("Error: No se pudo cargar la tabla " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), sucursales,cargart);
+            lo.LogBitacora("Error: No se pudo cargar la tabla " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), sucursales, cargart);
             JOptionPane.showMessageDialog(null, ex.toString());
         }
     }
@@ -934,16 +998,24 @@ public class Sucursales extends javax.swing.JFrame {
                 if ("Nimbus".equals(info.getName())) {
                     javax.swing.UIManager.setLookAndFeel(info.getClassName());
                     break;
+
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(Sucursales.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Sucursales.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
+
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(Sucursales.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Sucursales.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
+
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(Sucursales.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Sucursales.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
+
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(Sucursales.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(Sucursales.class
+                    .getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
         //</editor-fold>
 
@@ -1010,7 +1082,7 @@ public class Sucursales extends javax.swing.JFrame {
     }
 
     void buscarData(String valor) {
-        String buscar ="Buscar";
+        String buscar = "Buscar";
         String[] titulos = {"ID", "Nombre", "Ciudad", "Direccion", "Telefono", "Estado"};
         String[] registros = new String[13];
         String sql = "SELECT S.Id_Sucursal,S.Nombre,S.Ciudad,S.Direccion, S.Telefono,E.Estado\n"
@@ -1042,7 +1114,9 @@ public class Sucursales extends javax.swing.JFrame {
             // anchoColumnas();
         } catch (SQLException ex) {
             lo.LogBitacora("Error: No se pudo buscar el dato " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), sucursales, buscar);
-            Logger.getLogger(Sucursales.class.getName()).log(Level.SEVERE, null, ex);
+            Logger
+                    .getLogger(Sucursales.class
+                            .getName()).log(Level.SEVERE, null, ex);
         }
     }
 
@@ -1069,6 +1143,135 @@ public class Sucursales extends javax.swing.JFrame {
 
         public nuevo() {
         }
+    }
+
+    private void habilitarroles() {
+        try {
+
+            PreparedStatement ps;
+            ResultSet rs;
+            Connection con = Conexion.getConexion();
+            ps = con.prepareStatement("Select PU.Agregar, PU.Guardar, PU.Cancelar, PU.Editar, PU.Activo, PU.Inactivo, PU.Reporte, PU.Anular, PU.CrearCompra, PU.Historicos, PU.Buscar\n"
+                    + "From PermisosUsuario AS PU\n"
+                    + "Inner Join Usuario as U on PU.IdUsuario=U.Id_Usuario\n"
+                    + "where PU.IdPermiso=? and U.Nombre=?");
+            ps.setInt(1, 5);
+            ps.setString(2, usuario.getText());
+            rs = ps.executeQuery();
+            System.out.println(usuario.getText());
+
+            while (rs.next()) {
+                agregari = rs.getInt("Agregar");
+                guardari = rs.getInt("Guardar");
+                cancelari = rs.getInt("Cancelar");
+                editari = rs.getInt("Editar");
+                activoi = rs.getInt("Activo");
+                inactivoi = rs.getInt("Inactivo");
+                reportesi = rs.getInt("Reporte");
+                anulari = rs.getInt("Anular");
+                crearcomprai = rs.getInt("CrearCompra");
+                historicoi = rs.getInt("Historicos");
+                buscari = rs.getInt("Buscar");
+                System.out.print(agregari + " " + guardari + " " + cancelari);
+
+            }
+        } catch (SQLException ex) {
+            //lo.LogBitacora("Error: No se pudo seleccionar la tabla" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), proveedores, tablap);
+            JOptionPane.showMessageDialog(null, ex.toString());
+        }
+        if (agregari == 1) {
+            botonAgregarS.setEnabled(Boolean.TRUE);
+        } else if (agregari == 0) {
+            botonAgregarS.setEnabled(Boolean.FALSE);
+            botonAgregarS.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/obstruido (1).png")));
+        }
+
+        if (guardari == 1) {
+            botonGuardarS.setEnabled(Boolean.TRUE);
+        } else if (guardari == 0) {
+            botonGuardarS.setEnabled(Boolean.FALSE);
+            botonGuardarS.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/obstruido (1).png")));
+
+        }
+        if (editari == 1) {
+            botonEditarS.setEnabled(Boolean.TRUE);
+        } else {
+            botonEditarS.setEnabled(Boolean.FALSE);
+            botonEditarS.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/obstruido (1).png")));
+        }
+
+        if (cancelari == 1) {
+            botonCancelarS.setEnabled(Boolean.TRUE);
+
+        } else {
+            botonCancelarS.setEnabled(Boolean.FALSE);
+            botonCancelarS.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/obstruido (1).png")));
+        }
+        if (reportesi == 1) {
+            reporte.setVisible(Boolean.TRUE);
+
+        } else {
+            reporte.setVisible(Boolean.FALSE);
+            //jLabel2.setEnabled(Boolean.TRUE);
+        }
+        if (buscari == 1) {
+            txtBuscarS.setEnabled(Boolean.TRUE);
+        } else {
+            txtBuscarS.setEnabled(Boolean.FALSE);
+            txtBuscarS.setText("NO DISPONIBLE");
+        }
+        /* if (anulari == 1) {
+            Anular.setSelected(Boolean.TRUE);
+        } else {
+            Anular.setSelected(Boolean.FALSE);
+        }*/
+        if (activoi == 1) {
+            //BotonActivoPro.setVisible(Boolean.TRUE);
+        } else {
+            BotonActivoS.setVisible(Boolean.FALSE);
+        }
+        if (inactivoi == 1) {
+            //BotonInactivoPro.setVisible(Boolean.TRUE);
+        } else {
+            BotonInactivoS.setVisible(Boolean.FALSE);
+        }
+        /*if (historicoi == 1) {
+            Historico.setSelected(Boolean.TRUE);
+        } else {
+            Historico.setSelected(Boolean.FALSE);
+        }
+        if (crearcomprai == 1) {
+            CrearCompra.setSelected(Boolean.TRUE);
+        } else {
+            CrearCompra.setSelected(Boolean.FALSE);
+        }*/
+    }
+
+    public int habilitarr(int numeroPermiso) {
+        try {
+
+            PreparedStatement ps;
+            ResultSet rs;
+            Connection con = Conexion.getConexion();
+            ps = con.prepareStatement("Select PU.IdPermiso\n"
+                    + "From PermisosUsuario AS PU\n"
+                    + "Inner Join Usuario as U on PU.IdUsuario=U.Id_Usuario\n"
+                    + "where PU.IdPermiso=? and U.Nombre=?");
+            ps.setInt(1, numeroPermiso);
+            ps.setString(2, usuario.getText());
+            rs = ps.executeQuery();
+            System.out.println(usuario.getText());
+
+            while (rs.next()) {
+                npermiso = rs.getInt("IdPermiso");
+
+            }
+        } catch (SQLException ex) {
+            //lo.LogBitacora("Error: No se pudo seleccionar la tabla" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), proveedores, tablap);
+            JOptionPane.showMessageDialog(null, ex.toString());
+        }
+        return npermiso;
+
     }
 
 }

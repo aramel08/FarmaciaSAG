@@ -44,15 +44,31 @@ public class Producto_Proveedor extends javax.swing.JFrame {
     log lo = new log();
     String productop = "Producto Proveedor";
 
+    public static String IdProductoP = "0";
+    int agregari;
+    int guardari;
+    int editari;
+    int cancelari;
+    int reportesi;
+    int activoi;
+    int inactivoi;
+    int anulari;
+    int buscari;
+    int crearcomprai;
+    int historicoi;
+    String userName;
+
     public Producto_Proveedor() {
         initComponents();
         usuario.setText(Login.txtUsuario.getText());
+        habilitarroles();
         CargarP PP = new Producto_Proveedor.CargarP();
         ComboIdProductoPP.setModel(PP.getvalues());
         CargarPro Pro = new Producto_Proveedor.CargarPro();
         ComboIdProveedorPP.setModel(Pro.getvalues());
         cargartabla();
         Inhabillitar();
+        userName = usuario.getText();
 
     }
 
@@ -333,7 +349,22 @@ public class Producto_Proveedor extends javax.swing.JFrame {
     }//GEN-LAST:event_BotonRegresarPPMouseClicked
 
     private void BotonAgregarPPMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonAgregarPPMouseClicked
-        Habilitar();
+        if (BotonAgregarPP.isEnabled()) {
+            Habilitar();
+            if (guardari == 1) {
+                BotonGuardarPP.isEnabled();
+                //BotonCancelarPro.isEnabled();   
+            }
+            if (cancelari == 1) {
+                //BotonGuardarPro.isEnabled();
+                BotonCancelarPP.isEnabled();
+            }
+        } else {
+
+            JOptionPane.showMessageDialog(null, "Esta acción no se encuentra disponible para tu usuario", "ERROR", JOptionPane.ERROR_MESSAGE);
+            lo.LogUsuarios(productop, "Boton Editar", userName);
+        }
+
 
     }//GEN-LAST:event_BotonAgregarPPMouseClicked
 
@@ -341,62 +372,74 @@ public class Producto_Proveedor extends javax.swing.JFrame {
         ObtenerIDPro();
         ObtenerIDProduct();
         String guardar = "Btnguardar";
-        if (ComboIdProductoPP.equals("Seleccione Producto...") || ComboIdProveedorPP.equals("Seleccione Proveedor...")) {
-            JOptionPane.showMessageDialog(null, "No se puede Guardar datos vacios");
-        } else {
-            int Producto = Integer.parseInt(txtProducto.getText());
-            int Proveedor = Integer.parseInt(txtProveedor.getText());
+        if (BotonGuardarPP.isEnabled()) {
+            if (ComboIdProductoPP.equals("Seleccione Producto...") || ComboIdProveedorPP.equals("Seleccione Proveedor...")) {
+                JOptionPane.showMessageDialog(null, "No se puede Guardar datos vacios");
+            } else {
+                int Producto = Integer.parseInt(txtProducto.getText());
+                int Proveedor = Integer.parseInt(txtProveedor.getText());
 
-            try {
-                Connection con = Conexion.getConexion();
-                PreparedStatement ps = con.prepareStatement("Insert into Producto_Proveedor (Id_Producto, Id_Proveedor,Id_Estado) VALUES(?,?,?)");
-                ps.setInt(1, Producto);
-                ps.setInt(2, Proveedor);
-                ps.setInt(3, 1);
-                ps.executeUpdate();
+                try {
+                    Connection con = Conexion.getConexion();
+                    PreparedStatement ps = con.prepareStatement("Insert into Producto_Proveedor (Id_Producto, Id_Proveedor,Id_Estado) VALUES(?,?,?)");
+                    ps.setInt(1, Producto);
+                    ps.setInt(2, Proveedor);
+                    ps.setInt(3, 1);
+                    ps.executeUpdate();
 
-                JOptionPane.showMessageDialog(null, "Registro guardado");
-                cargartabla();
+                    JOptionPane.showMessageDialog(null, "Registro guardado");
+                    cargartabla();
 
-                //Limpiar();
-                Inhabillitar();
+                    //Limpiar();
+                    Inhabillitar();
 
-            } catch (SQLException ex) {
-                lo.LogBitacora("Error: No se pudo guardar el dato " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), productop, guardar);
-                JOptionPane.showMessageDialog(null, ex.toString());
+                } catch (SQLException ex) {
+                    lo.LogBitacora("Error: No se pudo guardar el dato " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), productop, guardar);
+                    JOptionPane.showMessageDialog(null, ex.toString());
+                }
             }
+        } else {
+            JOptionPane.showMessageDialog(null, "Esta acción no se encuentra disponible para tu usuario", "ERROR", JOptionPane.ERROR_MESSAGE);
+            lo.LogUsuarios(productop, "Boton Editar", userName);
         }
+
+
     }//GEN-LAST:event_BotonGuardarPPMouseClicked
 
     private void BotonEditarPPMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonEditarPPMouseClicked
         ObtenerIDPro();
         ObtenerIDProduct();
-        String editar = "BtnEditar";
-        if (ComboIdProductoPP.equals("Seleccione Producto...") || ComboIdProveedorPP.equals("Seleccione Proveedor...")) {
-            JOptionPane.showMessageDialog(null, "No se puede Guardar datos vacios");
-        } else {
-            int Producto = Integer.parseInt(txtProducto.getText());
-            int Proveedor = Integer.parseInt(txtProveedor.getText());
-            int Produ_Prov = Integer.parseInt(txtProductoPro.getText());
+        if (editari == 1) {
+            String editar = "BtnEditar";
+            if (ComboIdProductoPP.equals("Seleccione Producto...") || ComboIdProveedorPP.equals("Seleccione Proveedor...")) {
+                JOptionPane.showMessageDialog(null, "No se puede Guardar datos vacios");
+            } else {
+                int Producto = Integer.parseInt(txtProducto.getText());
+                int Proveedor = Integer.parseInt(txtProveedor.getText());
+                int Produ_Prov = Integer.parseInt(txtProductoPro.getText());
 
-            try {
-                Connection con = Conexion.getConexion();
-                PreparedStatement ps = con.prepareStatement("Update Producto_Proveedor set  Id_Producto=?,Id_Proveedor=? Where Id_Producto_Proveedor=?");
-                ps.setInt(1, Producto);
-                ps.setInt(2, Proveedor);
-                ps.setInt(3, Produ_Prov);
-                ps.executeUpdate();
+                try {
+                    Connection con = Conexion.getConexion();
+                    PreparedStatement ps = con.prepareStatement("Update Producto_Proveedor set  Id_Producto=?,Id_Proveedor=? Where Id_Producto_Proveedor=?");
+                    ps.setInt(1, Producto);
+                    ps.setInt(2, Proveedor);
+                    ps.setInt(3, Produ_Prov);
+                    ps.executeUpdate();
 
-                JOptionPane.showMessageDialog(null, "Registro Actualizado");
-                cargartabla();
+                    JOptionPane.showMessageDialog(null, "Registro Actualizado");
+                    cargartabla();
 
-                //Limpiar();
-                Inhabillitar();
+                    //Limpiar();
+                    Inhabillitar();
 
-            } catch (SQLException ex) {
-                lo.LogBitacora("Error: No se pudo editar el dato " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), productop, editar);
-                JOptionPane.showMessageDialog(null, ex.toString());
+                } catch (SQLException ex) {
+                    lo.LogBitacora("Error: No se pudo editar el dato " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), productop, editar);
+                    JOptionPane.showMessageDialog(null, ex.toString());
+                }
             }
+        } else {
+            JOptionPane.showMessageDialog(null, "Esta acción no se encuentra disponible para tu usuario", "ERROR", JOptionPane.ERROR_MESSAGE);
+            lo.LogUsuarios(productop, "Boton Editar", userName);
 
         }
     }//GEN-LAST:event_BotonEditarPPMouseClicked
@@ -423,17 +466,32 @@ public class Producto_Proveedor extends javax.swing.JFrame {
                 txtProductoPro.setText(String.valueOf(id));
                 ComboIdProductoPP.setSelectedItem(rs.getString("Nombre_Producto"));
                 ComboIdProveedorPP.setSelectedItem(rs.getString("Nombre_Empresa"));
+                if (activoi == 1) {
+                    BotonActivoPP.setVisible(Boolean.TRUE);
+                    if (rs.getString("Id_Estado").equals("1")) {
+                        BotonActivoPP.setSelected(true);
+                    }
+                } else {
+                    BotonActivoPP.setVisible(Boolean.FALSE);
+                }
+                if (inactivoi == 1) {
+                    BotonInactivoPP.setVisible(Boolean.TRUE);
+                    if (rs.getString("Id_Estado").equals("2")) {
+                        BotonInactivoPP.setSelected(true);
 
-                //if (rs.getString("Id_Estado").equals("1")) {
-                // BotonActivoPro.setSelected(true);
-                //} else if (rs.getString("Id_Estado").equals("2")) {
-                // BotonInactivoPro.setSelected(true);
-                //}
+                    }
+                } else {
+                    BotonInactivoPP.setVisible(Boolean.FALSE);
+                }
+
+                IdProductoP = txtProductoPro.getText();
+
                 //BotonActivoPro.setVisible(Boolean.TRUE);
                 //BotonInactivoPro.setVisible(Boolean.TRUE);
                 //id = txtId_Proveedor.getText();
                 Habilitar();
             }
+
         } catch (SQLException ex) {
             lo.LogBitacora("Error: No se pudo seleccionar la tabla " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), productop, tablap);
             JOptionPane.showMessageDialog(null, ex.toString());
@@ -456,10 +514,16 @@ public class Producto_Proveedor extends javax.swing.JFrame {
     }//GEN-LAST:event_txtBuscarPPKeyTyped
 
     private void BotonCancelarPPMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonCancelarPPMouseClicked
-        Limpiar();
-        Inhabillitar();
-        BotonEditarPP.setEnabled(Boolean.FALSE);
-        BotonGuardarPP.setEnabled(Boolean.FALSE);
+          if (BotonCancelarPP.isEnabled()) {
+            // Limpiar();
+            //Inhabillitar();
+            BotonCancelarPP.setEnabled(Boolean.FALSE);
+            BotonCancelarPP.setEnabled(Boolean.FALSE);
+        } else {
+            JOptionPane.showMessageDialog(null, "Esta acción no se encuentra disponible para tu usuario", "ERROR", JOptionPane.ERROR_MESSAGE);
+            lo.LogUsuarios(productop, "Boton Guardar", userName);
+        }
+
     }//GEN-LAST:event_BotonCancelarPPMouseClicked
 
     private void txtBuscarPPFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtBuscarPPFocusGained
@@ -756,9 +820,112 @@ public class Producto_Proveedor extends javax.swing.JFrame {
             TablaProductoProveedor.setModel(model);
             // anchoColumnas();
         } catch (SQLException ex) {
-            lo.LogBitacora("Error: No se pudo buscar el dato " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(),productop,buscar);
+            lo.LogBitacora("Error: No se pudo buscar el dato " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), productop, buscar);
             Logger.getLogger(Clientes.class.getName()).log(Level.SEVERE, null, ex);
         }
 
     }
+
+    private void habilitarroles() {
+        try {
+
+            PreparedStatement ps;
+            ResultSet rs;
+            Connection con = Conexion.getConexion();
+            ps = con.prepareStatement("Select PU.Agregar, PU.Guardar, PU.Cancelar, PU.Editar, PU.Activo, PU.Inactivo, PU.Reporte, PU.Anular, PU.CrearCompra, PU.Historicos, PU.Buscar\n"
+                    + "From PermisosUsuario AS PU\n"
+                    + "Inner Join Usuario as U on PU.IdUsuario=U.Id_Usuario\n"
+                    + "where PU.IdPermiso=? and U.Nombre=?");
+            ps.setInt(1, 14);
+            ps.setString(2, usuario.getText());
+            rs = ps.executeQuery();
+            System.out.println(usuario.getText());
+
+            while (rs.next()) {
+                agregari = rs.getInt("Agregar");
+                guardari = rs.getInt("Guardar");
+                cancelari = rs.getInt("Cancelar");
+                editari = rs.getInt("Editar");
+                activoi = rs.getInt("Activo");
+                inactivoi = rs.getInt("Inactivo");
+                reportesi = rs.getInt("Reporte");
+                anulari = rs.getInt("Anular");
+                crearcomprai = rs.getInt("CrearCompra");
+                historicoi = rs.getInt("Historicos");
+                buscari = rs.getInt("Buscar");
+                System.out.print(agregari + " " + guardari + " " + cancelari);
+
+            }
+        } catch (SQLException ex) {
+            //lo.LogBitacora("Error: No se pudo seleccionar la tabla" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), proveedores, tablap);
+            JOptionPane.showMessageDialog(null, ex.toString());
+        }
+        if (agregari == 1) {
+            BotonAgregarPP.setEnabled(Boolean.TRUE);
+        } else if (agregari == 0) {
+            BotonAgregarPP.setEnabled(Boolean.FALSE);
+            BotonAgregarPP.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/obstruido (1).png")));
+        }
+
+        if (guardari == 1) {
+            BotonGuardarPP.setEnabled(Boolean.TRUE);
+        } else if (guardari == 0) {
+            BotonGuardarPP.setEnabled(Boolean.FALSE);
+            BotonGuardarPP.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/obstruido (1).png")));
+
+        }
+        if (editari == 1) {
+            BotonEditarPP.setEnabled(Boolean.TRUE);
+        } else {
+            BotonEditarPP.setEnabled(Boolean.FALSE);
+            BotonEditarPP.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/obstruido (1).png")));
+        }
+
+        if (cancelari == 1) {
+            BotonCancelarPP.setEnabled(Boolean.TRUE);
+
+        } else {
+            BotonCancelarPP.setEnabled(Boolean.FALSE);
+            BotonCancelarPP.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/obstruido (1).png")));
+        }
+        if (reportesi == 1) {
+            reporte.setVisible(Boolean.TRUE);
+
+        } else {
+            reporte.setVisible(Boolean.FALSE);
+            //jLabel2.setEnabled(Boolean.TRUE);
+        }
+        if (buscari == 1) {
+            txtBuscarPP.setEnabled(Boolean.TRUE);
+        } else {
+            txtBuscarPP.setEnabled(Boolean.FALSE);
+            txtBuscarPP.setText("NO DISPONIBLE");
+        }
+        /* if (anulari == 1) {
+            Anular.setSelected(Boolean.TRUE);
+        } else {
+            Anular.setSelected(Boolean.FALSE);
+        }*/
+        if (activoi == 1) {
+            //BotonActivoPro.setVisible(Boolean.TRUE);
+        } else {
+            BotonActivoPP.setVisible(Boolean.FALSE);
+        }
+        if (inactivoi == 1) {
+            //BotonInactivoPro.setVisible(Boolean.TRUE);
+        } else {
+            BotonInactivoPP.setVisible(Boolean.FALSE);
+        }
+        /*if (historicoi == 1) {
+            Historico.setSelected(Boolean.TRUE);
+        } else {
+            Historico.setSelected(Boolean.FALSE);
+        }
+        if (crearcomprai == 1) {
+            CrearCompra.setSelected(Boolean.TRUE);
+        } else {
+            CrearCompra.setSelected(Boolean.FALSE);
+        }*/
+    }
+
 }

@@ -41,6 +41,20 @@ public class Almacen extends javax.swing.JFrame {
     log lo = new log();
     String almacen = "Almacen";
 
+    public static String Id_Almacen = "0";
+    int agregari;
+    int guardari;
+    int editari;
+    int cancelari;
+    int reportesi;
+    int activoi;
+    int inactivoi;
+    int anulari;
+    int buscari;
+    int crearcomprai;
+    int historicoi;
+    String userName;
+
     /**
      * Creates new form Almace
      */
@@ -49,6 +63,11 @@ public class Almacen extends javax.swing.JFrame {
         cargartabla();
         Inhabillitar();
         usuario.setText(Login.txtUsuario.getText());
+        habilitarroles();
+        
+        userName = usuario.getText();
+        
+        txtIdAlmacen.setVisible(Boolean.FALSE);
 
     }
 
@@ -255,6 +274,11 @@ public class Almacen extends javax.swing.JFrame {
                 txtCapMaximaMousePressed(evt);
             }
         });
+        txtCapMaxima.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                txtCapMaximaActionPerformed(evt);
+            }
+        });
         txtCapMaxima.addKeyListener(new java.awt.event.KeyAdapter() {
             public void keyPressed(java.awt.event.KeyEvent evt) {
                 txtCapMaximaKeyPressed(evt);
@@ -266,7 +290,7 @@ public class Almacen extends javax.swing.JFrame {
                 txtCapMaximaKeyTyped(evt);
             }
         });
-        getContentPane().add(txtCapMaxima, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 380, 170, 26));
+        getContentPane().add(txtCapMaxima, new org.netbeans.lib.awtextra.AbsoluteConstraints(60, 375, 170, 26));
 
         txtCapMin.setBackground(new java.awt.Color(240, 240, 240));
         txtCapMin.setFont(new java.awt.Font("Georgia", 0, 12)); // NOI18N
@@ -496,103 +520,129 @@ public class Almacen extends javax.swing.JFrame {
     }//GEN-LAST:event_txtUbicacionActionPerformed
 
     private void botonAgregarALMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_botonAgregarALMouseClicked
-        Habilitar();
-        botonGuardarAL.isEnabled();
-        botonCancelarAL.isEnabled();
+       
+        if (botonAgregarAL.isEnabled()) {
+            Habilitar();
+            if (guardari == 1) {
+                botonGuardarAL.isEnabled();
+                //BotonCancelarPro.isEnabled();   
+            }
+            if (cancelari == 1) {
+                //BotonGuardarPro.isEnabled();
+                botonCancelarAL.isEnabled();
+            }
+        } else {            
+            JOptionPane.showMessageDialog(null, "Esta acción no se encuentra disponible para tu usuario", "ERROR", JOptionPane.ERROR_MESSAGE); 
+            lo.LogUsuarios(almacen, "Boton Agregar", userName);
+        }
     }//GEN-LAST:event_botonAgregarALMouseClicked
 
     private void botonEditarALMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_botonEditarALMouseClicked
-        String editar = "BtnEditar";
-        if (txtUbicacion.getText().equals("Ingrese Ubicación") || txtCapMaxima.getText().equals("Ingrese Capacidad Maxima ") || txtCapMin.getText().equals("Ingrese Capacidad Minima") || txtCapOpt.getText().equals("Ingrese Capacidad Optima") || txtCapOpt.getText().equals("Ingrese Capacidad Actual")
-                || txtEstante.getText().equals("Ingrese Número Estante")) {
-            JOptionPane.showMessageDialog(null, "No se puede Guardar datos vacios");
-
-        } else {
-            int IdAlmacen = Integer.parseInt(txtIdAlmacen.getText());
-            String Ubicacion = txtUbicacion.getText();
-            String CapacidadM = txtCapMaxima.getText();
-            String CapacidadMin = txtCapMin.getText();
-            String CapacidadOp = txtCapOpt.getText();
-            String CapacidadAc = txtCapActual.getText();
-            String Estante = txtEstante.getText();
-
-            try {
-                Connection con = Conexion.getConexion();
-                PreparedStatement ps = con.prepareStatement("Update Almacen set Ubicacion=, Capacidad_Minima=?,Capacidad_Maxima=?,Capacidad_Optima=?,Capacidad_Actual=?,Num_Estante=? Where Id_Almacen=?");
-                ps.setString(1, Ubicacion);
-                ps.setString(2, CapacidadM);
-                ps.setString(3, CapacidadMin);
-                ps.setString(4, CapacidadOp);
-                ps.setString(5, CapacidadAc);
-                ps.setString(6, Estante);
-                ps.setInt(7, IdAlmacen);
-
-                ps.executeUpdate();
-                JOptionPane.showMessageDialog(null, "Registro Actualizado");
-
-                cargartabla();
-                Limpiar();
-                Inhabillitar();
-
-            } catch (Exception ex) {
-                lo.LogBitacora("Error: No se pudo actualizar el registro " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), almacen, editar);
-                JOptionPane.showMessageDialog(null, ex.toString());
-            }
-        }
-    }//GEN-LAST:event_botonEditarALMouseClicked
-
-    private void botonGuardarALMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_botonGuardarALMouseClicked
-        String guardar = "BtnGuardar";
-        if (txtUbicacion.getText().equals("Ingrese Ubicación") && txtCapMaxima.getText().equals("Ingrese Capacidad Maxima")
-                && txtCapMin.getText().equals("Ingrese Capacidad Minima") && txtCapOpt.getText().equals("Ingrese Capacidad Optima") && txtCapActual.getText().equals("Ingrese Capacidad Actual") && txtEstante.getText().equals("Ingrese Número Estante")) {
-            JOptionPane.showMessageDialog(null, "Debes llenar todos los campos", "Advertencia", JOptionPane.WARNING_MESSAGE);
-        } else {
-            if (txtUbicacion.getText().equals("Ingrese Ubicación")) {
-                JOptionPane.showMessageDialog(null, "Debe ingresar un nombre de Empresa", "Advertencia", JOptionPane.WARNING_MESSAGE);
-            } else if (txtCapMaxima.getText().equals("Ingrese Capacidad Maxima")) {
-                JOptionPane.showMessageDialog(null, "Debe ingresar un RTN", "Advertencia", JOptionPane.WARNING_MESSAGE);
-            } else if (txtCapMin.getText().equals("Ingrese Capacidad Minima")) {
-                JOptionPane.showMessageDialog(null, "Debe ingresar una direccion", "Advertencia", JOptionPane.WARNING_MESSAGE);
-            } else if (txtCapOpt.getText().equals("Ingrese Capacidad Optima")) {
-                JOptionPane.showMessageDialog(null, "Debe ingresar un telefono", "Advertencia", JOptionPane.WARNING_MESSAGE);
-            } else if (txtCapActual.getText().equals("Ingrese Capacidad Actual")) {
-                JOptionPane.showMessageDialog(null, "Debe ingresar un telefono", "Advertencia", JOptionPane.WARNING_MESSAGE);
-            } else if (txtEstante.getText().equals("Ingrese Número Estante")) {
-                JOptionPane.showMessageDialog(null, "Debe ingresar un telefono", "Advertencia", JOptionPane.WARNING_MESSAGE);
+        if (botonEditarAL.isEnabled()){          
+            String editar = "BtnEditar";
+            if (txtUbicacion.getText().equals("Ingrese Ubicación") || txtCapMaxima.getText().equals("Ingrese Capacidad Maxima ") || txtCapMin.getText().equals("Ingrese Capacidad Minima") || txtCapOpt.getText().equals("Ingrese Capacidad Optima") || txtCapOpt.getText().equals("Ingrese Capacidad Actual")
+                    || txtEstante.getText().equals("Ingrese Número Estante")) {
+                JOptionPane.showMessageDialog(null, "No se puede Guardar datos vacios");
 
             } else {
-
-                String Ubi = txtUbicacion.getText();
-                String Maxima = txtCapMaxima.getText();
-
-                String Minima = txtCapMin.getText();
-                String Optima = txtCapOpt.getText();
-                String Actual = txtCapActual.getText();
+                int IdAlmacen = Integer.parseInt(txtIdAlmacen.getText());
+                String Ubicacion = txtUbicacion.getText();
+                String CapacidadM = txtCapMaxima.getText();
+                String CapacidadMin = txtCapMin.getText();
+                String CapacidadOp = txtCapOpt.getText();
+                String CapacidadAc = txtCapActual.getText();
                 String Estante = txtEstante.getText();
 
                 try {
                     Connection con = Conexion.getConexion();
-                    PreparedStatement ps = con.prepareStatement("Insert into Almacen (Ubicacion, Capacidad_Minima,Capacidad_Maxima,Capacidad_Optima,Capacidad_Actual,Num_Estante,Id_Estado ) VALUES(?,?,?,?,?,?,?)");
-                    ps.setString(1, Ubi);
-                    ps.setString(2, Maxima);
-                    ps.setString(3, Minima);
-                    ps.setString(4, Optima);
-                    ps.setString(5, Actual);
+                    PreparedStatement ps = con.prepareStatement("Update Almacen set Ubicacion=, Capacidad_Minima=?,Capacidad_Maxima=?,Capacidad_Optima=?,Capacidad_Actual=?,Num_Estante=? Where Id_Almacen=?");
+                    ps.setString(1, Ubicacion);
+                    ps.setString(2, CapacidadM);
+                    ps.setString(3, CapacidadMin);
+                    ps.setString(4, CapacidadOp);
+                    ps.setString(5, CapacidadAc);
                     ps.setString(6, Estante);
-                    ps.setInt(7, 1);
-                    ps.executeUpdate();
+                    ps.setInt(7, IdAlmacen);
 
-                    JOptionPane.showMessageDialog(null, "Registro guardado");
+                    ps.executeUpdate();
+                    JOptionPane.showMessageDialog(null, "Registro Actualizado");
+
                     cargartabla();
                     Limpiar();
                     Inhabillitar();
 
-                } catch (SQLException ex) {
-                    lo.LogBitacora("Error: No se pudo guardar el registro " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), almacen, guardar);
+                } catch (Exception ex) {
+                    lo.LogBitacora("Error: No se pudo actualizar el registro " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), almacen, editar);
+                    JOptionPane.showMessageDialog(null, ex.toString());
                     JOptionPane.showMessageDialog(null, ex.toString());
                 }
             }
+        } else {            
+            JOptionPane.showMessageDialog(null, "Esta acción no se encuentra disponible para tu usuario", "ERROR", JOptionPane.ERROR_MESSAGE);
+            lo.LogUsuarios(almacen, "botonEditar", userName);
         }
+    }//GEN-LAST:event_botonEditarALMouseClicked
+
+    private void botonGuardarALMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_botonGuardarALMouseClicked
+        if (botonGuardarAL.isEnabled()) {
+            String guardar = "BtnGuardar";
+            if (txtUbicacion.getText().equals("Ingrese Ubicación") && txtCapMaxima.getText().equals("Ingrese Capacidad Maxima")
+                    && txtCapMin.getText().equals("Ingrese Capacidad Minima") && txtCapOpt.getText().equals("Ingrese Capacidad Optima") && txtCapActual.getText().equals("Ingrese Capacidad Actual") && txtEstante.getText().equals("Ingrese Número Estante")) {
+                JOptionPane.showMessageDialog(null, "Debes llenar todos los campos", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            } else {
+                if (txtUbicacion.getText().equals("Ingrese Ubicación")) {
+                    JOptionPane.showMessageDialog(null, "Debe ingresar un nombre de Empresa", "Advertencia", JOptionPane.WARNING_MESSAGE);
+                } else if (txtCapMaxima.getText().equals("Ingrese Capacidad Maxima")) {
+                    JOptionPane.showMessageDialog(null, "Debe ingresar un RTN", "Advertencia", JOptionPane.WARNING_MESSAGE);
+                } else if (txtCapMin.getText().equals("Ingrese Capacidad Minima")) {
+                    JOptionPane.showMessageDialog(null, "Debe ingresar una direccion", "Advertencia", JOptionPane.WARNING_MESSAGE);
+                } else if (txtCapOpt.getText().equals("Ingrese Capacidad Optima")) {
+                    JOptionPane.showMessageDialog(null, "Debe ingresar un telefono", "Advertencia", JOptionPane.WARNING_MESSAGE);
+                } else if (txtCapActual.getText().equals("Ingrese Capacidad Actual")) {
+                    JOptionPane.showMessageDialog(null, "Debe ingresar un telefono", "Advertencia", JOptionPane.WARNING_MESSAGE);
+                } else if (txtEstante.getText().equals("Ingrese Número Estante")) {
+                    JOptionPane.showMessageDialog(null, "Debe ingresar un telefono", "Advertencia", JOptionPane.WARNING_MESSAGE);
+
+                } else {
+
+                    String Ubi = txtUbicacion.getText();
+                    String Maxima = txtCapMaxima.getText();
+
+                    String Minima = txtCapMin.getText();
+                    String Optima = txtCapOpt.getText();
+                    String Actual = txtCapActual.getText();
+                    String Estante = txtEstante.getText();
+
+                    try {
+                        Connection con = Conexion.getConexion();
+                        PreparedStatement ps = con.prepareStatement("Insert into Almacen (Ubicacion, Capacidad_Minima,Capacidad_Maxima,Capacidad_Optima,Capacidad_Actual,Num_Estante,Id_Estado ) VALUES(?,?,?,?,?,?,?)");
+                        ps.setString(1, Ubi);
+                        ps.setString(2, Maxima);
+                        ps.setString(3, Minima);
+                        ps.setString(4, Optima);
+                        ps.setString(5, Actual);
+                        ps.setString(6, Estante);
+                        ps.setInt(7, 1);
+                        ps.executeUpdate();
+
+                        JOptionPane.showMessageDialog(null, "Registro guardado");
+                        cargartabla();
+                        Limpiar();
+                        Inhabillitar();
+
+                    } catch (SQLException ex) {
+                        lo.LogBitacora("Error: No se pudo guardar el registro " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), almacen, guardar);
+                        JOptionPane.showMessageDialog(null, ex.toString());
+                     }
+            }}
+        } else {
+
+            JOptionPane.showMessageDialog(null, "Esta acción no se encuentra disponible para tu usuario", "ERROR", JOptionPane.ERROR_MESSAGE);
+            lo.LogUsuarios(almacen, "Boton Guardar", userName);
+        }
+
+
+
     }//GEN-LAST:event_botonGuardarALMouseClicked
 
     private void TablaAlmacenMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_TablaAlmacenMouseClicked
@@ -623,19 +673,33 @@ public class Almacen extends javax.swing.JFrame {
                 txtCapActual.setText(rs.getString("Capacidad_Actual"));
                 txtEstante.setText(rs.getString("Num_Estante"));
 
-                if (rs.getString("Estado").equals("Activo")) {
-                    BotonActivoAl.setSelected(true);
-                } else if (rs.getString("Estado").equals("Inactivo")) {
-                    BotonInactivoAl.setSelected(true);
-
+                if (activoi == 1) {
+                    BotonActivoAl.setVisible(Boolean.TRUE);
+                    if (rs.getString("Id_Estado").equals("1")) {
+                        BotonActivoAl.setSelected(true);
+                    } 
+                } else {
+                    BotonActivoAl.setVisible(Boolean.FALSE);
                 }
-                Id_Proveedor = txtIdAlmacen.getText();
+                if (inactivoi == 1) {
+                    BotonInactivoAl.setVisible(Boolean.TRUE);
+                    if (rs.getString("Id_Estado").equals("2")) {
+                        BotonInactivoAl.setSelected(true);
+                           }
+                } else {
+                    BotonInactivoAl.setVisible(Boolean.FALSE);
+                }
+                
+                Id_Almacen = txtIdAlmacen.getText();
 
-                BotonActivoAl.setVisible(Boolean.TRUE);
-                BotonInactivoAl.setVisible(Boolean.TRUE);
+                //BotonActivoPro.setVisible(Boolean.TRUE);
+                //BotonInactivoPro.setVisible(Boolean.TRUE);
                 //id = txtId_Proveedor.getText();
                 Habilitar();
             }
+                        
+
+                   
         } catch (SQLException ex) {
             lo.LogBitacora("Error: No se pudo seleccionar el registro " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), almacen, tablaAl);
             JOptionPane.showMessageDialog(null, ex.toString());
@@ -658,10 +722,16 @@ public class Almacen extends javax.swing.JFrame {
     }//GEN-LAST:event_txtBuscarAlKeyTyped
 
     private void botonCancelarALMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_botonCancelarALMouseClicked
-        Limpiar();
-        Inhabillitar();
-        botonEditarAL.setEnabled(Boolean.FALSE);
-        botonGuardarAL.setEnabled(Boolean.FALSE);
+     if (botonCancelarAL.isEnabled()) {
+            // Limpiar();
+            //Inhabillitar();
+            botonCancelarAL.setEnabled(Boolean.FALSE);
+            botonCancelarAL.setEnabled(Boolean.FALSE);
+        } else {
+            JOptionPane.showMessageDialog(null, "Esta acción no se encuentra disponible para tu usuario", "ERROR", JOptionPane.ERROR_MESSAGE);
+            lo.LogUsuarios(almacen, "Boton Cancelar", userName);
+        }
+        
     }//GEN-LAST:event_botonCancelarALMouseClicked
 
     private void txtUbicacionFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtUbicacionFocusGained
@@ -721,12 +791,26 @@ public class Almacen extends javax.swing.JFrame {
     }//GEN-LAST:event_txtUbicacionFocusLost
 
     private void botonDetalleAlmacenMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_botonDetalleAlmacenMouseClicked
-        java.awt.EventQueue.invokeLater(new Runnable() {
+
+         if (habilitarroles1(19) == 19) {
+            DetalleAlmacen CL = new DetalleAlmacen();
+            {
+                CL.setVisible(true);
+                dispose();
+
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "Este usuario No tiene Acceso a esta pantalla", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            lo.LogUsuarios(almacen, "Boton Detalle Almacen", userName);
+            
+        }
+       /* java.awt.EventQueue.invokeLater(new Runnable() {
+           
             public void run() {
                 new DetalleAlmacen().setVisible(true);
             }
         });
-        this.dispose();
+        this.dispose();*/
     }//GEN-LAST:event_botonDetalleAlmacenMouseClicked
 
     private void txtCapOptFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtCapOptFocusGained
@@ -949,12 +1033,16 @@ public class Almacen extends javax.swing.JFrame {
             JasperPrint jp = JasperFillManager.fillReport(reporte, hm, con);
             JasperViewer.viewReport(jp, true);
             ReportView view = new ReportView(jp, false);
-            
+
             view.setVisible(true);
         } catch (JRException ex) {
             Logger.getLogger(Clientes.class.getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_reporteMouseClicked
+
+    private void txtCapMaximaActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtCapMaximaActionPerformed
+        // TODO add your handling code here:
+    }//GEN-LAST:event_txtCapMaximaActionPerformed
 
     /**
      * @param args the command line arguments
@@ -1141,6 +1229,7 @@ public class Almacen extends javax.swing.JFrame {
         } catch (SQLException ex) {
             Logger.getLogger(Clientes.class.getName()).log(Level.SEVERE, null, ex);
             lo.LogBitacora("Error: No se pudo buscar el registro " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), almacen, buscarD);
+            lo.LogUsuarios(almacen, "Buscar", userName);
         }
     }
 
@@ -1165,4 +1254,134 @@ public class Almacen extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, "Este campo no acepta caracteres especiales, no puede ser solo númerico", "Advertencia", JOptionPane.WARNING_MESSAGE);
         }
     }
+
+    public void habilitarroles() {
+        try {
+
+            PreparedStatement ps;
+            ResultSet rs;
+            Connection con = Conexion.getConexion();
+            ps = con.prepareStatement("Select PU.Agregar, PU.Guardar, PU.Cancelar, PU.Editar, PU.Activo, PU.Inactivo, PU.Reporte, PU.Anular, PU.CrearCompra, PU.Historicos, PU.Buscar\n"
+                    + "From PermisosUsuario AS PU\n"
+                    + "Inner Join Usuario as U on PU.IdUsuario=U.Id_Usuario\n"
+                    + "where PU.IdPermiso=? and U.Nombre=?");
+            ps.setInt(1,6);
+            ps.setString(2, usuario.getText());
+            rs = ps.executeQuery();
+            System.out.println(usuario.getText());
+
+            while (rs.next()) {
+                agregari = rs.getInt("Agregar");
+                guardari = rs.getInt("Guardar");
+                cancelari = rs.getInt("Cancelar");
+                editari = rs.getInt("Editar");
+                activoi = rs.getInt("Activo");
+                inactivoi = rs.getInt("Inactivo");
+                reportesi = rs.getInt("Reporte");
+                anulari = rs.getInt("Anular");
+                crearcomprai = rs.getInt("CrearCompra");
+                historicoi = rs.getInt("Historicos");
+                buscari = rs.getInt("Buscar");
+                System.out.print(agregari + " " + guardari + " " + cancelari);
+
+            }
+        } catch (SQLException ex) {
+            //lo.LogBitacora("Error: No se pudo seleccionar la tabla" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), proveedores, tablap);
+            JOptionPane.showMessageDialog(null, ex.toString());
+        }
+        if (agregari == 1) {
+            botonAgregarAL.setEnabled(Boolean.TRUE);
+        } else if (agregari == 0) {
+            botonAgregarAL.setEnabled(Boolean.FALSE);
+            botonAgregarAL.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/obstruido (1).png")));
+        }
+
+        if (guardari == 1) {
+            botonGuardarAL.setEnabled(Boolean.TRUE);
+        } else if (guardari == 0) {
+            botonGuardarAL.setEnabled(Boolean.FALSE);
+            botonGuardarAL.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/obstruido (1).png")));
+
+        }
+        if (editari == 1) {
+            botonEditarAL.setEnabled(Boolean.TRUE);
+        } else {
+            botonEditarAL.setEnabled(Boolean.FALSE);
+            botonEditarAL.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/obstruido (1).png")));
+        }
+
+        if (cancelari == 1) {
+            botonCancelarAL.setEnabled(Boolean.TRUE);
+
+        } else {
+            botonCancelarAL.setEnabled(Boolean.FALSE);
+            botonCancelarAL.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/obstruido (1).png")));
+        }
+        if (reportesi == 1) {
+            reporte.setVisible(Boolean.TRUE);
+
+        } else {
+            reporte.setVisible(Boolean.FALSE);
+            //jLabel2.setEnabled(Boolean.TRUE);
+        }
+        if (buscari == 1) {
+            txtBuscarAl.setEnabled(Boolean.TRUE);
+        } else {
+            txtBuscarAl.setEnabled(Boolean.FALSE);
+            txtBuscarAl.setText("NO DISPONIBLE");
+        }
+        /* if (anulari == 1) {
+            Anular.setSelected(Boolean.TRUE);
+        } else {
+            Anular.setSelected(Boolean.FALSE);
+        }*/
+        if (activoi == 1) {
+            //BotonActivoPro.setVisible(Boolean.TRUE);
+        } else {
+            BotonActivoAl.setVisible(Boolean.FALSE);
+        }
+        if (inactivoi == 1) {
+            //BotonInactivoPro.setVisible(Boolean.TRUE);
+        } else {
+            BotonInactivoAl.setVisible(Boolean.FALSE);
+        }
+        /*if (historicoi == 1) {
+            Historico.setSelected(Boolean.TRUE);
+        } else {
+            Historico.setSelected(Boolean.FALSE);
+        }
+        if (crearcomprai == 1) {
+            CrearCompra.setSelected(Boolean.TRUE);
+        } else {
+            CrearCompra.setSelected(Boolean.FALSE);
+        }*/
+    }
+    public int habilitarroles1(int numeroPermiso) {
+        int npermiso = 0;
+        try {
+
+            PreparedStatement ps;
+            ResultSet rs;
+            Connection con = Conexion.getConexion();
+            ps = con.prepareStatement("Select PU.IdPermiso\n"
+                    + "From PermisosUsuario AS PU\n"
+                    + "Inner Join Usuario as U on PU.IdUsuario=U.Id_Usuario\n"
+                    + "where PU.IdPermiso=? and U.Nombre=?");
+            ps.setInt(1, numeroPermiso);
+            ps.setString(2, usuario.getText());
+            rs = ps.executeQuery();
+            System.out.println(usuario.getText());
+
+            while (rs.next()) {
+                npermiso = rs.getInt("IdPermiso");
+
+            }
+        } catch (SQLException ex) {
+            //lo.LogBitacora("Error: No se pudo seleccionar la tabla" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), proveedores, tablap);
+            JOptionPane.showMessageDialog(null, ex.toString());
+        }
+        return npermiso;
+
+    }
+
 }

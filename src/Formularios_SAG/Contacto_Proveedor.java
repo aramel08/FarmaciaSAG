@@ -6,6 +6,7 @@
 package Formularios_SAG;
 
 import Conexion.Conexion;
+import static Formularios_SAG.Clientes.IdCliente;
 import static Formularios_SAG.Proveedores.Id_Proveedor;
 import Logs.log;
 import Reportes.ReportView;
@@ -43,12 +44,28 @@ public class Contacto_Proveedor extends javax.swing.JFrame {
     log lo = new log();
     String contactop = "ContactoProveedor";
 
+    public static String Id_ContactoProveedor = "0";
+    int agregari;
+    int guardari;
+    int editari;
+    int cancelari;
+    int reportesi;
+    int activoi;
+    int inactivoi;
+    int anulari;
+    int buscari;
+    int crearcomprai;
+    int historicoi;
+    String userName;
+
     public Contacto_Proveedor() {
         initComponents();
         usuario.setText(Login.txtUsuario.getText());
         cargarnombre();
+        habilitarroles();
         cargartabla();
         Inhabillitar();
+        userName = usuario.getText();
     }
 
     @Override
@@ -333,7 +350,7 @@ public class Contacto_Proveedor extends javax.swing.JFrame {
         });
         jScrollPane1.setViewportView(TablaContacto);
 
-        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(410, 250, 500, 240));
+        getContentPane().add(jScrollPane1, new org.netbeans.lib.awtextra.AbsoluteConstraints(380, 280, 500, 240));
 
         jLabel1.setFont(new java.awt.Font("Georgia", 0, 12)); // NOI18N
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/Pantalla contacto proveedor(1)(1).png"))); // NOI18N
@@ -354,9 +371,22 @@ public class Contacto_Proveedor extends javax.swing.JFrame {
     }//GEN-LAST:event_BotonRegresarConMouseClicked
 
     private void BotonAgregarConMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonAgregarConMouseClicked
-        Habilitar();
-        BotonGuardarCon.isEnabled();
-        BotonCancelarCon.isEnabled();
+        if (BotonAgregarCon.isEnabled()) {
+            Habilitar();
+            if (guardari == 1) {
+                BotonGuardarCon.isEnabled();
+                //BotonCancelarPro.isEnabled();   
+            }
+            if (cancelari == 1) {
+                //BotonGuardarPro.isEnabled();
+                BotonCancelarCon.isEnabled();
+            }
+        } else {
+
+            JOptionPane.showMessageDialog(null, "Esta acción no se encuentra disponible para tu usuario", "ERROR", JOptionPane.ERROR_MESSAGE);
+            lo.LogUsuarios(contactop, "Boton Agregar", userName);
+        }
+
 
     }//GEN-LAST:event_BotonAgregarConMouseClicked
 
@@ -365,86 +395,103 @@ public class Contacto_Proveedor extends javax.swing.JFrame {
     }//GEN-LAST:event_txtNombreProveedorActionPerformed
 
     private void BotonEditarConMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonEditarConMouseClicked
-        String editar = "BtnEditar";
-        if (txtNombreContacto.getText().equals("Ingrese Nombre Contacto") || txtTelefonoContacto.getText().equals("Ingrese Teléfono") || txtEmailContacto.getText().equals("Ingrese Email")) {
-            JOptionPane.showMessageDialog(null, "No se puede Guardar datos vacios");
-        } else {
-            int IdContacto = Integer.parseInt(txtIdContacto.getText());
-            String NombreContacto = txtNombreContacto.getText();
-            String Telefono = txtTelefonoContacto.getText();
-            String Email = txtEmailContacto.getText();
-
-            try {
-                Connection con = Conexion.getConexion();
-                PreparedStatement ps = con.prepareStatement("Update Contacto_Proveedor set Nombre_Contacto=?,Telefono=?,[E-mail]=? Where Id_Contacto=?");
-                ps.setString(1, NombreContacto);
-                ps.setString(2, Telefono);
-                ps.setString(3, Email);
-                ps.setInt(4, IdContacto);
-
-                ps.executeUpdate();
-                JOptionPane.showMessageDialog(null, "Registro Actualizado");
-
-                cargartabla();
-                Limpiar();
-                Inhabillitar();
-
-            } catch (SQLException ex) {
-                lo.LogBitacora("Error: No se pudo editar el dato " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), contactop, editar);
-                JOptionPane.showMessageDialog(null, ex.toString());
-            }
-        }
-    }//GEN-LAST:event_BotonEditarConMouseClicked
-
-    private void BotonCancelarConMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonCancelarConMouseClicked
-        Limpiar();
-        Inhabillitar();
-        BotonEditarCon.setEnabled(Boolean.FALSE);
-        BotonGuardarCon.setEnabled(Boolean.FALSE);
-
-    }//GEN-LAST:event_BotonCancelarConMouseClicked
-
-    private void BotonGuardarConMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonGuardarConMouseClicked
-        String guardar = "BtnGuardar";
-        if (txtNombreContacto.getText().equals("Ingrese Nombre Contacto") && txtTelefonoContacto.getText().equals("Ingrese Teléfono")
-                && txtEmailContacto.getText().equals("Ingrese Email")) {
-
-            JOptionPane.showMessageDialog(null, "Debes llenar todos los campos", "Advertencia", JOptionPane.WARNING_MESSAGE);
-        } else {
-            if (txtNombreContacto.getText().equals("Ingrese Nombre Contacto")) {
-                JOptionPane.showMessageDialog(null, "Debe ingresar un nombre", "Advertencia", JOptionPane.WARNING_MESSAGE);
-            } else if (txtTelefonoContacto.getText().equals("Ingrese Teléfono")) {
-                JOptionPane.showMessageDialog(null, "Debe ingresar un Teléfono", "Advertencia", JOptionPane.WARNING_MESSAGE);
-            } else if (txtEmailContacto.getText().equals("Ingrese Email")) {
-                JOptionPane.showMessageDialog(null, "Debe ingresar un Email", "Advertencia", JOptionPane.WARNING_MESSAGE);
-
+        if (editari == 1) {
+            String editar = "BtnEditar";
+            if (txtNombreContacto.getText().equals("Ingrese Nombre Contacto") || txtTelefonoContacto.getText().equals("Ingrese Teléfono") || txtEmailContacto.getText().equals("Ingrese Email")) {
+                JOptionPane.showMessageDialog(null, "No se puede Guardar datos vacios");
             } else {
-
-                String NombreCont = txtNombreContacto.getText();
+                int IdContacto = Integer.parseInt(txtIdContacto.getText());
+                String NombreContacto = txtNombreContacto.getText();
                 String Telefono = txtTelefonoContacto.getText();
                 String Email = txtEmailContacto.getText();
-                int Id_P = Integer.parseInt(txtIdProv.getText());
 
                 try {
                     Connection con = Conexion.getConexion();
-                    PreparedStatement ps = con.prepareStatement("Insert into Contacto_Proveedor (Id_ProveedorNombre_Contacto,Telefono,[E-mail],Id_Estado) VALUES(?,?,?,?,?)");
-                    ps.setString(2, NombreCont);
-                    ps.setString(3, Telefono);
-                    ps.setString(4, Email);
-                    ps.setInt(1, Id_P);
-                    ps.setInt(5, 1);
-                    ps.executeUpdate();
+                    PreparedStatement ps = con.prepareStatement("Update Contacto_Proveedor set Nombre_Contacto=?,Telefono=?,[E-mail]=? Where Id_Contacto=?");
+                    ps.setString(1, NombreContacto);
+                    ps.setString(2, Telefono);
+                    ps.setString(3, Email);
+                    ps.setInt(4, IdContacto);
 
-                    JOptionPane.showMessageDialog(null, "Registro guardado");
+                    ps.executeUpdate();
+                    JOptionPane.showMessageDialog(null, "Registro Actualizado");
+
                     cargartabla();
                     Limpiar();
                     Inhabillitar();
 
                 } catch (SQLException ex) {
-                    lo.LogBitacora("Error: No se pudo guardar el dato " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), contactop, guardar);
+                    lo.LogBitacora("Error: No se pudo editar el dato " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), contactop, editar);
                     JOptionPane.showMessageDialog(null, ex.toString());
                 }
             }
+        } else {
+
+            JOptionPane.showMessageDialog(null, "Esta acción no se encuentra disponible para tu usuario", "ERROR", JOptionPane.ERROR_MESSAGE);
+            lo.LogUsuarios(contactop, "Boton Editar", userName);
+        }
+
+    }//GEN-LAST:event_BotonEditarConMouseClicked
+
+    private void BotonCancelarConMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonCancelarConMouseClicked
+        if (BotonCancelarCon.isEnabled()) {
+            // Limpiar();
+            //Inhabillitar();
+            BotonCancelarCon.setEnabled(Boolean.FALSE);
+            BotonCancelarCon.setEnabled(Boolean.FALSE);
+        } else {
+            JOptionPane.showMessageDialog(null, "Esta acción no se encuentra disponible para tu usuario", "ERROR", JOptionPane.ERROR_MESSAGE);
+            lo.LogUsuarios(contactop, "Boton Cancelar", userName);
+        }
+    }//GEN-LAST:event_BotonCancelarConMouseClicked
+
+    private void BotonGuardarConMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonGuardarConMouseClicked
+        if (BotonGuardarCon.isEnabled()) {
+            String guardar = "BtnGuardar";
+            if (txtNombreContacto.getText().equals("Ingrese Nombre Contacto") && txtTelefonoContacto.getText().equals("Ingrese Teléfono")
+                    && txtEmailContacto.getText().equals("Ingrese Email")) {
+
+                JOptionPane.showMessageDialog(null, "Debes llenar todos los campos", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            } else {
+                if (txtNombreContacto.getText().equals("Ingrese Nombre Contacto")) {
+                    JOptionPane.showMessageDialog(null, "Debe ingresar un nombre", "Advertencia", JOptionPane.WARNING_MESSAGE);
+                } else if (txtTelefonoContacto.getText().equals("Ingrese Teléfono")) {
+                    JOptionPane.showMessageDialog(null, "Debe ingresar un Teléfono", "Advertencia", JOptionPane.WARNING_MESSAGE);
+                } else if (txtEmailContacto.getText().equals("Ingrese Email")) {
+                    JOptionPane.showMessageDialog(null, "Debe ingresar un Email", "Advertencia", JOptionPane.WARNING_MESSAGE);
+
+                } else {
+
+                    String NombreCont = txtNombreContacto.getText();
+                    String Telefono = txtTelefonoContacto.getText();
+                    String Email = txtEmailContacto.getText();
+                    int Id_P = Integer.parseInt(txtIdProv.getText());
+
+                    try {
+                        Connection con = Conexion.getConexion();
+                        PreparedStatement ps = con.prepareStatement("Insert into Contacto_Proveedor (Id_ProveedorNombre_Contacto,Telefono,[E-mail],Id_Estado) VALUES(?,?,?,?,?)");
+                        ps.setString(2, NombreCont);
+                        ps.setString(3, Telefono);
+                        ps.setString(4, Email);
+                        ps.setInt(1, Id_P);
+                        ps.setInt(5, 1);
+                        ps.executeUpdate();
+
+                        JOptionPane.showMessageDialog(null, "Registro guardado");
+                        cargartabla();
+                        Limpiar();
+                        Inhabillitar();
+
+                    } catch (SQLException ex) {
+                        lo.LogBitacora("Error: No se pudo guardar el dato " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), contactop, guardar);
+                        JOptionPane.showMessageDialog(null, ex.toString());
+                    }
+                }
+            }
+        } else {
+
+            JOptionPane.showMessageDialog(null, "Esta acción no se encuentra disponible para tu usuario", "ERROR", JOptionPane.ERROR_MESSAGE);
+            lo.LogUsuarios(contactop, "Boton Guardar", userName);
         }
     }//GEN-LAST:event_BotonGuardarConMouseClicked
 
@@ -473,20 +520,28 @@ public class Contacto_Proveedor extends javax.swing.JFrame {
                 txtTelefonoContacto.setText(rs.getString("Telefono"));
                 txtEmailContacto.setText(rs.getString("E-mail"));
 
-                if (rs.getString("Estado").equals("Activo")) {
-                    BotonActivoCont.setSelected(true);
-                } else if (rs.getString("Estado").equals("Inactivo")) {
-                    BotonInactivoCont.setSelected(true);
+                if (activoi == 1) {
+                    BotonActivoCont.setVisible(Boolean.TRUE);
+                    if (rs.getString("Id_Estado").equals("1")) {
+                        BotonActivoCont.setSelected(true);
+                    }
+                } else {
+                    BotonActivoCont.setVisible(Boolean.FALSE);
+                }
+                if (inactivoi == 1) {
+                    BotonInactivoCont.setVisible(Boolean.TRUE);
+                    if (rs.getString("Id_Estado").equals("2")) {
+                        BotonInactivoCont.setSelected(true);
 
+                    }
+                } else {
+                    BotonInactivoCont.setVisible(Boolean.FALSE);
                 }
 
-                BotonActivoCont.setVisible(Boolean.TRUE);
-                BotonInactivoCont.setVisible(Boolean.TRUE);
-                //id = txtId_Proveedor.getText();
-                Habilitar();
+                Id_ContactoProveedor = txtIdContacto.getText();
             }
         } catch (SQLException ex) {
-             lo.LogBitacora("Error: No se pudo seleccionar el registro" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), contactop, tablac);
+            lo.LogBitacora("Error: No se pudo seleccionar el registro" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), contactop, tablac);
             JOptionPane.showMessageDialog(null, ex.toString());
         }
     }//GEN-LAST:event_TablaContactoMouseClicked
@@ -926,4 +981,107 @@ public class Contacto_Proveedor extends javax.swing.JFrame {
         }
         return resultado;
     }
+
+    public void habilitarroles() {
+        try {
+
+            PreparedStatement ps;
+            ResultSet rs;
+            Connection con = Conexion.getConexion();
+            ps = con.prepareStatement("Select PU.Agregar, PU.Guardar, PU.Cancelar, PU.Editar, PU.Activo, PU.Inactivo, PU.Reporte, PU.Anular, PU.CrearCompra, PU.Historicos, PU.Buscar\n"
+                    + "From PermisosUsuario AS PU\n"
+                    + "Inner Join Usuario as U on PU.IdUsuario=U.Id_Usuario\n"
+                    + "where PU.IdPermiso=? and U.Nombre=?");
+            ps.setInt(1, 13);
+            ps.setString(2, usuario.getText());
+            rs = ps.executeQuery();
+            System.out.println(usuario.getText());
+
+            while (rs.next()) {
+                agregari = rs.getInt("Agregar");
+                guardari = rs.getInt("Guardar");
+                cancelari = rs.getInt("Cancelar");
+                editari = rs.getInt("Editar");
+                activoi = rs.getInt("Activo");
+                inactivoi = rs.getInt("Inactivo");
+                reportesi = rs.getInt("Reporte");
+                anulari = rs.getInt("Anular");
+                crearcomprai = rs.getInt("CrearCompra");
+                historicoi = rs.getInt("Historicos");
+                buscari = rs.getInt("Buscar");
+                System.out.print(agregari + " " + guardari + " " + cancelari);
+
+            }
+        } catch (SQLException ex) {
+            //lo.LogBitacora("Error: No se pudo seleccionar la tabla" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), proveedores, tablap);
+            JOptionPane.showMessageDialog(null, ex.toString());
+        }
+        if (agregari == 1) {
+            BotonAgregarCon.setEnabled(Boolean.TRUE);
+        } else if (agregari == 0) {
+            BotonAgregarCon.setEnabled(Boolean.FALSE);
+            BotonAgregarCon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/obstruido (1).png")));
+        }
+
+        if (guardari == 1) {
+            BotonGuardarCon.setEnabled(Boolean.TRUE);
+        } else if (guardari == 0) {
+            BotonGuardarCon.setEnabled(Boolean.FALSE);
+            BotonGuardarCon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/obstruido (1).png")));
+
+        }
+        if (editari == 1) {
+            BotonEditarCon.setEnabled(Boolean.TRUE);
+        } else {
+            BotonEditarCon.setEnabled(Boolean.FALSE);
+            BotonEditarCon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/obstruido (1).png")));
+        }
+
+        if (cancelari == 1) {
+            BotonCancelarCon.setEnabled(Boolean.TRUE);
+
+        } else {
+            BotonCancelarCon.setEnabled(Boolean.FALSE);
+            BotonCancelarCon.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/obstruido (1).png")));
+        }
+        if (reportesi == 1) {
+            reporte.setVisible(Boolean.TRUE);
+
+        } else {
+            reporte.setVisible(Boolean.FALSE);
+            //jLabel2.setEnabled(Boolean.TRUE);
+        }
+        if (buscari == 1) {
+            txtBuscarContacto.setEnabled(Boolean.TRUE);
+        } else {
+            txtBuscarContacto.setEnabled(Boolean.FALSE);
+            txtBuscarContacto.setText("NO DISPONIBLE");
+        }
+        /* if (anulari == 1) {
+            Anular.setSelected(Boolean.TRUE);
+        } else {
+            Anular.setSelected(Boolean.FALSE);
+        }*/
+        if (activoi == 1) {
+            //BotonActivoPro.setVisible(Boolean.TRUE);
+        } else {
+            BotonActivoCont.setVisible(Boolean.FALSE);
+        }
+        if (inactivoi == 1) {
+            //BotonInactivoPro.setVisible(Boolean.TRUE);
+        } else {
+            BotonInactivoCont.setVisible(Boolean.FALSE);
+        }
+        /*if (historicoi == 1) {
+            Historico.setSelected(Boolean.TRUE);
+        } else {
+            Historico.setSelected(Boolean.FALSE);
+        }
+        if (crearcomprai == 1) {
+            CrearCompra.setSelected(Boolean.TRUE);
+        } else {
+            CrearCompra.setSelected(Boolean.FALSE);
+        }*/
+    }
+
 }

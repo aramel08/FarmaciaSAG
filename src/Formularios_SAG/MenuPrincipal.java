@@ -5,16 +5,21 @@
  */
 package Formularios_SAG;
 
+import Conexion.Conexion;
 import Logs.log;
 import java.awt.Image;
 import java.awt.Toolkit;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import javax.swing.JOptionPane;
 
 /**
  *
  * @author Allisson Castro
  */
 public class MenuPrincipal extends javax.swing.JFrame {
-
 
     /**
      * Creates new form Menu_Principal
@@ -24,11 +29,12 @@ public class MenuPrincipal extends javax.swing.JFrame {
         Image retValue = Toolkit.getDefaultToolkit().getImage(ClassLoader.getSystemResource("componentes/LOGOSAG(2).png"));
         return retValue;
     }
+    int npermiso;
 
     public MenuPrincipal() {
         initComponents();
         usuario.setText(Login.txtUsuario.getText());
-        
+
     }
 
     /**
@@ -158,85 +164,139 @@ public class MenuPrincipal extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void BotonClienteMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonClienteMouseClicked
-        Clientes CL = new Clientes();
-        {
-            CL.setVisible(true);
-            dispose();
 
+        if (habilitarroles(1) == 1) {
+            Clientes CL = new Clientes();
+            {
+                CL.setVisible(true);
+                dispose();
+
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "Este usuario No tiene Acceso a esta pantalla", "Advertencia", JOptionPane.WARNING_MESSAGE);
         }
     }//GEN-LAST:event_BotonClienteMouseClicked
 
     private void BotonEmpleadoMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonEmpleadoMouseClicked
-        Empleados1 EM = new Empleados1();
-        {
-            EM.setVisible(true);
-            dispose();
+        if (habilitarroles(2) == 2) {
+            Empleados1 EM = new Empleados1();
+            {
+                EM.setVisible(true);
+                dispose();
 
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "Este usuario No tiene Acceso a esta pantalla", "Advertencia", JOptionPane.WARNING_MESSAGE);
         }
+
+
     }//GEN-LAST:event_BotonEmpleadoMouseClicked
 
     private void BotonProveedoresMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonProveedoresMouseClicked
-        Proveedores PR = new Proveedores();
-        {
-            PR.setVisible(true);
-            dispose();
+        if (habilitarroles(3) == 3) {
+            Proveedores PR = new Proveedores();
+            {
+                PR.setVisible(true);
+                dispose();
 
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "Este usuario No tiene Acceso a esta pantalla", "Advertencia", JOptionPane.WARNING_MESSAGE);
         }
+
     }//GEN-LAST:event_BotonProveedoresMouseClicked
 
     private void BotonMedicamentosMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonMedicamentosMouseClicked
-        Productos P = new Productos();
-        {
-            P.setVisible(true);
-            dispose();
+        if (habilitarroles(4) == 4) {
+            Productos P = new Productos();
+            {
+                P.setVisible(true);
+                dispose();
+
+            }
+
+        } else {
+            JOptionPane.showMessageDialog(null, "Este usuario No tiene Acceso a esta pantalla", "Advertencia", JOptionPane.WARNING_MESSAGE);
 
         }
+
     }//GEN-LAST:event_BotonMedicamentosMouseClicked
 
     private void BotonSucursalMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonSucursalMouseClicked
-        Sucursales SC = new Sucursales();
-        {
-            SC.setVisible(true);
-            dispose();
+        if (habilitarroles(5) == 5) {
+            Sucursales SC = new Sucursales();
+            {
+                SC.setVisible(true);
+                dispose();
+
+            }
+
+        } else {
+            JOptionPane.showMessageDialog(null, "Este usuario No tiene Acceso a esta pantalla", "Advertencia", JOptionPane.WARNING_MESSAGE);
 
         }
+
     }//GEN-LAST:event_BotonSucursalMouseClicked
 
     private void BotonAlmacenMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonAlmacenMouseClicked
-       Almacen OP = new Almacen();
-        {
-            OP.setVisible(true);
-            dispose();
+        if (habilitarroles(6) == 6) {
+            Almacen OP = new Almacen();
+            {
+                OP.setVisible(true);
+                dispose();
+            }
+
+        } else {
+            JOptionPane.showMessageDialog(null, "Este usuario No tiene Acceso a esta pantalla", "Advertencia", JOptionPane.WARNING_MESSAGE);
 
         }
+
     }//GEN-LAST:event_BotonAlmacenMouseClicked
 
     private void BotonComprasMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonComprasMouseClicked
-         RegistroCompras PC = new RegistroCompras();
-        {
-            PC.setVisible(true);
-            dispose();
+        if (habilitarroles(7) == 7) {
+            RegistroCompras PC = new RegistroCompras();
+            {
+                PC.setVisible(true);
+                dispose();
+            }
+
+        } else {
+            JOptionPane.showMessageDialog(null, "Este usuario No tiene Acceso a esta pantalla", "Advertencia", JOptionPane.WARNING_MESSAGE);
 
         }
+
+
     }//GEN-LAST:event_BotonComprasMouseClicked
 
     private void BotonFacturaMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonFacturaMouseClicked
-        RegistroVentas F = new RegistroVentas();
-        {
-            F.setVisible(true);
-            dispose();
+        if (habilitarroles(8) == 8) {
+            RegistroVentas F = new RegistroVentas();
+            {
+                F.setVisible(true);
+                dispose();
+            }
+
+        } else {
+            JOptionPane.showMessageDialog(null, "Este usuario No tiene Acceso a esta pantalla", "Advertencia", JOptionPane.WARNING_MESSAGE);
 
         }
+
+
     }//GEN-LAST:event_BotonFacturaMouseClicked
 
     private void BotonInventarioMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonInventarioMouseClicked
-        
-        Inventario I = new Inventario();
-        {
-            I.setVisible(true);
-            dispose();
+        if (habilitarroles(20) == 20) {
+            Inventario I = new Inventario();
+            {
+                I.setVisible(true);
+                dispose();
+                 }
+            }else {
+            JOptionPane.showMessageDialog(null, "Este usuario No tiene Acceso a esta pantalla", "Advertencia", JOptionPane.WARNING_MESSAGE);
 
-        }
+              }
+
     }//GEN-LAST:event_BotonInventarioMouseClicked
 
     private void BotonSalirMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonSalirMouseClicked
@@ -294,4 +354,32 @@ public class MenuPrincipal extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel usuario;
     // End of variables declaration//GEN-END:variables
+
+    public int habilitarroles(int numeroPermiso) {
+        try {
+
+            PreparedStatement ps;
+            ResultSet rs;
+            Connection con = Conexion.getConexion();
+            ps = con.prepareStatement("Select PU.IdPermiso\n"
+                    + "From PermisosUsuario AS PU\n"
+                    + "Inner Join Usuario as U on PU.IdUsuario=U.Id_Usuario\n"
+                    + "where PU.IdPermiso=? and U.Nombre=?");
+            ps.setInt(1, numeroPermiso);
+            ps.setString(2, usuario.getText());
+            rs = ps.executeQuery();
+            System.out.println(usuario.getText());
+
+            while (rs.next()) {
+                npermiso = rs.getInt("IdPermiso");
+
+            }
+        } catch (SQLException ex) {
+            //lo.LogBitacora("Error: No se pudo seleccionar la tabla" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), proveedores, tablap);
+            JOptionPane.showMessageDialog(null, ex.toString());
+        }
+        return npermiso;
+
+    }
+
 }

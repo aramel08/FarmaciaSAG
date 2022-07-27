@@ -8,6 +8,8 @@ package Formularios_SAG;
 import Conexion.Conexion;
 import Logs.log;
 import java.awt.Color;
+import java.awt.Image;
+import java.awt.Toolkit;
 import java.awt.event.KeyEvent;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -50,6 +52,19 @@ public class Factura extends javax.swing.JFrame {
     String Factura = "Factura";
     String[] titulos = {"ID", "Restricción", "Verificación"};
     String[] registros = new String[13];
+    int agregari;
+    int guardari;
+    int editari;
+    int cancelari;
+    int reportesi;
+    int activoi;
+    int inactivoi;
+    int anulari;
+    int buscari;
+    int crearcomprai;
+    int historicoi;
+    int eliminari;
+    String userName;
     boolean ColumnasEditables[] = {false, false, true};
     Class tipo[] = new Class[]{java.lang.Object.class, java.lang.Object.class, java.lang.Boolean.class};
     DefaultTableModel model = new DefaultTableModel() {
@@ -74,11 +89,23 @@ public class Factura extends javax.swing.JFrame {
     int edad = 0;
     public static String regresar = "";
     boolean agrega = false;
+    
+
+    @Override
+    public Image getIconImage() {
+        Image retValue = Toolkit.getDefaultToolkit().getImage(ClassLoader.getSystemResource("componentes/LOGOSAG(2).png"));
+        return retValue;
+        
+    }
 
     public Factura() {
         initComponents();
         Ncaja.setText(Operaciones2.caja);
         Usuario.setText(LoginVendedores.txtUsuarioV.getText());
+        userName = Usuario.getText();
+        habilitarroles();
+        
+      
 
         CargarTP ctp = new Factura.CargarTP();
         ComboTipoPago.setModel(ctp.getvalues());
@@ -160,6 +187,7 @@ public class Factura extends javax.swing.JFrame {
         jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setIconImage(getIconImage());
         setUndecorated(true);
         getContentPane().setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
         getContentPane().add(Fecha, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 200, 190, 30));
@@ -428,6 +456,12 @@ public class Factura extends javax.swing.JFrame {
             }
         });
         getContentPane().add(txtCantidadP, new org.netbeans.lib.awtextra.AbsoluteConstraints(40, 430, 180, 30));
+
+        BotonEliminarP.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                BotonEliminarPMouseClicked(evt);
+            }
+        });
         getContentPane().add(BotonEliminarP, new org.netbeans.lib.awtextra.AbsoluteConstraints(370, 330, 120, 30));
 
         Botongenerar.setEnabled(false);
@@ -668,7 +702,12 @@ public class Factura extends javax.swing.JFrame {
         getContentPane().add(Usuario, new org.netbeans.lib.awtextra.AbsoluteConstraints(820, 110, 130, 20));
 
         BotonEliminarF.setEnabled(false);
-        getContentPane().add(BotonEliminarF, new org.netbeans.lib.awtextra.AbsoluteConstraints(840, 250, 120, 40));
+        BotonEliminarF.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                BotonEliminarFMouseClicked(evt);
+            }
+        });
+        getContentPane().add(BotonEliminarF, new org.netbeans.lib.awtextra.AbsoluteConstraints(840, 250, 130, 40));
 
         BotonEditarF.setEnabled(false);
         BotonEditarF.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -1384,7 +1423,7 @@ public class Factura extends javax.swing.JFrame {
             txtCantidadP.setEnabled(Boolean.TRUE);
 
         } catch (SQLException ex) {
-            lo.LogBitacora("Error: No se cargar producto " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), Factura,combop);
+            lo.LogBitacora("Error: No se cargar producto " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), Factura, combop);
 
             JOptionPane.showMessageDialog(null, ex.toString());
         }
@@ -1426,47 +1465,59 @@ public class Factura extends javax.swing.JFrame {
     }//GEN-LAST:event_txtNumeroFacturaMousePressed
 
     private void BotonGuardarFMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonGuardarFMouseClicked
-        String Guardar = "Guardar";
-        if (ComboTipoPago.equals("Seleccione Tipo de Pago...")) {
-            JOptionPane.showMessageDialog(null, "Seleccione tipo de pago");
+        if (guardari == 1) {
+            if (BotonGuardarF.isEnabled()) {
+                String Guardar = "Guardar";
+                if (ComboTipoPago.equals("Seleccione Tipo de Pago...")) {
+                    JOptionPane.showMessageDialog(null, "Seleccione tipo de pago");
 
-        } else {
-            //int Numerofactura = Integer.parseInt(factura);
-            String Hora = txtHoraF.getText();
-            String Descuento = txtDescuento.getText();
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-            String FechaCom = sdf.format(Fecha.getDate());
-            //ComboTipoPago.getSelectedIndex()
-            try {
-                Connection con = Conexion.getConexion();
-                PreparedStatement ps = con.prepareStatement("Insert into Factura (Id_Cliente,Fecha_Factura,Hora, Num_Factura,Id_Empleado, Id_Tipo_Pago,Id_Parametro,Num_Tarjeta,montotarjeta) VALUES(?,?,?,?,?,?,?,?,?)");
-                ps.setInt(1, idcliente);
-                ps.setString(2, FechaCom);
-                ps.setString(3, Hora);
-                ps.setString(4, factura);
-                ps.setInt(5, Integer.parseInt(Operaciones2.Id_Empleado));
-                ps.setInt(6, ComboTipoPago.getSelectedIndex());
-                ps.setInt(7, idcai);
-                ps.setString(8, tarjeta);
-                ps.setString(10, String.valueOf(monto));
-                ps.executeUpdate();
+                } else {
+                    //int Numerofactura = Integer.parseInt(factura);
+                    String Hora = txtHoraF.getText();
+                    String Descuento = txtDescuento.getText();
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                    String FechaCom = sdf.format(Fecha.getDate());
+                    //ComboTipoPago.getSelectedIndex()
+                    try {
+                        Connection con = Conexion.getConexion();
+                        PreparedStatement ps = con.prepareStatement("Insert into Factura (Id_Cliente,Fecha_Factura,Hora, Num_Factura,Id_Empleado, Id_Tipo_Pago,Id_Parametro,Num_Tarjeta,montotarjeta) VALUES(?,?,?,?,?,?,?,?,?)");
+                        ps.setInt(1, idcliente);
+                        ps.setString(2, FechaCom);
+                        ps.setString(3, Hora);
+                        ps.setString(4, factura);
+                        ps.setInt(5, Integer.parseInt(Operaciones2.Id_Empleado));
+                        ps.setInt(6, ComboTipoPago.getSelectedIndex());
+                        ps.setInt(7, idcai);
+                        ps.setString(8, tarjeta);
+                        ps.setString(9, String.valueOf(monto));
+                        ps.executeUpdate();
 
-                JOptionPane.showMessageDialog(null, "Registro guardado");
-                //Inhabillitar();
-                txtNumeroFactura.setText(factura);
+                        JOptionPane.showMessageDialog(null, "Registro guardado");
+                        //Inhabillitar();
+                        txtNumeroFactura.setText(factura);
 
-                cargarFact();
-                ComboDescuentoF.setEnabled(Boolean.TRUE);
-                ComboProducto.setEnabled(Boolean.TRUE);
-                BotonAgregarP.setEnabled(Boolean.TRUE);
-                Botongenerar.setEnabled(Boolean.TRUE);
+                        cargarFact();
+                        ComboDescuentoF.setEnabled(Boolean.TRUE);
+                        ComboProducto.setEnabled(Boolean.TRUE);
+                        BotonAgregarP.setEnabled(Boolean.TRUE);
+                        Botongenerar.setEnabled(Boolean.TRUE);
 
-            } catch (SQLException ex) {
-                lo.LogBitacora("Error: No se pudo guardar la factura" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), Factura, Guardar);
+                    } catch (SQLException ex) {
+                        lo.LogBitacora("Error: No se pudo guardar la factura" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), Factura, Guardar);
 
-                JOptionPane.showMessageDialog(null, ex.toString());
+                        JOptionPane.showMessageDialog(null, ex.toString());
+                    }
+                }
+            } else {
+
+                JOptionPane.showMessageDialog(null, "Debe agregar al menos 1 producto", "ERROR", JOptionPane.ERROR_MESSAGE);
             }
+        } else {
+            JOptionPane.showMessageDialog(null, "Esta acción no se encuentra disponible para tu usuario", "ERROR", JOptionPane.ERROR_MESSAGE);
+            lo.LogUsuarios(Factura, "Boton Guardar", userName);
         }
+
+
     }//GEN-LAST:event_BotonGuardarFMouseClicked
 
     private void txtImpuestoMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txtImpuestoMouseClicked
@@ -1523,51 +1574,60 @@ public class Factura extends javax.swing.JFrame {
     }//GEN-LAST:event_txtCantidadPKeyReleased
 
     private void BotonAgregarPMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonAgregarPMouseClicked
-        String Agregar = "Agregar";
-        cargarFact();
-        if (agrega == true) {
+        if (BotonAgregarP.isEnabled()) {
+            String Agregar = "Agregar";
+            cargarFact();
+            if (agrega == true) {
 
-            if (ComboProducto.equals("Seleccione Tipo de Pago...")) {
-                JOptionPane.showMessageDialog(null, "Seleccione tipo de pago");
+                if (ComboProducto.equals("Seleccione Tipo de Pago...")) {
+                    JOptionPane.showMessageDialog(null, "Seleccione tipo de pago");
 
-            } else {
-                //int Numerofactura = Integer.parseInt(factura);
-                String Hora = txtHoraF.getText();
-                String Descuento = txtDescuentoP.getText();
-                String impuesto = txtImpuesto.getText();
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                String FechaCom = sdf.format(Fecha.getDate());
-                //ComboTipoPago.getSelectedIndex()
-                try {
-                    Connection con = Conexion.getConexion();
-                    PreparedStatement ps = con.prepareStatement("Insert into DetalleFactura (Id_Factura,Id_Producto,Id_Tipo_Impuesto,Precio_Unitario,Cantidad, Descuento,Impuesto) VALUES(?,?,?,?,?,?,?)");
-                    ps.setInt(1, Integer.parseInt(idFactura.getText()));
-                    ps.setInt(2, Integer.parseInt(txtIdProducto.getText()));
-                    ps.setInt(3, 1);
-                    ps.setString(4, txtPrecioUnitario.getText());
-                    ps.setDouble(5, Double.parseDouble(txtCantidadP.getText()));
-                    ps.setString(6, Descuento);
-                    ps.setString(7, impuesto);
-                    ps.executeUpdate();
+                } else {
+                    //int Numerofactura = Integer.parseInt(factura);
+                    String Hora = txtHoraF.getText();
+                    String Descuento = txtDescuentoP.getText();
+                    String impuesto = txtImpuesto.getText();
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                    String FechaCom = sdf.format(Fecha.getDate());
+                    //ComboTipoPago.getSelectedIndex()
+                    try {
+                        Connection con = Conexion.getConexion();
+                        PreparedStatement ps = con.prepareStatement("Insert into DetalleFactura (Id_Factura,Id_Producto,Id_Tipo_Impuesto,Precio_Unitario,Cantidad, Descuento,Impuesto) VALUES(?,?,?,?,?,?,?)");
+                        ps.setInt(1, Integer.parseInt(idFactura.getText()));
+                        ps.setInt(2, Integer.parseInt(txtIdProducto.getText()));
+                        ps.setInt(3, 1);
+                        ps.setString(4, txtPrecioUnitario.getText());
+                        ps.setDouble(5, Double.parseDouble(txtCantidadP.getText()));
+                        ps.setString(6, Descuento);
+                        ps.setString(7, impuesto);
+                        ps.executeUpdate();
 
-                    JOptionPane.showMessageDialog(null, "Registro guardado");
+                        JOptionPane.showMessageDialog(null, "Registro guardado");
 
-                    // txtNumeroFactura.setText(factura);
-                    CARGARtp();
-                    ComboDescuentoF.setEnabled(Boolean.TRUE);
-                    ComboTipoPago.setEnabled(Boolean.TRUE);
-                    BotonGuardarF.setEnabled(Boolean.TRUE);
+                        // txtNumeroFactura.setText(factura);
+                        CARGARtp();
+                        ComboDescuentoF.setEnabled(Boolean.TRUE);
+                        ComboTipoPago.setEnabled(Boolean.TRUE);
 
-                    ObtenerTotales();
+                        if (guardari == 1) {
+                            BotonGuardarF.setEnabled(Boolean.TRUE);
+                        }
 
-                } catch (SQLException ex) {
-                    lo.LogBitacora("Error: No se pudo agregar datos" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), Factura, Agregar);
+                        ObtenerTotales();
 
-                    JOptionPane.showMessageDialog(null, ex.toString());
+                    } catch (SQLException ex) {
+                        lo.LogBitacora("Error: No se pudo agregar datos" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), Factura, Agregar);
+
+                        JOptionPane.showMessageDialog(null, ex.toString());
+                    }
                 }
+            } else if (agrega == false) {
+                JOptionPane.showMessageDialog(null, "Este producto no está disponible para venta sin receta médica");
             }
-        } else if (agrega == false) {
-            JOptionPane.showMessageDialog(null, "Este producto no está disponible para venta sin receta médica");
+        } else {
+
+            JOptionPane.showMessageDialog(null, "Esta acción no se encuentra disponible para tu usuario", "ERROR", JOptionPane.ERROR_MESSAGE);
+             lo.LogUsuarios(Factura, "Boton Agregar", userName);
         }
     }//GEN-LAST:event_BotonAgregarPMouseClicked
 
@@ -1769,31 +1829,35 @@ public class Factura extends javax.swing.JFrame {
     }//GEN-LAST:event_ComboTipoPagoMouseClicked
 
     private void BotonGuardarFMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonGuardarFMousePressed
-        if (BotonGuardarF.isEnabled() == false) {
+        /*if (BotonGuardarF.isEnabled() == false) {
 
             JOptionPane.showMessageDialog(null, "Debes guardar al menos un detalle", "Advertencia", JOptionPane.WARNING_MESSAGE);
 
-        }
+        }*/
     }//GEN-LAST:event_BotonGuardarFMousePressed
 
     private void BotonEditarFMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonEditarFMouseClicked
-        String bE = "BtnE";
-        try {
-            Connection con = Conexion.getConexion();
-            PreparedStatement ps = con.prepareStatement("Update Factura set Id_Cliente=?, Id_Tipo_Pago=?, Num_Tarjeta=?, montotarjeta=? where Id_Factura=?");
-            ps.setInt(1, idcliente);
-            ps.setInt(2, ComboTipoPago.getSelectedIndex());
-            ps.setString(3, tarjeta);
-            ps.setString(4, String.valueOf(monto));
-            ps.setInt(5, Integer.parseInt(idFactura.getText()));
-            ps.executeUpdate();
-            JOptionPane.showMessageDialog(null, "Registro Actualizado");
+        if (BotonEditarF.isEnabled()) {
+            String bE = "BtnE";
+            try {
+                Connection con = Conexion.getConexion();
+                PreparedStatement ps = con.prepareStatement("Update Factura set Id_Cliente=?, Id_Tipo_Pago=?, Num_Tarjeta=?, montotarjeta=? where Id_Factura=?");
+                ps.setInt(1, idcliente);
+                ps.setInt(2, ComboTipoPago.getSelectedIndex());
+                ps.setString(3, tarjeta);
+                ps.setString(4, String.valueOf(monto));
+                ps.setInt(5, Integer.parseInt(idFactura.getText()));
+                ps.executeUpdate();
+                JOptionPane.showMessageDialog(null, "Registro Actualizado");
 
-        } catch (SQLException ex) {
-            lo.LogBitacora("Error: No se pudo editar" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), Factura, bE);
-            JOptionPane.showMessageDialog(null, ex.toString());
+            } catch (SQLException ex) {
+                lo.LogBitacora("Error: No se pudo editar" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), Factura, bE);
+                JOptionPane.showMessageDialog(null, ex.toString());
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "Esta acción no se encuentra disponible para tu usuario", "ERROR", JOptionPane.ERROR_MESSAGE);
+             lo.LogUsuarios(Factura, "Boton Editar", userName);
         }
-
     }//GEN-LAST:event_BotonEditarFMouseClicked
 
     private void txtISVPActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtISVPActionPerformed
@@ -1801,14 +1865,55 @@ public class Factura extends javax.swing.JFrame {
     }//GEN-LAST:event_txtISVPActionPerformed
 
     private void BotongenerarMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotongenerarMouseClicked
-        ReporteFactura RP = new ReporteFactura();
-        {
-            RP.setVisible(true);
-            //dispose();
+        if (reportesi == 1) {
+            ReporteFactura RP = new ReporteFactura();
+            {
+                RP.setVisible(true);
+                //dispose();
 
+            }
+        }else{
+            JOptionPane.showMessageDialog(null, "Esta acción no se encuentra disponible para tu usuario", "ERROR", JOptionPane.ERROR_MESSAGE);
+             lo.LogUsuarios(Factura, "Boton Generar Factura", userName);
         }
 
+
     }//GEN-LAST:event_BotongenerarMouseClicked
+
+    private void BotonEliminarFMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonEliminarFMouseClicked
+        if (BotonEliminarF.isEnabled()) {
+            // Limpiar();
+            //Inhabillitar();
+            BotonEliminarF.setEnabled(Boolean.FALSE);
+            BotonEliminarF.setEnabled(Boolean.FALSE);
+        } else {
+            JOptionPane.showMessageDialog(null, "Esta acción no se encuentra disponible para tu usuario", "ERROR", JOptionPane.ERROR_MESSAGE);
+        }
+    }//GEN-LAST:event_BotonEliminarFMouseClicked
+
+    private void BotonEliminarPMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonEliminarPMouseClicked
+//      if(BotonEliminarP.isEnabled()) {
+//            String eliminar = "BtnEliminar";
+//            int id_Detalle = Integer.parseInt(txtIdDetalle.getText());
+//            try {
+//                ResultSet rs;
+//                Connection con = Conexion.getConexion();
+//                PreparedStatement ps = con.prepareStatement("Delete Detalle_Compra where Id_Detalle_Compra=?");
+//                ps.setInt(1, id_Detalle);
+//                rs = ps.executeQuery();
+//                JOptionPane.showMessageDialog(null, "Registro Eliminado");
+//                cargartabla();
+//            } catch (SQLException ex) {
+//                lo.LogBitacora("Error: No se pudo eliminar los datos" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), comprasp, eliminar);
+//                JOptionPane.showMessageDialog(null, ex.toString());
+//            }
+//        } else {
+//
+//            JOptionPane.showMessageDialog(null, "Esta acción no se encuentra disponible para tu usuario", "ERROR", JOptionPane.ERROR_MESSAGE);
+               lo.LogUsuarios(Factura, "Boton Eliminar", userName);
+//        }
+
+    }//GEN-LAST:event_BotonEliminarPMouseClicked
 
     /**
      * @param args the command line arguments
@@ -1929,7 +2034,7 @@ public class Factura extends javax.swing.JFrame {
     }
 
     public void ObtenerIdProd() {
-        String obtnp ="Obtener Producto";
+        String obtnp = "Obtener Producto";
         String Nombre = ComboProducto.getSelectedItem().toString();
         try {
             ResultSet rs;
@@ -1943,13 +2048,13 @@ public class Factura extends javax.swing.JFrame {
             }
 
         } catch (SQLException ex) {
-             lo.LogBitacora("Error: No se pudo obtener el id del producto" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), factura,obtnp );
+            lo.LogBitacora("Error: No se pudo obtener el id del producto" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), factura, obtnp);
             JOptionPane.showMessageDialog(null, ex.toString());
         }
     }
 
     public void ObtenerIdDesc() {
-        String obtd ="obtenerDescuento";
+        String obtd = "obtenerDescuento";
         String Nombre = ComboDescuentoF.getSelectedItem().toString();
         try {
             ResultSet rs;
@@ -1968,7 +2073,7 @@ public class Factura extends javax.swing.JFrame {
             }
 
         } catch (SQLException ex) {
-             lo.LogBitacora("Error: No se pudo obtener  el descuento" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), factura,obtd );
+            lo.LogBitacora("Error: No se pudo obtener  el descuento" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), factura, obtd);
             JOptionPane.showMessageDialog(null, ex.toString());
         }
     }
@@ -2014,7 +2119,7 @@ public class Factura extends javax.swing.JFrame {
                 con.close();
                 rs.close();
             } catch (Exception e) {
-                lo.LogBitacora("Error: No se cargar producto" + "Excepción: " + e + ". Origen: " + this.getClass().getSimpleName(),factura,cargarpro);
+                lo.LogBitacora("Error: No se cargar producto" + "Excepción: " + e + ". Origen: " + this.getClass().getSimpleName(), factura, cargarpro);
 
                 System.out.println(e);
             }
@@ -2030,7 +2135,7 @@ public class Factura extends javax.swing.JFrame {
         ResultSetMetaData rsmd;
         int columnas;
         int id = Integer.parseInt(idFactura.getText());
-        String cargartp="CargarTP";
+        String cargartp = "CargarTP";
         try {
             Connection con = Conexion.getConexion();
             ps = con.prepareStatement("Select DF.Id_Detalle_Factura, F.Num_Factura, P.Nombre_Producto,DF.Precio_Unitario,DF.Cantidad,DF.Impuesto,DF.Descuento\n"
@@ -2053,7 +2158,7 @@ public class Factura extends javax.swing.JFrame {
             }
 
         } catch (SQLException ex) {
-          lo.LogBitacora("Error: No se pudo cargar " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(),factura, cargartp);
+            lo.LogBitacora("Error: No se pudo cargar " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), factura, cargartp);
 
             JOptionPane.showMessageDialog(null, ex.toString());
         }
@@ -2288,4 +2393,101 @@ public class Factura extends javax.swing.JFrame {
         return bandera;
     }
 
+    public void habilitarroles() {
+        try {
+
+            PreparedStatement ps;
+            ResultSet rs;
+            Connection con = Conexion.getConexion();
+            ps = con.prepareStatement("Select PU.Agregar, PU.Guardar, PU.Cancelar, PU.Editar, PU.Activo, PU.Inactivo, PU.Reporte, PU.Anular, PU.CrearCompra, PU.Historicos, PU.Buscar, PU.Eliminar, PU.Aprobar\n"
+                    + "From PermisosUsuario AS PU\n"
+                    + "Inner Join Usuario as U on PU.IdUsuario=U.Id_Usuario\n"
+                    + "where PU.IdPermiso=? and U.Nombre=?");
+            ps.setInt(1, 17);
+            ps.setString(2, Usuario.getText());
+            rs = ps.executeQuery();
+            System.out.println(Usuario.getText());
+
+            while (rs.next()) {
+                agregari = rs.getInt("Agregar");
+                guardari = rs.getInt("Guardar");
+                cancelari = rs.getInt("Cancelar");
+                editari = rs.getInt("Editar");
+                activoi = rs.getInt("Activo");
+                inactivoi = rs.getInt("Inactivo");
+                reportesi = rs.getInt("Reporte");
+                anulari = rs.getInt("Anular");
+                crearcomprai = rs.getInt("CrearCompra");
+                historicoi = rs.getInt("Historicos");
+                buscari = rs.getInt("Buscar");
+                eliminari = rs.getInt("Eliminar");
+                System.out.print(agregari + " " + guardari + " " + cancelari);
+
+            }
+        } catch (SQLException ex) {
+            //lo.LogBitacora("Error: No se pudo seleccionar la tabla" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), proveedores, tablap);
+            JOptionPane.showMessageDialog(null, ex.toString());
+        }
+        if (agregari == 1) {
+            BotonAgregarP.setEnabled(Boolean.TRUE);
+        } else if (agregari == 0) {
+            BotonAgregarP.setEnabled(Boolean.FALSE);
+            BotonAgregarP.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/obstruido (1).png")));
+        }
+
+        if (guardari == 1) {
+            //BotonGuardarF.setEnabled(Boolean.TRUE);
+        } else if (guardari == 0) {
+            BotonGuardarF.setEnabled(Boolean.FALSE);
+            BotonGuardarF.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/obstruido (1).png")));
+
+        }
+        if (editari == 1) {
+            BotonEditarF.setEnabled(Boolean.TRUE);
+        } else {
+            BotonEditarF.setEnabled(Boolean.FALSE);
+            BotonEditarF.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/obstruido (1).png")));
+        }
+
+        if (cancelari == 1) {
+            BotonEliminarF.setEnabled(Boolean.TRUE);
+
+        } else {
+            BotonEliminarF.setEnabled(Boolean.FALSE);
+            BotonEliminarF.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/obstruido (1).png")));
+
+        }
+        if (buscari == 1) {
+            buscarC.setEnabled(Boolean.TRUE);
+        } else {
+            buscarC.setEnabled(Boolean.FALSE);
+            buscarC.setText("NO DISPONIBLE");
+        }
+
+        if (eliminari == 1) {
+            BotonEliminarP.setEnabled(Boolean.TRUE);
+        } else {
+            BotonEliminarP.setEnabled(Boolean.FALSE);
+            BotonEliminarP.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/obstruido (1).png")));
+
+        }
+        if (reportesi == 1) {
+            //Botongenerar.setEnabled(Boolean.TRUE);
+        } else {
+            Botongenerar.setEnabled(Boolean.FALSE);
+            Botongenerar.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/obstruido (1).png")));
+
+        }
+
+        /*if (historicoi == 1) {
+            Historico.setSelected(Boolean.TRUE);
+        } else {
+            Historico.setSelected(Boolean.FALSE);
+        }
+        if (crearcomprai == 1) {
+            CrearCompra.setSelected(Boolean.TRUE);
+        } else {
+            CrearCompra.setSelected(Boolean.FALSE);
+        }*/
+    }
 }

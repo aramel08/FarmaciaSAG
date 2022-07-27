@@ -37,6 +37,7 @@ public class PantallaPrincipal extends javax.swing.JFrame {
         BotonAdmin = new javax.swing.JLabel();
         BotonVendedor = new javax.swing.JLabel();
         BotonSalir = new javax.swing.JLabel();
+        txtCandado = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -68,7 +69,14 @@ public class PantallaPrincipal extends javax.swing.JFrame {
         });
         getContentPane().add(BotonSalir, new org.netbeans.lib.awtextra.AbsoluteConstraints(900, 30, 90, 40));
 
-        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/PantallaP (2).png"))); // NOI18N
+        txtCandado.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                txtCandadoMouseClicked(evt);
+            }
+        });
+        getContentPane().add(txtCandado, new org.netbeans.lib.awtextra.AbsoluteConstraints(31, 16, 60, 70));
+
+        jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/Vendedor.png"))); // NOI18N
         getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 0, 1030, -1));
 
         pack();
@@ -90,6 +98,12 @@ public class PantallaPrincipal extends javax.swing.JFrame {
         la.setVisible(true);
         this.dispose();
     }//GEN-LAST:event_BotonAdminMouseClicked
+
+    private void txtCandadoMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txtCandadoMouseClicked
+        LoginRolesPrivilegios Roles = new LoginRolesPrivilegios();
+        Roles.setVisible(true);
+        this.dispose();
+    }//GEN-LAST:event_txtCandadoMouseClicked
 
     /**
      * @param args the command line arguments
@@ -134,5 +148,6 @@ public class PantallaPrincipal extends javax.swing.JFrame {
     private javax.swing.JLabel BotonSalir;
     private javax.swing.JLabel BotonVendedor;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel txtCandado;
     // End of variables declaration//GEN-END:variables
 }

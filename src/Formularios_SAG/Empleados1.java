@@ -6,6 +6,8 @@
 package Formularios_SAG;
 
 import Conexion.Conexion;
+import static Formularios_SAG.Contacto_Proveedor.Id_ContactoProveedor;
+import static Formularios_SAG.Operaciones2.Id_Empleado;
 import Logs.log;
 import Reportes.ReportView;
 import encriptacion.Encode;
@@ -45,6 +47,19 @@ public class Empleados1 extends javax.swing.JFrame {
 
     log lo = new log();
     String empleados = "Empleados";
+    public static String IdEmpleados = "0";
+    int agregari;
+    int guardari;
+    int editari;
+    int cancelari;
+    int reportesi;
+    int activoi;
+    int inactivoi;
+    int anulari;
+    int buscari;
+    int crearcomprai;
+    int historicoi;
+    String userName;
 
     /**
      * Creates new form Empleados
@@ -55,11 +70,13 @@ public class Empleados1 extends javax.swing.JFrame {
         return retValue;
 
     }
-
-    public static String Id_emp = "0";
+    int npermiso;
 
     public Empleados1() {
         initComponents();
+        usuario.setText(Login.txtUsuario.getText());
+        habilitarroles();
+        userName = usuario.getText();
         txtIdS.setVisible(Boolean.FALSE);
         txtIdE.setVisible(Boolean.FALSE);
         //txt.setVisible(Boolean.FALSE);
@@ -89,7 +106,7 @@ public class Empleados1 extends javax.swing.JFrame {
         AutoCompleteDecorator.decorate(ComboDocumento);
         AutoCompleteDecorator.decorate(ComboGeneroE);
         AutoCompleteDecorator.decorate(ComboSucursalE);
-         usuario.setText(Login.txtUsuario.getText());
+        usuario.setText(Login.txtUsuario.getText());
 
     }
 
@@ -215,7 +232,7 @@ public class Empleados1 extends javax.swing.JFrame {
                 BotonAgregarEMouseClicked(evt);
             }
         });
-        getContentPane().add(BotonAgregarE, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 140, 140, 50));
+        getContentPane().add(BotonAgregarE, new org.netbeans.lib.awtextra.AbsoluteConstraints(300, 140, 120, 40));
 
         txtBuscarE.setFont(new java.awt.Font("Georgia", 0, 14)); // NOI18N
         txtBuscarE.setForeground(new java.awt.Color(153, 153, 153));
@@ -282,7 +299,7 @@ public class Empleados1 extends javax.swing.JFrame {
                 BotonCancelarEMouseClicked(evt);
             }
         });
-        getContentPane().add(BotonCancelarE, new org.netbeans.lib.awtextra.AbsoluteConstraints(760, 140, 130, 50));
+        getContentPane().add(BotonCancelarE, new org.netbeans.lib.awtextra.AbsoluteConstraints(760, 140, 130, 40));
 
         BotonGuardarE.setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
         BotonGuardarE.addMouseListener(new java.awt.event.MouseAdapter() {
@@ -573,7 +590,7 @@ public class Empleados1 extends javax.swing.JFrame {
         Conexion cc = new Conexion();
         Connection cn = cc.getConexion();
         boolean resultado = true;
-        String sql = " " + columna + " FROM " + tabla + " WHERE " + columna + " = '" + campo + "'";
+        String sql = "select " + columna + " FROM " + tabla + " WHERE " + columna + " = '" + campo + "'";
 
         try {
             Statement st = cn.createStatement();
@@ -626,122 +643,135 @@ public class Empleados1 extends javax.swing.JFrame {
     Encode encode = new Encode();
     String secretKey = "farmaciaSAG";
     private void BotonGuardarEMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonGuardarEMouseClicked
-        String Guardar = "BtnGuardar";
-        ObtenerIdS();
-        if (txtNombreE.getText().equals("Ingrese Nombre y Apellido")) {
-            JOptionPane.showMessageDialog(null, "NIngrese Nombre y Apellido");
-        } else if (ComboDocumento.getSelectedIndex() == 0) {
-            JOptionPane.showMessageDialog(null, "Seleccione Tipo de Documento");
-        } else if (txtDocumentoE.getText().equals("Ingrese Número de Documento")) {
-            JOptionPane.showMessageDialog(null, "Ingrese Documento");
-        } else if (ComboGeneroE.getSelectedIndex() == 0) {
-            JOptionPane.showMessageDialog(null, "Seleccione Genero");
-        } else if (ComboCargoE.getSelectedIndex() == 0) {
-            JOptionPane.showMessageDialog(null, "Seleccione Cargo");
-        } else if (txtEmail.getText().equals("Email")) {
-            JOptionPane.showMessageDialog(null, "Ingrese Email");
-        } else if (txtSueldoE.getText().equals("Sueldo")) {
-            JOptionPane.showMessageDialog(null, "Ingrese Sueldo");
-        } else if (txtUsuarioE.getText().equals("Usuario")) {
-            JOptionPane.showMessageDialog(null, "Ingrese Usuario");
-        } else if (ComboSucursalE.getSelectedIndex() == 0) {
-            JOptionPane.showMessageDialog(null, "Seleccione Sucursal");
-        } else if (txtCotrasenaE.getText().equals("")) {
-            JOptionPane.showMessageDialog(null, "Ingrese Contraseña");
-        } else {
-            String Nombre = txtNombreE.getText();
-            int tpDoc = ComboDocumento.getSelectedIndex();
-            String Documento = txtDocumentoE.getText();
-            int Genero = ComboGeneroE.getSelectedIndex();
-            int Sucursal = Integer.parseInt(txtIdS.getText());
-            int cargo = ComboCargoE.getSelectedIndex();
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-            String FechaF = sdf.format(txtFechaNac.getDate());
-            String sueldo = txtSueldoE.getText();
-            String contraseña = txtCotrasenaE.getText();
-            String usuario = txtUsuarioE.getText();
-            String email = txtEmail.getText();
+        if (BotonGuardarE.isEnabled()) {
+            String Guardar = "BtnGuardar";
+            ObtenerIdS();
+            if (txtNombreE.getText().equals("Ingrese Nombre y Apellido")) {
+                JOptionPane.showMessageDialog(null, "NIngrese Nombre y Apellido");
+            } else if (ComboDocumento.getSelectedIndex() == 0) {
+                JOptionPane.showMessageDialog(null, "Seleccione Tipo de Documento");
+            } else if (txtDocumentoE.getText().equals("Ingrese Número de Documento")) {
+                JOptionPane.showMessageDialog(null, "Ingrese Documento");
+            } else if (ComboGeneroE.getSelectedIndex() == 0) {
+                JOptionPane.showMessageDialog(null, "Seleccione Genero");
+            } else if (ComboCargoE.getSelectedIndex() == 0) {
+                JOptionPane.showMessageDialog(null, "Seleccione Cargo");
+            } else if (txtEmail.getText().equals("Email")) {
+                JOptionPane.showMessageDialog(null, "Ingrese Email");
+            } else if (txtSueldoE.getText().equals("Sueldo")) {
+                JOptionPane.showMessageDialog(null, "Ingrese Sueldo");
+            } else if (txtUsuarioE.getText().equals("Usuario")) {
+                JOptionPane.showMessageDialog(null, "Ingrese Usuario");
+            } else if (ComboSucursalE.getSelectedIndex() == 0) {
+                JOptionPane.showMessageDialog(null, "Seleccione Sucursal");
+            } else if (txtCotrasenaE.getText().equals("")) {
+                JOptionPane.showMessageDialog(null, "Ingrese Contraseña");
+            } else {
+                String Nombre = txtNombreE.getText();
+                int tpDoc = ComboDocumento.getSelectedIndex();
+                String Documento = txtDocumentoE.getText();
+                int Genero = ComboGeneroE.getSelectedIndex();
+                int Sucursal = Integer.parseInt(txtIdS.getText());
+                int cargo = ComboCargoE.getSelectedIndex();
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                String FechaF = sdf.format(txtFechaNac.getDate());
+                String sueldo = txtSueldoE.getText();
+                String contraseña = txtCotrasenaE.getText();
+                String usuario = txtUsuarioE.getText();
+                String email = txtEmail.getText();
 
-            try {
-                Connection con = Conexion.getConexion();
-                PreparedStatement ps = con.prepareStatement("Insert into Empleados NombreE, Id_Tipo_Documento, Documento, Id_Genero, FechaNac, [E-mail], Id_Cargo, Id_Sucursal, Sueldo, Id_Estado, Contrasena, Usuario,Intentos) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)");
-                ps.setString(1, Nombre);
-                ps.setInt(2, tpDoc);
-                ps.setString(3, Documento);
-                ps.setInt(4, Genero);
-                ps.setString(5, FechaF);
-                ps.setString(6, email);
-                ps.setInt(7, cargo);
-                ps.setInt(8, Sucursal);
-                ps.setString(9, sueldo);
-                ps.setInt(10, 1);
-                ps.setString(11, encode.ecnode(secretKey, contraseña));
-                ps.setString(12, usuario);
-                ps.setInt(13, 3);
-                ps.executeUpdate();
+                try {
+                    Connection con = Conexion.getConexion();
+                    PreparedStatement ps = con.prepareStatement("Insert into Empleados NombreE, Id_Tipo_Documento, Documento, Id_Genero, FechaNac, [E-mail], Id_Cargo, Id_Sucursal, Sueldo, Id_Estado, Contrasena, Usuario,Intentos) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?)");
+                    ps.setString(1, Nombre);
+                    ps.setInt(2, tpDoc);
+                    ps.setString(3, Documento);
+                    ps.setInt(4, Genero);
+                    ps.setString(5, FechaF);
+                    ps.setString(6, email);
+                    ps.setInt(7, cargo);
+                    ps.setInt(8, Sucursal);
+                    ps.setString(9, sueldo);
+                    ps.setInt(10, 1);
+                    ps.setString(11, encode.ecnode(secretKey, contraseña));
+                    ps.setString(12, usuario);
+                    ps.setInt(13, 3);
+                    ps.executeUpdate();
 
-                JOptionPane.showMessageDialog(null, "Registro guardado");
-                cargartabla();
-                Limpiar();
-                Inhabillitar();
+                    JOptionPane.showMessageDialog(null, "Registro guardado");
+                    cargartabla();
+                    Limpiar();
+                    Inhabillitar();
 
-            } catch (SQLException ex) {
-                lo.LogBitacora("Error: No se pudo guardar datos" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), empleados, Guardar);
+                } catch (SQLException ex) {
+                    lo.LogBitacora("Error: No se pudo guardar datos" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), empleados, Guardar);
 
-                JOptionPane.showMessageDialog(null, ex.toString());
+                    JOptionPane.showMessageDialog(null, ex.toString());
+                }
             }
+        } else {
+
+            JOptionPane.showMessageDialog(null, "Esta acción no se encuentra disponible para tu usuario", "ERROR", JOptionPane.ERROR_MESSAGE);
+            lo.LogUsuarios(empleados, "Boton Guardar", userName);
 
         }
     }//GEN-LAST:event_BotonGuardarEMouseClicked
 
     private void BotonEditarEMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonEditarEMouseClicked
-        String Editar = "BtnEditar";
-        ObtenerIdS();
-        if (txtNombreE.getText().equals("Ingrese Nombre y Apellido") || txtDocumentoE.getText().equals("Ingrese Número de Documento") || ComboSucursalE.equals("Seleccione Sucursal...") || ComboDocumento.equals("Seleccione Tipo Documento...") || ComboGeneroE.equals("Seleccione Genero...")) {
-            JOptionPane.showMessageDialog(null, "No se puede Guardar datos vacios");
-        } else {
-            String Nombre = txtNombreE.getText();
-            int tpDoc = ComboDocumento.getSelectedIndex();
-            String Documento = txtDocumentoE.getText();
-            int Genero = ComboGeneroE.getSelectedIndex();
-            int Sucursal = Integer.parseInt(txtIdS.getText());
-            int cargo = ComboCargoE.getSelectedIndex();
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-            String FechaF = sdf.format(txtFechaNac.getDate());
-            String sueldo = txtSueldoE.getText();
-            String contraseña = txtCotrasenaE.getText();
-            String usuario = txtUsuarioE.getText();
-            String email = txtEmail.getText();
+        if (BotonEditarE.isEnabled()) {
+            String Editar = "BtnEditar";
+            ObtenerIdS();
+            if (txtNombreE.getText().equals("Ingrese Nombre y Apellido") || txtDocumentoE.getText().equals("Ingrese Número de Documento") || ComboSucursalE.equals("Seleccione Sucursal...") || ComboDocumento.equals("Seleccione Tipo Documento...") || ComboGeneroE.equals("Seleccione Genero...")) {
+                JOptionPane.showMessageDialog(null, "No se puede Guardar datos vacios");
+            } else {
+                String Nombre = txtNombreE.getText();
+                int tpDoc = ComboDocumento.getSelectedIndex();
+                String Documento = txtDocumentoE.getText();
+                int Genero = ComboGeneroE.getSelectedIndex();
+                int Sucursal = Integer.parseInt(txtIdS.getText());
+                int cargo = ComboCargoE.getSelectedIndex();
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                String FechaF = sdf.format(txtFechaNac.getDate());
+                String sueldo = txtSueldoE.getText();
+                String contraseña = txtCotrasenaE.getText();
+                String usuario = txtUsuarioE.getText();
+                String email = txtEmail.getText();
 
-            try {
-                Connection con = Conexion.getConexion();
-                PreparedStatement ps = con.prepareStatement("Update Empleados set NombreE=?, Id_Genero=?,Documento=?,Id_Sucursal=?,Id_Tipo_Documento=?, Id_Cargo=?, Sueldo=?,FechaNac=?, Intentos=?,Contrasena=?,Usuario=?,[E-mail]=?  Where  Id_Empleado=?");
-                ps.setString(1, Nombre);
-                ps.setInt(2, Genero);
-                ps.setString(3, Documento);
-                ps.setInt(4, Sucursal);
-                ps.setInt(5, tpDoc);
-                ps.setInt(6, cargo);
-                ps.setString(7, sueldo);
-                ps.setString(8, FechaF);
-                ps.setString(10, encode.ecnode(secretKey, contraseña));
-                ps.setString(11, usuario);
-                ps.setInt(9, 3);
-                ps.setString(12, email);
-                ps.setInt(13, Integer.parseInt(txtIdE.getText()));
-                ps.executeUpdate();
-                JOptionPane.showMessageDialog(null, "Registro Actualizado");
-                cargartabla();
-                BotonActivoE.setVisible(Boolean.FALSE);
-                BotonInactivoE.setVisible(Boolean.FALSE);
-                Limpiar();
-                Inhabillitar();
+                try {
+                    Connection con = Conexion.getConexion();
+                    PreparedStatement ps = con.prepareStatement("Update Empleados set NombreE=?, Id_Genero=?,Documento=?,Id_Sucursal=?,Id_Tipo_Documento=?, Id_Cargo=?, Sueldo=?,FechaNac=?, Intentos=?,Contrasena=?,Usuario=?,[E-mail]=?  Where  Id_Empleado=?");
+                    ps.setString(1, Nombre);
+                    ps.setInt(2, Genero);
+                    ps.setString(3, Documento);
+                    ps.setInt(4, Sucursal);
+                    ps.setInt(5, tpDoc);
+                    ps.setInt(6, cargo);
+                    ps.setString(7, sueldo);
+                    ps.setString(8, FechaF);
+                    ps.setString(10, encode.ecnode(secretKey, contraseña));
+                    ps.setString(11, usuario);
+                    ps.setInt(9, 3);
+                    ps.setString(12, email);
+                    ps.setInt(13, Integer.parseInt(txtIdE.getText()));
+                    ps.executeUpdate();
+                    JOptionPane.showMessageDialog(null, "Registro Actualizado");
+                    cargartabla();
+                    BotonActivoE.setVisible(Boolean.FALSE);
+                    BotonInactivoE.setVisible(Boolean.FALSE);
+                    Limpiar();
+                    Inhabillitar();
 
-            } catch (SQLException ex) {
-              lo.LogBitacora("Error: No se pudo editar datos " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(),empleados,Editar);
+                } catch (SQLException ex) {
+                    lo.LogBitacora("Error: No se pudo editar datos " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), empleados, Editar);
 
-                JOptionPane.showMessageDialog(null, ex.toString());
+                    JOptionPane.showMessageDialog(null, ex.toString());
+                }
+
             }
+        } else {
+
+            JOptionPane.showMessageDialog(null, "Esta acción no se encuentra disponible para tu usuario", "ERROR", JOptionPane.ERROR_MESSAGE);
+            lo.LogUsuarios(empleados, "Boton Editar", userName);
 
         }
     }//GEN-LAST:event_BotonEditarEMouseClicked
@@ -828,7 +858,7 @@ public class Empleados1 extends javax.swing.JFrame {
     }//GEN-LAST:event_txtDocumentoEKeyTyped
 
     void buscarData(String valor) {
-        String Buscar="BuscarDatos";
+        String Buscar = "BuscarDatos";
         String[] titulos = {"ID", "Nombre Completo", "Tipo Documento", "Documento", "Genero", "Fecha Nacimiento", "Correo", "Cargo", "Sucursal", "Sueldo", "Estado", "Contraseña", "Usuario", "Intentos"};
         String[] registros = new String[14];
         String sql = "Select E.Id_Empleado, E.NombreE, TD.TDocumento, E.Documento , G.Genero, E.FechaNac,C.Cargo, E.[E-mail],E.Sueldo,  S.Nombre,  ES.Estado, E.Usuario, E.Contrasena \n"
@@ -870,7 +900,7 @@ public class Empleados1 extends javax.swing.JFrame {
             TablaEmpleado.setModel(model);
             // anchoColumnas();
         } catch (SQLException ex) {
-           lo.LogBitacora("Error: No se pudo buscar el registro " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), empleados,Buscar);
+            lo.LogBitacora("Error: No se pudo buscar el registro " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), empleados, Buscar);
 
             Logger.getLogger(Clientes.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -878,14 +908,14 @@ public class Empleados1 extends javax.swing.JFrame {
 
 
     private void TablaEmpleadoMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_TablaEmpleadoMouseClicked
-        String Tabla="Tabla Empleados";
+        String Tabla = "Tabla Empleados";
         try {
             int fila = TablaEmpleado.getSelectedRow();
             int id = Integer.parseInt(TablaEmpleado.getValueAt(fila, 0).toString());
             PreparedStatement ps;
             ResultSet rs;
             Connection con = Conexion.getConexion();
-            ps = con.prepareStatement("Select E.NombreE, TD.TDocumento,E.Documento,E.FechaNac,G.Genero, S.Nombre,C.Cargo,E.Sueldo, ES.Estado\n"
+            ps = con.prepareStatement("Select E.NombreE, TD.TDocumento,E.Documento,E.FechaNac,G.Genero, S.Nombre,C.Cargo,E.Sueldo, ES.Id_Estado\n"
                     + "From Empleados as E\n"
                     + "INNER JOIN Tipo_Documento AS TD ON E.Id_Tipo_Documento = TD.Id_Documento\n"
                     + "INNER JOIN Genero AS G ON E.Id_Genero = G.Id_Genero\n"
@@ -908,19 +938,30 @@ public class Empleados1 extends javax.swing.JFrame {
                 txtSueldoE.setText(rs.getString("Sueldo"));
                 txtFechaNac.setDate(rs.getDate("FechaNac"));
 
-                if (rs.getString("Estado").equals("Activo")) {
-                    BotonActivoE.setSelected(true);
-                } else if (rs.getString("Estado").equals("Inactivo")) {
-                    BotonInactivoE.setSelected(true);
+                if (activoi == 1) {
+                    BotonActivoE.setVisible(Boolean.TRUE);
+                    if (rs.getString("Id_Estado").equals("1")) {
+                        BotonActivoE.setSelected(true);
+                    }
+                } else {
+                    BotonActivoE.setVisible(Boolean.FALSE);
                 }
+                if (inactivoi == 1) {
+                    BotonInactivoE.setVisible(Boolean.TRUE);
+                    if (rs.getString("Id_Estado").equals("2")) {
+                        BotonInactivoE.setSelected(true);
+
+                    }
+                } else {
+                    BotonInactivoE.setVisible(Boolean.FALSE);
+                }
+
+                Id_Empleado = txtIdE.getText();
+
             }
 
-            BotonActivoE.setVisible(Boolean.TRUE);
-            BotonInactivoE.setVisible(Boolean.TRUE);
-            Id_emp = txtIdE.getText();
-            Habillitar();
         } catch (SQLException ex) {
-            lo.LogBitacora("Error: No se pudo cargar tabla " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), empleados,Tabla);
+            lo.LogBitacora("Error: No se pudo cargar tabla " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), empleados, Tabla);
 
             JOptionPane.showMessageDialog(null, ex.toString());
         }
@@ -932,13 +973,34 @@ public class Empleados1 extends javax.swing.JFrame {
     }//GEN-LAST:event_jLabel1MouseClicked
 
     private void BotonAgregarEMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonAgregarEMouseClicked
-        // TODO add your handling code here:
-        Habillitar();
+        if (BotonAgregarE.isEnabled()) {
+            Habillitar();
+            if (guardari == 1) {
+                BotonGuardarE.isEnabled();
+                //BotonCancelarPro.isEnabled();   
+            }
+            if (cancelari == 1) {
+                //BotonGuardarPro.isEnabled();
+                BotonCancelarE.isEnabled();
+            }
+        } else {
+
+            JOptionPane.showMessageDialog(null, "Esta acción no se encuentra disponible para tu usuario", "ERROR", JOptionPane.ERROR_MESSAGE);
+            lo.LogUsuarios(empleados, "Boton Agregar", userName);
+        }
+
     }//GEN-LAST:event_BotonAgregarEMouseClicked
 
     private void BotonCancelarEMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonCancelarEMouseClicked
-        Limpiar();
-        Inhabillitar();
+        if (BotonCancelarE.isEnabled()) {
+            // Limpiar();
+            //Inhabillitar();
+            BotonCancelarE.setEnabled(Boolean.FALSE);
+            BotonCancelarE.setEnabled(Boolean.FALSE);
+        } else {
+            JOptionPane.showMessageDialog(null, "Esta acción no se encuentra disponible para tu usuario", "ERROR", JOptionPane.ERROR_MESSAGE);
+            lo.LogUsuarios(empleados, "Boton Cancelar", userName);
+        }
     }//GEN-LAST:event_BotonCancelarEMouseClicked
 
     private void txtNombreEFocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_txtNombreEFocusGained
@@ -987,24 +1049,39 @@ public class Empleados1 extends javax.swing.JFrame {
     }//GEN-LAST:event_txtBuscarEFocusLost
 
     private void BotonCargoHistoricoEMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonCargoHistoricoEMouseClicked
-        CargoHistorico CH = new CargoHistorico();
-        {
-            CH.setVisible(true);
-            dispose();
+        if (habilitarr(10) == 10) {
+            CargoHistorico CH = new CargoHistorico();
+            {
+                CH.setVisible(true);
+                dispose();
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "Este usuario No tiene Acceso a esta pantalla", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            lo.LogUsuarios(empleados, "Boton Cargo Historico", userName);
+
         }
     }//GEN-LAST:event_BotonCargoHistoricoEMouseClicked
 
     private void BotonSueldoHistoricoEMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonSueldoHistoricoEMouseClicked
-        SueldoHistorico SH = new SueldoHistorico();
-        {
-            SH.setVisible(true);
-            dispose();
+        if (habilitarr(9) == 9) {
+            SueldoHistorico SH = new SueldoHistorico();
+            {
+                SH.setVisible(true);
+                dispose();
+
+            }
+
+        } else {
+            JOptionPane.showMessageDialog(null, "Este usuario No tiene Acceso a esta pantalla", "Advertencia", JOptionPane.WARNING_MESSAGE);
+            lo.LogUsuarios(empleados, "Boton Sueldo Historico", userName);
+
         }
+
 
     }//GEN-LAST:event_BotonSueldoHistoricoEMouseClicked
 
     private void BotonInactivoEActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BotonInactivoEActionPerformed
-        String Inactivo ="Inactivo";
+        String Inactivo = "Inactivo";
         int IdEmpleado = Integer.parseInt(txtIdE.getText());
 
         try {
@@ -1021,7 +1098,7 @@ public class Empleados1 extends javax.swing.JFrame {
             Inhabillitar();
 
         } catch (SQLException ex) {
-           lo.LogBitacora("Error: No se pudo actualizar el estado " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), empleados,Inactivo);
+            lo.LogBitacora("Error: No se pudo actualizar el estado " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), empleados, Inactivo);
 
             JOptionPane.showMessageDialog(null, ex.toString());
         }
@@ -1029,7 +1106,7 @@ public class Empleados1 extends javax.swing.JFrame {
     }//GEN-LAST:event_BotonInactivoEActionPerformed
 
     private void BotonActivoEActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BotonActivoEActionPerformed
-        String activo="Activo";
+        String activo = "Activo";
         int IdEmpleado = Integer.parseInt(txtIdE.getText());
         String Estado = "Activo";
         try {
@@ -1046,7 +1123,7 @@ public class Empleados1 extends javax.swing.JFrame {
             Inhabillitar();
 
         } catch (SQLException ex) {
-        lo.LogBitacora("Error: No se pudo actualizar el estado " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), empleados,activo);
+            lo.LogBitacora("Error: No se pudo actualizar el estado " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), empleados, activo);
 
             JOptionPane.showMessageDialog(null, ex.toString());
         }
@@ -1075,7 +1152,7 @@ public class Empleados1 extends javax.swing.JFrame {
     }//GEN-LAST:event_txtSueldoEFocusLost
 
     private void BotonActivoEMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonActivoEMouseClicked
-        String BActivo= "btnActivo";
+        String BActivo = "btnActivo";
         int IdEmpleado = Integer.parseInt(txtIdE.getText());
         try {
             Connection con = Conexion.getConexion();
@@ -1091,14 +1168,14 @@ public class Empleados1 extends javax.swing.JFrame {
             Inhabillitar();
 
         } catch (SQLException ex) {
-          lo.LogBitacora("Error: No se pudo actualizar el estado " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), empleados,BActivo);
+            lo.LogBitacora("Error: No se pudo actualizar el estado " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), empleados, BActivo);
 
             JOptionPane.showMessageDialog(null, ex.toString());
         }
     }//GEN-LAST:event_BotonActivoEMouseClicked
 
     private void BotonActivoEMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonActivoEMousePressed
-        String Activo ="BtnActivo";
+        String Activo = "BtnActivo";
         int IdEmpleado = Integer.parseInt(txtIdE.getText());
         try {
             Connection con = Conexion.getConexion();
@@ -1114,7 +1191,7 @@ public class Empleados1 extends javax.swing.JFrame {
             Inhabillitar();
 
         } catch (SQLException ex) {
-       lo.LogBitacora("Error: No se pudo actualizar el estado " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), empleados,Activo);
+            lo.LogBitacora("Error: No se pudo actualizar el estado " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), empleados, Activo);
 
             JOptionPane.showMessageDialog(null, ex.toString());
         }
@@ -1254,8 +1331,10 @@ public class Empleados1 extends javax.swing.JFrame {
             JasperViewer.viewReport(jp, true);
             ReportView view = new ReportView(jp, false);
             view.setVisible(true);
+
         } catch (JRException ex) {
-            Logger.getLogger(Clientes.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(Clientes.class
+                    .getName()).log(Level.SEVERE, null, ex);
         }
     }//GEN-LAST:event_reporteMouseClicked
 
@@ -1339,7 +1418,7 @@ public class Empleados1 extends javax.swing.JFrame {
     // End of variables declaration//GEN-END:variables
 
     private void cargartabla() {
-        String Cargar="Cargar Tabla";
+        String Cargar = "Cargar Tabla";
         DefaultTableModel modeloTabla = (DefaultTableModel) TablaEmpleado.getModel();
         modeloTabla.setRowCount(0);
 
@@ -1356,8 +1435,7 @@ public class Empleados1 extends javax.swing.JFrame {
                     + "INNER JOIN Genero AS G ON E.Id_Genero = G.Id_Genero\n"
                     + "INNER JOIN Sucursal AS S ON E.Id_Sucursal = S.Id_Sucursal\n"
                     + "INNER JOIN Cargo AS C ON E.Id_Cargo = C.Id_Cargo\n"
-                    + 
-                    "INNER JOIN Estado AS ES ON E.Id_Estado = ES.Id_Estado\n"
+                    + "INNER JOIN Estado AS ES ON E.Id_Estado = ES.Id_Estado\n"
                     + "ORDER BY E.Id_Empleado");
             rs = ps.executeQuery();
             rsmd = rs.getMetaData();
@@ -1372,7 +1450,7 @@ public class Empleados1 extends javax.swing.JFrame {
             }
 
         } catch (SQLException ex) {
-            lo.LogBitacora("Error: No se pudo cargar la tabla " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), empleados,Cargar);
+            lo.LogBitacora("Error: No se pudo cargar la tabla " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), empleados, Cargar);
 
             JOptionPane.showMessageDialog(null, ex.toString());
         }
@@ -1447,7 +1525,7 @@ public class Empleados1 extends javax.swing.JFrame {
     public class Cargarg {
 
         public DefaultComboBoxModel getvalues() {
-        String Cargarg="Cargar Genero";
+            String Cargarg = "Cargar Genero";
             DefaultComboBoxModel modelo = new DefaultComboBoxModel();
             try {
                 Connection con = Conexion.getConexion();
@@ -1461,7 +1539,7 @@ public class Empleados1 extends javax.swing.JFrame {
                 con.close();
                 rs.close();
             } catch (Exception e) {
-             lo.LogBitacora("Error: No se pudo cargar " + "Excepción: " + e + ". Origen: " + this.getClass().getSimpleName(),empleados,Cargarg);
+                lo.LogBitacora("Error: No se pudo cargar " + "Excepción: " + e + ". Origen: " + this.getClass().getSimpleName(), empleados, Cargarg);
 
                 System.out.println(e);
             }
@@ -1472,7 +1550,7 @@ public class Empleados1 extends javax.swing.JFrame {
     public class CargarSucursal {
 
         public DefaultComboBoxModel getvalues() {
-             String CargarS="Cargar Sucursal";
+            String CargarS = "Cargar Sucursal";
             DefaultComboBoxModel modelo = new DefaultComboBoxModel();
             try {
                 Connection con = Conexion.getConexion();
@@ -1486,7 +1564,7 @@ public class Empleados1 extends javax.swing.JFrame {
                 con.close();
                 rs.close();
             } catch (Exception e) {
-           lo.LogBitacora("Error: No se pudo cargar sucursal " + "Excepción: " + e + ". Origen: " + this.getClass().getSimpleName(),empleados,CargarS);
+                lo.LogBitacora("Error: No se pudo cargar sucursal " + "Excepción: " + e + ". Origen: " + this.getClass().getSimpleName(), empleados, CargarS);
 
                 System.out.println(e);
             }
@@ -1497,7 +1575,7 @@ public class Empleados1 extends javax.swing.JFrame {
     public class CargarCargo {
 
         public DefaultComboBoxModel getvalues() {
-          String CargarC="Cargar Cargo";
+            String CargarC = "Cargar Cargo";
             DefaultComboBoxModel modelo = new DefaultComboBoxModel();
             try {
                 Connection con = Conexion.getConexion();
@@ -1511,7 +1589,7 @@ public class Empleados1 extends javax.swing.JFrame {
                 con.close();
                 rs.close();
             } catch (Exception e) {
-               lo.LogBitacora("Error: No se pudo cargar el cargo  " + "Excepción: " + e + ". Origen: " + this.getClass().getSimpleName(), empleados,CargarC);
+                lo.LogBitacora("Error: No se pudo cargar el cargo  " + "Excepción: " + e + ". Origen: " + this.getClass().getSimpleName(), empleados, CargarC);
 
                 System.out.println(e);
             }
@@ -1522,7 +1600,7 @@ public class Empleados1 extends javax.swing.JFrame {
     public class CargarTDocumento {
 
         public DefaultComboBoxModel getvalues() {
-        String CargarD="CargarID";
+            String CargarD = "CargarID";
             DefaultComboBoxModel modelo = new DefaultComboBoxModel();
             try {
                 Connection con = Conexion.getConexion();
@@ -1536,7 +1614,7 @@ public class Empleados1 extends javax.swing.JFrame {
                 con.close();
                 rs.close();
             } catch (Exception e) {
-             lo.LogBitacora("Error: No se pudo cargar documento " + "Excepción: " + e + ". Origen: " + this.getClass().getSimpleName(), empleados,CargarD);
+                lo.LogBitacora("Error: No se pudo cargar documento " + "Excepción: " + e + ". Origen: " + this.getClass().getSimpleName(), empleados, CargarD);
 
                 System.out.println(e);
             }
@@ -1545,7 +1623,7 @@ public class Empleados1 extends javax.swing.JFrame {
     }
 
     public void ObtenerIdS() {
-        String ObtenerID="OBTENER";
+        String ObtenerID = "OBTENER";
         String Nombre = ComboSucursalE.getSelectedItem().toString();
         try {
             ResultSet rs;
@@ -1559,9 +1637,139 @@ public class Empleados1 extends javax.swing.JFrame {
             }
 
         } catch (SQLException ex) {
-            lo.LogBitacora("Error: No se pudo obtener ID " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), empleados,ObtenerID);
+            lo.LogBitacora("Error: No se pudo obtener ID " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), empleados, ObtenerID);
 
             JOptionPane.showMessageDialog(null, ex.toString());
         }
     }
+
+    private void habilitarroles() {
+        try {
+
+            PreparedStatement ps;
+            ResultSet rs;
+            Connection con = Conexion.getConexion();
+            ps = con.prepareStatement("Select PU.Agregar, PU.Guardar, PU.Cancelar, PU.Editar, PU.Activo, PU.Inactivo, PU.Reporte, PU.Anular, PU.CrearCompra, PU.Historicos, PU.Buscar\n"
+                    + "From PermisosUsuario AS PU\n"
+                    + "Inner Join Usuario as U on PU.IdUsuario=U.Id_Usuario\n"
+                    + "where PU.IdPermiso=? and U.Nombre=?");
+            ps.setInt(1, 2);
+            ps.setString(2, usuario.getText());
+            rs = ps.executeQuery();
+            System.out.println(usuario.getText());
+
+            while (rs.next()) {
+                agregari = rs.getInt("Agregar");
+                guardari = rs.getInt("Guardar");
+                cancelari = rs.getInt("Cancelar");
+                editari = rs.getInt("Editar");
+                activoi = rs.getInt("Activo");
+                inactivoi = rs.getInt("Inactivo");
+                reportesi = rs.getInt("Reporte");
+                anulari = rs.getInt("Anular");
+                crearcomprai = rs.getInt("CrearCompra");
+                historicoi = rs.getInt("Historicos");
+                buscari = rs.getInt("Buscar");
+                System.out.print(agregari + " " + guardari + " " + cancelari);
+
+            }
+        } catch (SQLException ex) {
+            //lo.LogBitacora("Error: No se pudo seleccionar la tabla" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), proveedores, tablap);
+            JOptionPane.showMessageDialog(null, ex.toString());
+        }
+        if (agregari == 1) {
+            BotonAgregarE.setEnabled(Boolean.TRUE);
+        } else if (agregari == 0) {
+            BotonAgregarE.setEnabled(Boolean.FALSE);
+            BotonAgregarE.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/obstruido (1).png")));
+        }
+
+        if (guardari == 1) {
+            BotonGuardarE.setEnabled(Boolean.TRUE);
+        } else if (guardari == 0) {
+            BotonGuardarE.setEnabled(Boolean.FALSE);
+            BotonGuardarE.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/obstruido (1).png")));
+
+        }
+        if (editari == 1) {
+            BotonEditarE.setEnabled(Boolean.TRUE);
+        } else {
+            BotonEditarE.setEnabled(Boolean.FALSE);
+            BotonEditarE.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/obstruido (1).png")));
+        }
+
+        if (cancelari == 1) {
+            BotonCancelarE.setEnabled(Boolean.TRUE);
+
+        } else {
+            BotonCancelarE.setEnabled(Boolean.FALSE);
+            BotonCancelarE.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/obstruido (1).png")));
+        }
+        if (reportesi == 1) {
+            reporte.setVisible(Boolean.TRUE);
+
+        } else {
+            reporte.setVisible(Boolean.FALSE);
+            //jLabel2.setEnabled(Boolean.TRUE);
+        }
+        if (buscari == 1) {
+            txtBuscarE.setEnabled(Boolean.TRUE);
+        } else {
+            txtBuscarE.setEnabled(Boolean.FALSE);
+            txtBuscarE.setText("NO DISPONIBLE");
+        }
+        /* if (anulari == 1) {
+            Anular.setSelected(Boolean.TRUE);
+        } else {
+            Anular.setSelected(Boolean.FALSE);
+        }*/
+        if (activoi == 1) {
+            //BotonActivoPro.setVisible(Boolean.TRUE);
+        } else {
+            BotonActivoE.setVisible(Boolean.FALSE);
+        }
+        if (inactivoi == 1) {
+            //BotonInactivoPro.setVisible(Boolean.TRUE);
+        } else {
+            BotonInactivoE.setVisible(Boolean.FALSE);
+        }
+        /*if (historicoi == 1) {
+            Historico.setSelected(Boolean.TRUE);
+        } else {
+            Historico.setSelected(Boolean.FALSE);
+        }
+        if (crearcomprai == 1) {
+            CrearCompra.setSelected(Boolean.TRUE);
+        } else {
+            CrearCompra.setSelected(Boolean.FALSE);
+        }*/
+    }
+
+    public int habilitarr(int numeroPermiso) {
+        try {
+
+            PreparedStatement ps;
+            ResultSet rs;
+            Connection con = Conexion.getConexion();
+            ps = con.prepareStatement("Select PU.IdPermiso\n"
+                    + "From PermisosUsuario AS PU\n"
+                    + "Inner Join Usuario as U on PU.IdUsuario=U.Id_Usuario\n"
+                    + "where PU.IdPermiso=? and U.Nombre=?");
+            ps.setInt(1, numeroPermiso);
+            ps.setString(2, usuario.getText());
+            rs = ps.executeQuery();
+            System.out.println(usuario.getText());
+
+            while (rs.next()) {
+                npermiso = rs.getInt("IdPermiso");
+
+            }
+        } catch (SQLException ex) {
+            //lo.LogBitacora("Error: No se pudo seleccionar la tabla" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), proveedores, tablap);
+            JOptionPane.showMessageDialog(null, ex.toString());
+        }
+        return npermiso;
+
+    }
+
 }

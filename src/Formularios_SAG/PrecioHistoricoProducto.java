@@ -39,6 +39,19 @@ public class PrecioHistoricoProducto extends javax.swing.JFrame {
     log lo = new log();
     String PrecioHistorico = "Precio historico producto";
 
+    public static String Id_Preciop = "0";
+    int agregari;
+    int guardari;
+    int editari;
+    int cancelari;
+    int reportesi;
+    int activoi;
+    int inactivoi;
+    int anulari;
+    int buscari;
+    int crearcomprai;
+    int historicoi;
+
     /**
      * Creates new form PrecioHistoricoProducto
      */
@@ -57,6 +70,8 @@ public class PrecioHistoricoProducto extends javax.swing.JFrame {
         Date max = cal.getTime();
         Date min = new Date();
         txtId_Pro.setVisible(Boolean.FALSE);
+        usuario.setText(Login.txtUsuario.getText());
+        habilitarroles();
         //FechaFinalPH.setSelectableDateRange(min, max);
     }
 
@@ -307,39 +322,39 @@ public class PrecioHistoricoProducto extends javax.swing.JFrame {
     }//GEN-LAST:event_txtBuscarPHFocusLost
 
     private void reporteMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_reporteMouseClicked
-       net.sf.jasperreports.engine.JasperReport reporte;
-          HashMap hm = new HashMap();
-          hm.put("Usuario", usuario.getText());
-          hm.put("idp", Integer.valueOf(txtId_Pro.getText()));
-        
-        if(Integer.parseInt(txtId_Pro.getText())==0){
-         JOptionPane.showMessageDialog(null, "Seleccione un Producto en la pantalla de Productos");
-       }else{
-            if(ComboHistorico.getSelectedIndex()==1){
+        net.sf.jasperreports.engine.JasperReport reporte;
+        HashMap hm = new HashMap();
+        hm.put("Usuario", usuario.getText());
+        hm.put("idp", Integer.valueOf(txtId_Pro.getText()));
 
-              try {
-                  Connection con = Conexion.getConexion();
-                  reporte = JasperCompileManager.compileReport("src/Reportes/ReporteHistoricoPrecio.jrxml");
-                  JasperPrint jp = JasperFillManager.fillReport(reporte, hm, con);
-                  JasperViewer.viewReport(jp, true);
-                  ReportView view = new ReportView(jp, false);
-                  view.setVisible(true);
-              } catch (JRException ex) {
-                  Logger.getLogger(Clientes.class.getName()).log(Level.SEVERE, null, ex);
-              } 
-            }else if(ComboHistorico.getSelectedIndex()==2){
-                      try {
-                        Connection con = Conexion.getConexion();
-                        reporte = JasperCompileManager.compileReport("src/Reportes/ReporteHistoricoImpuesto.jrxml");
-                        JasperPrint jp = JasperFillManager.fillReport(reporte, hm, con);
-                        JasperViewer.viewReport(jp, true);
-                        ReportView view = new ReportView(jp, false);
-                        view.setVisible(true);
-                    } catch (JRException ex) {
-                        Logger.getLogger(Clientes.class.getName()).log(Level.SEVERE, null, ex);
-                    } 
-            }else if(ComboHistorico.getSelectedIndex()==3){
-                  try {
+        if (Integer.parseInt(txtId_Pro.getText()) == 0) {
+            JOptionPane.showMessageDialog(null, "Seleccione un Producto en la pantalla de Productos");
+        } else {
+            if (ComboHistorico.getSelectedIndex() == 1) {
+
+                try {
+                    Connection con = Conexion.getConexion();
+                    reporte = JasperCompileManager.compileReport("src/Reportes/ReporteHistoricoPrecio.jrxml");
+                    JasperPrint jp = JasperFillManager.fillReport(reporte, hm, con);
+                    JasperViewer.viewReport(jp, true);
+                    ReportView view = new ReportView(jp, false);
+                    view.setVisible(true);
+                } catch (JRException ex) {
+                    Logger.getLogger(Clientes.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            } else if (ComboHistorico.getSelectedIndex() == 2) {
+                try {
+                    Connection con = Conexion.getConexion();
+                    reporte = JasperCompileManager.compileReport("src/Reportes/ReporteHistoricoImpuesto.jrxml");
+                    JasperPrint jp = JasperFillManager.fillReport(reporte, hm, con);
+                    JasperViewer.viewReport(jp, true);
+                    ReportView view = new ReportView(jp, false);
+                    view.setVisible(true);
+                } catch (JRException ex) {
+                    Logger.getLogger(Clientes.class.getName()).log(Level.SEVERE, null, ex);
+                }
+            } else if (ComboHistorico.getSelectedIndex() == 3) {
+                try {
                     Connection con = Conexion.getConexion();
                     reporte = JasperCompileManager.compileReport("src/Reportes/ReporteHistoricoDescuento.jrxml");
                     JasperPrint jp = JasperFillManager.fillReport(reporte, hm, con);
@@ -349,13 +364,12 @@ public class PrecioHistoricoProducto extends javax.swing.JFrame {
                 } catch (JRException ex) {
                     Logger.getLogger(Clientes.class.getName()).log(Level.SEVERE, null, ex);
                 }
-           }else{
-               JOptionPane.showMessageDialog(null, "Seleccione un Historico");
-           }   
-       }
-        
-        
-        
+            } else {
+                JOptionPane.showMessageDialog(null, "Seleccione un Historico");
+            }
+        }
+
+
     }//GEN-LAST:event_reporteMouseClicked
 
     /**
@@ -530,4 +544,104 @@ private void cargartabla() {
 
     }
 
+    public void habilitarroles() {
+        try {
+
+            PreparedStatement ps;
+            ResultSet rs;
+            Connection con = Conexion.getConexion();
+            ps = con.prepareStatement("Select PU.Agregar, PU.Guardar, PU.Cancelar, PU.Editar, PU.Activo, PU.Inactivo, PU.Reporte, PU.Anular, PU.CrearCompra, PU.Historicos, PU.Buscar\n"
+                    + "From PermisosUsuario AS PU\n"
+                    + "Inner Join Usuario as U on PU.IdUsuario=U.Id_Usuario\n"
+                    + "where PU.IdPermiso=? and U.Nombre=?");
+            ps.setInt(1, 12);
+            ps.setString(2, usuario.getText());
+            rs = ps.executeQuery();
+            System.out.println(usuario.getText());
+
+            while (rs.next()) {
+                agregari = rs.getInt("Agregar");
+                guardari = rs.getInt("Guardar");
+                cancelari = rs.getInt("Cancelar");
+                editari = rs.getInt("Editar");
+                activoi = rs.getInt("Activo");
+                inactivoi = rs.getInt("Inactivo");
+                reportesi = rs.getInt("Reporte");
+                anulari = rs.getInt("Anular");
+                crearcomprai = rs.getInt("CrearCompra");
+                historicoi = rs.getInt("Historicos");
+                buscari = rs.getInt("Buscar");
+                System.out.print(agregari + " " + guardari + " " + cancelari);
+
+            }
+        } catch (SQLException ex) {
+            //lo.LogBitacora("Error: No se pudo seleccionar la tabla" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), proveedores, tablap);
+            JOptionPane.showMessageDialog(null, ex.toString());
+        }
+//        if (agregari == 1) {
+//            BotonAgregarPro.setEnabled(Boolean.TRUE);
+//        } else if (agregari == 0) {
+//            BotonAgregarPro.setEnabled(Boolean.FALSE);
+//            BotonAgregarPro.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/obstruido (1).png")));
+//        }
+//
+//        if (guardari == 1) {
+//            BotonGuardarPro.setEnabled(Boolean.TRUE);
+//        } else if (guardari == 0) {
+//            BotonGuardarPro.setEnabled(Boolean.FALSE);
+//            BotonGuardarPro.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/obstruido (1).png")));
+//
+//        }
+//        if (editari == 1) {
+//            BotonEditarPro.setEnabled(Boolean.TRUE);
+//        } else {
+//            BotonEditarPro.setEnabled(Boolean.FALSE);
+//            BotonEditarPro.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/obstruido (1).png")));
+//        }
+//
+//        if (cancelari == 1) {
+//            BotonCancelarPro.setEnabled(Boolean.TRUE);
+//
+//        } else {
+//            BotonCancelarPro.setEnabled(Boolean.FALSE);
+//            BotonCancelarPro.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/obstruido (1).png")));
+
+        if (reportesi == 1) {
+            reporte.setVisible(Boolean.TRUE);
+
+        } else {
+            reporte.setVisible(Boolean.FALSE);
+            //jLabel2.setEnabled(Boolean.TRUE);
+        }
+        if (buscari == 1) {
+            txtBuscarPH.setEnabled(Boolean.TRUE);
+        } else {
+            txtBuscarPH.setEnabled(Boolean.FALSE);
+            txtBuscarPH.setText("NO DISPONIBLE");
+        }
+        /* if (anulari == 1) {
+            Anular.setSelected(Boolean.TRUE);
+        } else {
+            Anular.setSelected(Boolean.FALSE);
+        }*/
+//        if (activoi == 1) {
+//            //BotonActivoPro.setVisible(Boolean.TRUE);
+//        } else {
+//            BotonActivoPro.setVisible(Boolean.FALSE);
+//        }
+//        if (inactivoi == 1) {
+//            //BotonInactivoPro.setVisible(Boolean.TRUE);
+//        } else {
+//            BotonInactivoPro.setVisible(Boolean.FALSE);
+    }
+    /*if (historicoi == 1) {
+            Historico.setSelected(Boolean.TRUE);
+        } else {
+            Historico.setSelected(Boolean.FALSE);
+        }
+        if (crearcomprai == 1) {
+            CrearCompra.setSelected(Boolean.TRUE);
+        } else {
+            CrearCompra.setSelected(Boolean.FALSE);
+        }*/
 }

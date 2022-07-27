@@ -36,8 +36,21 @@ import net.sf.jasperreports.view.JasperViewer;
  * @author carba
  */
 public class Medicamentos_Restringidos extends javax.swing.JFrame {
+
     log lo = new log();
     String MedicamentoR = "Medicamentos restriguidos";
+    int agregari;
+    int guardari;
+    int editari;
+    int cancelari;
+    int reportesi;
+    int activoi;
+    int inactivoi;
+    int anulari;
+    int buscari;
+    int crearcomprai;
+    int historicoi;
+    String userName;
 
     /**
      * Creates new form Medicamentos_Restringidos
@@ -46,7 +59,6 @@ public class Medicamentos_Restringidos extends javax.swing.JFrame {
         initComponents();
         cargartabla();
         Inhabillitar();
-        usuario.setText(Login.txtUsuario.getText());
         CargarProducto p = new Medicamentos_Restringidos.CargarProducto();
         comboProducto.setModel(p.getvalues());
         CargarRestriccion r = new Medicamentos_Restringidos.CargarRestriccion();
@@ -54,13 +66,17 @@ public class Medicamentos_Restringidos extends javax.swing.JFrame {
         txtId_Restriccion.setVisible(Boolean.FALSE);
         txtIdProducto.setVisible(Boolean.FALSE);
         txtIdMR.setVisible(Boolean.FALSE);
+        usuario.setText(Login.txtUsuario.getText());
+        habilitarroles();
+        
+        userName = usuario.getText();
     }
-     @Override
+
+    @Override
     public Image getIconImage() {
         Image retValue = Toolkit.getDefaultToolkit().getImage(ClassLoader.getSystemResource("componentes/LOGOSAG(2).png"));
         return retValue;
     }
-    
 
     /**
      * This method is called from within the constructor to initialize the form.
@@ -296,9 +312,21 @@ public class Medicamentos_Restringidos extends javax.swing.JFrame {
     }//GEN-LAST:event_botonRegresarMRMouseClicked
 
     private void botonAgregarMRMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_botonAgregarMRMouseClicked
-        Habilitar ();
-        botonGuardarMR.isEnabled();
-        botonCancelarMR.isEnabled();
+        if (botonAgregarMR.isEnabled()) {
+            Habilitar();
+            if (guardari == 1) {
+                botonGuardarMR.isEnabled();
+                //BotonCancelarPro.isEnabled();   
+            }
+            if (cancelari == 1) {
+                //BotonGuardarPro.isEnabled();
+                botonCancelarMR.isEnabled();
+            }
+        } else {
+
+            JOptionPane.showMessageDialog(null, "Esta acción no se encuentra disponible para tu usuario", "ERROR", JOptionPane.ERROR_MESSAGE);
+            lo.LogUsuarios(MedicamentoR, "Boton Agregar", userName);
+        }
     }//GEN-LAST:event_botonAgregarMRMouseClicked
 
     private void txtDescripcionMRActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_txtDescripcionMRActionPerformed
@@ -306,85 +334,103 @@ public class Medicamentos_Restringidos extends javax.swing.JFrame {
     }//GEN-LAST:event_txtDescripcionMRActionPerformed
 
     private void botonGuardarMRMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_botonGuardarMRMouseClicked
-        String Guardar="Guardar medicamento";
-        ObtenerIDRestriccion();
-         ObtenerIDProducto();
-         if ( comboRestriccion.getSelectedIndex() == 0  && comboProducto.getSelectedIndex() == 0 && txtDescripcionMR.getText().equals("Ingrese Descripción") )  {
-             JOptionPane.showMessageDialog(null, "No se puede Guardar datos vacios");
-        } else {
-            int Restricciones = Integer.parseInt(txtId_Restriccion.getText());
-            int Productos = Integer.parseInt(txtIdProducto.getText());
-            String Descripcion = txtDescripcionMR.getText(); 
+        if (botonGuardarMR.isEnabled()) {
+            String Guardar = "Guardar medicamento";
+            ObtenerIDRestriccion();
+            ObtenerIDProducto();
+            if (comboRestriccion.getSelectedIndex() == 0 && comboProducto.getSelectedIndex() == 0 && txtDescripcionMR.getText().equals("Ingrese Descripción")) {
+                JOptionPane.showMessageDialog(null, "No se puede Guardar datos vacios");
+            } else {
+                int Restricciones = Integer.parseInt(txtId_Restriccion.getText());
+                int Productos = Integer.parseInt(txtIdProducto.getText());
+                String Descripcion = txtDescripcionMR.getText();
 
-            try {
-                Connection con = Conexion.getConexion();
-                PreparedStatement ps = con.prepareStatement("Insert into Medicamentos_Restringuidos( Id_Restriccion,Id_Producto,Descripcion) VALUES(?,?,?)");
-                ps.setInt(1, Restricciones);
-                ps.setInt(2, Productos);
-                ps.setString(3, Descripcion);
-                ps.executeUpdate();
+                try {
+                    Connection con = Conexion.getConexion();
+                    PreparedStatement ps = con.prepareStatement("Insert into Medicamentos_Restringuidos( Id_Restriccion,Id_Producto,Descripcion) VALUES(?,?,?)");
+                    ps.setInt(1, Restricciones);
+                    ps.setInt(2, Productos);
+                    ps.setString(3, Descripcion);
+                    ps.executeUpdate();
 
-                JOptionPane.showMessageDialog(null, "Registro guardado");
-                cargartabla();
-                
-                //Limpiar();
-                Inhabillitar();
+                    JOptionPane.showMessageDialog(null, "Registro guardado");
+                    cargartabla();
 
-            } catch (SQLException ex) {
-           lo.LogBitacora("Error: No se pudo guardar medicamento " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), MedicamentoR,Guardar);
+                    //Limpiar();
+                    Inhabillitar();
 
-                JOptionPane.showMessageDialog(null, ex.toString());
+                } catch (SQLException ex) {
+                    lo.LogBitacora("Error: No se pudo guardar medicamento " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), MedicamentoR, Guardar);
+
+                    JOptionPane.showMessageDialog(null, ex.toString());
+                }
             }
+        } else {
+
+            JOptionPane.showMessageDialog(null, "Esta acción no se encuentra disponible para tu usuario", "ERROR", JOptionPane.ERROR_MESSAGE);
+             lo.LogUsuarios(MedicamentoR, "Boton Guardar", userName);
         }
     }//GEN-LAST:event_botonGuardarMRMouseClicked
 
     private void botonEditarMRMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_botonEditarMRMouseClicked
-       String EditarM="Editar medicamento Restringuido";
-        ObtenerIDProducto();
-        ObtenerIDRestriccion();
-        if (comboRestriccion.equals("Seleccione Restricción") || comboProducto.equals("Seleccione Producto")  || txtDescripcionMR.getText().equals("Ingrese Descripción")) {
-            JOptionPane.showMessageDialog(null, "No se puede Guardar datos vacios");
-        } else {
-            int Id = Integer.parseInt(txtIdMR.getText());
-            int restriccion = Integer.parseInt(txtId_Restriccion.getText());
-            int Producto = Integer.parseInt(txtIdProducto.getText());
-            String Descripcion = txtDescripcionMR.getText();
-           ;
-          
-            
-            try {
-                Connection con = Conexion.getConexion();
-                PreparedStatement ps = con.prepareStatement("Update Medicamentos_Restringuidos set Id_Restriccion=?, Id_Producto=?,Descripcion=? Where Id_MR=?");
-                ps.setInt(1, restriccion);
-                ps.setInt(2, Producto);
-                ps.setString(3,Descripcion);
-                ps.setInt(4, Id);
-                
-                ps.executeUpdate();
-                JOptionPane.showMessageDialog(null, "Registro Actualizado");
-                
-                cargartabla();  
-                Limpiar();
-                Inhabillitar();
+        if (botonEditarMR.isEnabled()) {
+            String EditarM = "Editar medicamento Restringuido";
+            ObtenerIDProducto();
+            ObtenerIDRestriccion();
+            if (comboRestriccion.equals("Seleccione Restricción") || comboProducto.equals("Seleccione Producto") || txtDescripcionMR.getText().equals("Ingrese Descripción")) {
+                JOptionPane.showMessageDialog(null, "No se puede Guardar datos vacios");
+            } else {
+                int Id = Integer.parseInt(txtIdMR.getText());
+                int restriccion = Integer.parseInt(txtId_Restriccion.getText());
+                int Producto = Integer.parseInt(txtIdProducto.getText());
+                String Descripcion = txtDescripcionMR.getText();
+                ;
 
-            } catch (SQLException ex) {
-              lo.LogBitacora("Error: No se pudo editar medicamento " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), MedicamentoR,EditarM);
+                try {
+                    Connection con = Conexion.getConexion();
+                    PreparedStatement ps = con.prepareStatement("Update Medicamentos_Restringuidos set Id_Restriccion=?, Id_Producto=?,Descripcion=? Where Id_MR=?");
+                    ps.setInt(1, restriccion);
+                    ps.setInt(2, Producto);
+                    ps.setString(3, Descripcion);
+                    ps.setInt(4, Id);
 
-                JOptionPane.showMessageDialog(null, ex.toString());
+                    ps.executeUpdate();
+                    JOptionPane.showMessageDialog(null, "Registro Actualizado");
+
+                    cargartabla();
+                    Limpiar();
+                    Inhabillitar();
+
+                } catch (SQLException ex) {
+                    lo.LogBitacora("Error: No se pudo editar medicamento " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), MedicamentoR, EditarM);
+
+                    JOptionPane.showMessageDialog(null, ex.toString());
+                }
             }
+
+        } else {
+
+            JOptionPane.showMessageDialog(null, "Esta acción no se encuentra disponible para tu usuario", "ERROR", JOptionPane.ERROR_MESSAGE);
+             lo.LogUsuarios(MedicamentoR, "Boton Editar", userName);
         }
     }//GEN-LAST:event_botonEditarMRMouseClicked
 
     private void botonCancelarMRMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_botonCancelarMRMouseClicked
-        Limpiar();
-        Inhabillitar();
-        botonEditarMR.setEnabled(Boolean.FALSE);
-        botonGuardarMR.setEnabled(Boolean.FALSE);
-    
+        if (botonCancelarMR.isEnabled()) {
+            // Limpiar();
+            //Inhabillitar();
+            botonCancelarMR.setEnabled(Boolean.FALSE);
+            botonCancelarMR.setEnabled(Boolean.FALSE);
+        } else {
+            JOptionPane.showMessageDialog(null, "Esta acción no se encuentra disponible para tu usuario", "ERROR", JOptionPane.ERROR_MESSAGE);
+             lo.LogUsuarios(MedicamentoR, "Boton Cancelar", userName);
+        }
+
+
     }//GEN-LAST:event_botonCancelarMRMouseClicked
 
     private void TablaMedicamentoRestriMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_TablaMedicamentoRestriMouseClicked
-       String TablaMR="Tabla medicamento Restringuido";
+        String TablaMR = "Tabla medicamento Restringuido";
         try {
             int fila = TablaMedicamentoRestri.getSelectedRow();
             int id = Integer.parseInt(TablaMedicamentoRestri.getValueAt(fila, 0).toString());
@@ -392,12 +438,12 @@ public class Medicamentos_Restringidos extends javax.swing.JFrame {
             ResultSet rs;
             Connection con = Conexion.getConexion();
             ps = con.prepareStatement("Select MR.Id_MR,P.Nombre_Producto,RMM.Restriccion,MR.Descripcion\n"
-                   + "From Medicamentos_Restringuidos as MR\n"
-                   + "INNER JOIN Productos AS P ON MR.Id_Producto = P.Id_Producto\n"
-                   + "INNER JOIN Restricciones_Medicamentos AS RMM ON MR.Id_Restriccion =RMM.Id_Restriccion\n"
-                   + "where MR.Id_MR=?\n"
-                   + "Order By MR.Id_MR");
-                  
+                    + "From Medicamentos_Restringuidos as MR\n"
+                    + "INNER JOIN Productos AS P ON MR.Id_Producto = P.Id_Producto\n"
+                    + "INNER JOIN Restricciones_Medicamentos AS RMM ON MR.Id_Restriccion =RMM.Id_Restriccion\n"
+                    + "where MR.Id_MR=?\n"
+                    + "Order By MR.Id_MR");
+
             ps.setInt(1, id);
             rs = ps.executeQuery();
 
@@ -406,12 +452,11 @@ public class Medicamentos_Restringidos extends javax.swing.JFrame {
                 comboRestriccion.setSelectedItem(rs.getString("Restriccion"));
                 comboProducto.setSelectedItem(rs.getString("Nombre_Producto"));
                 txtDescripcionMR.setText(rs.getString("Descripcion"));
-               
-  
-            Habilitar();
+
+                Habilitar();
             }
         } catch (SQLException ex) {
-             lo.LogBitacora("Error: No se pudo guardar medicamento " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), MedicamentoR,TablaMR);
+            lo.LogBitacora("Error: No se pudo guardar medicamento " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), MedicamentoR, TablaMR);
 
             JOptionPane.showMessageDialog(null, ex.toString());
         }
@@ -450,7 +495,7 @@ public class Medicamentos_Restringidos extends javax.swing.JFrame {
     }//GEN-LAST:event_txtDescripcionMRFocusLost
 
     private void comboRestriccionMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_comboRestriccionMousePressed
-       if (comboRestriccion.isEnabled() == false) {
+        if (comboRestriccion.isEnabled() == false) {
 
             JOptionPane.showMessageDialog(null, "Dar Click en Agregar o Editar para utilizar el campo", "Advertencia", JOptionPane.WARNING_MESSAGE);
 
@@ -475,14 +520,13 @@ public class Medicamentos_Restringidos extends javax.swing.JFrame {
             if (!txtBuscarMR.getText().matches("^(?!.*([A-Za-zñÑáéíóúÁÉÍÓÚ\\s])\\1{2})[A-Za-zñÑáéíóúÁÉÍÓÚ\\s0-9]+$")) {
                 JOptionPane.showMessageDialog(null, "No repitas caracteres de forma incorrecta", "Advertencia", JOptionPane.WARNING_MESSAGE);
                 evt.consume();
-                
-                
+
             }
         }
     }//GEN-LAST:event_txtBuscarMRKeyTyped
 
     private void txtDescripcionMRMousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txtDescripcionMRMousePressed
-     if (txtDescripcionMR.isEnabled() == false) {
+        if (txtDescripcionMR.isEnabled() == false) {
 
             JOptionPane.showMessageDialog(null, "Dar Click en Agregar o Editar para utilizar el campo", "Advertencia", JOptionPane.WARNING_MESSAGE);
 
@@ -490,7 +534,7 @@ public class Medicamentos_Restringidos extends javax.swing.JFrame {
     }//GEN-LAST:event_txtDescripcionMRMousePressed
 
     private void txtDescripcionMRKeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_txtDescripcionMRKeyTyped
-       buscarData(txtDescripcionMR.getText());
+        buscarData(txtDescripcionMR.getText());
         validarNumerosLetras(evt);
         if (txtDescripcionMR.getText().length() > 50) {
             JOptionPane.showMessageDialog(null, "Alcanzaste el máximo de 50 caracteres para este campo", "Advertencia", JOptionPane.WARNING_MESSAGE);
@@ -499,7 +543,7 @@ public class Medicamentos_Restringidos extends javax.swing.JFrame {
             if (!txtDescripcionMR.getText().matches("^(?!.*([A-Za-zñÑáéíóúÁÉÍÓÚ\\s])\\1{2})[A-Za-zñÑáéíóúÁÉÍÓÚ\\s0-9]+$")) {
                 JOptionPane.showMessageDialog(null, "No repitas caracteres de forma incorrecta", "Advertencia", JOptionPane.WARNING_MESSAGE);
                 evt.consume();
-                              
+
             }
         }
     }//GEN-LAST:event_txtDescripcionMRKeyTyped
@@ -578,16 +622,17 @@ public class Medicamentos_Restringidos extends javax.swing.JFrame {
     // End of variables declaration//GEN-END:variables
 
     private void Habilitar() {
-      
+
         comboRestriccion.enable(Boolean.TRUE);
         comboProducto.enable(Boolean.TRUE);
         txtDescripcionMR.enable(Boolean.TRUE);
-        
+
     }
-      public class CargarProducto {
+
+    public class CargarProducto {
 
         public DefaultComboBoxModel getvalues() {
-              String CargarMR="Cargar medicamento Restringuido";
+            String CargarMR = "Cargar medicamento Restringuido";
             DefaultComboBoxModel modelo = new DefaultComboBoxModel();
             try {
                 Connection con = Conexion.getConexion();
@@ -601,17 +646,18 @@ public class Medicamentos_Restringidos extends javax.swing.JFrame {
                 con.close();
                 rs.close();
             } catch (Exception e) {
-             lo.LogBitacora("Error: No se pudo cargar medicamento restringuido " + "Excepción: " + e + ". Origen: " + this.getClass().getSimpleName(), MedicamentoR,CargarMR);
+                lo.LogBitacora("Error: No se pudo cargar medicamento restringuido " + "Excepción: " + e + ". Origen: " + this.getClass().getSimpleName(), MedicamentoR, CargarMR);
 
                 System.out.println(e);
             }
             return modelo;
         }
     }
-       public class CargarRestriccion {
+
+    public class CargarRestriccion {
 
         public DefaultComboBoxModel getvalues() {
-              String CargarRestriccion="Cargar restriccion de medicamento";
+            String CargarRestriccion = "Cargar restriccion de medicamento";
             DefaultComboBoxModel modelo = new DefaultComboBoxModel();
             try {
                 Connection con = Conexion.getConexion();
@@ -625,7 +671,7 @@ public class Medicamentos_Restringidos extends javax.swing.JFrame {
                 con.close();
                 rs.close();
             } catch (Exception e) {
-              lo.LogBitacora("Error: No se pudo cargar la restriccion " + "Excepción: " + e + ". Origen: " + this.getClass().getSimpleName(), MedicamentoR,CargarRestriccion);
+                lo.LogBitacora("Error: No se pudo cargar la restriccion " + "Excepción: " + e + ". Origen: " + this.getClass().getSimpleName(), MedicamentoR, CargarRestriccion);
 
                 System.out.println(e);
             }
@@ -634,45 +680,44 @@ public class Medicamentos_Restringidos extends javax.swing.JFrame {
     }
 
     private void ObtenerIDRestriccion() {
-        String Nombre=comboRestriccion.getSelectedItem().toString();
+        String Nombre = comboRestriccion.getSelectedItem().toString();
         try {
-                ResultSet rs;
-                Connection con = Conexion.getConexion();
-                PreparedStatement ps = con.prepareStatement("Select Id_Restriccion From Restricciones_Medicamentos Where Restriccion=?");
-                ps.setString(1, Nombre);
-                rs = ps.executeQuery();
-                
-               while (rs.next()) {
-                txtId_Restriccion.setText(rs.getString("Id_Restriccion"));
-               }
-                
+            ResultSet rs;
+            Connection con = Conexion.getConexion();
+            PreparedStatement ps = con.prepareStatement("Select Id_Restriccion From Restricciones_Medicamentos Where Restriccion=?");
+            ps.setString(1, Nombre);
+            rs = ps.executeQuery();
 
-            } catch (SQLException ex) {
-                JOptionPane.showMessageDialog(null, ex.toString());
-            } }
+            while (rs.next()) {
+                txtId_Restriccion.setText(rs.getString("Id_Restriccion"));
+            }
+
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null, ex.toString());
+        }
+    }
 
     private void ObtenerIDProducto() {
-        String Nombre=comboProducto.getSelectedItem().toString();
+        String Nombre = comboProducto.getSelectedItem().toString();
         try {
-                ResultSet rs;
-                Connection con = Conexion.getConexion();
-                PreparedStatement ps = con.prepareStatement("Select Id_Producto From Productos Where Nombre_Producto=?");
-                ps.setString(1, Nombre);
-                rs = ps.executeQuery();
-                
-               while (rs.next()) {
-                   txtIdProducto.setText(rs.getString("Id_Producto"));
-               }
-                
+            ResultSet rs;
+            Connection con = Conexion.getConexion();
+            PreparedStatement ps = con.prepareStatement("Select Id_Producto From Productos Where Nombre_Producto=?");
+            ps.setString(1, Nombre);
+            rs = ps.executeQuery();
 
-            } catch (SQLException ex) {
-                JOptionPane.showMessageDialog(null, ex.toString());
+            while (rs.next()) {
+                txtIdProducto.setText(rs.getString("Id_Producto"));
             }
-        
+
+        } catch (SQLException ex) {
+            JOptionPane.showMessageDialog(null, ex.toString());
+        }
+
     }
 
     private void cargartabla() {
-        String CargarTablaMR="Cargar tabla medicamento restringuido";
+        String CargarTablaMR = "Cargar tabla medicamento restringuido";
         DefaultTableModel modeloTabla = (DefaultTableModel) TablaMedicamentoRestri.getModel();
         modeloTabla.setRowCount(0);
 
@@ -685,8 +730,8 @@ public class Medicamentos_Restringidos extends javax.swing.JFrame {
             Connection con = Conexion.getConexion();
             ps = con.prepareStatement("Select MR.Id_MR,P.Nombre_Producto,RMM.Restriccion,MR.Descripcion\n"
                     + "From Medicamentos_Restringuidos as MR\n"
-                    + "INNER JOIN Productos AS P ON MR.Id_Producto = P.Id_Producto\n"  
-                    + "INNER JOIN Restricciones_Medicamentos AS RMM ON MR.Id_Restriccion =RMM.Id_Restriccion\n" 
+                    + "INNER JOIN Productos AS P ON MR.Id_Producto = P.Id_Producto\n"
+                    + "INNER JOIN Restricciones_Medicamentos AS RMM ON MR.Id_Restriccion =RMM.Id_Restriccion\n"
                     + "Order By MR.Id_MR");
             rs = ps.executeQuery();
             rsmd = rs.getMetaData();
@@ -701,7 +746,7 @@ public class Medicamentos_Restringidos extends javax.swing.JFrame {
             }
 
         } catch (SQLException ex) {
-           lo.LogBitacora("Error: No se pudo cargar tabla  " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), MedicamentoR,CargarTablaMR);
+            lo.LogBitacora("Error: No se pudo cargar tabla  " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), MedicamentoR, CargarTablaMR);
 
             JOptionPane.showMessageDialog(null, ex.toString());
         }
@@ -712,33 +757,30 @@ public class Medicamentos_Restringidos extends javax.swing.JFrame {
         comboRestriccion.enable(Boolean.FALSE);
         comboProducto.enable(Boolean.FALSE);
         txtDescripcionMR.enable(Boolean.FALSE);
-        
+
     }
 
     private void Limpiar() {
         comboRestriccion.setSelectedIndex(0);
-         comboProducto.setSelectedIndex(0);
-    
-    
-        
-         txtDescripcionMR.setText("");
+        comboProducto.setSelectedIndex(0);
+
+        txtDescripcionMR.setText("");
         if (txtDescripcionMR.getText().equals("")) {
             txtDescripcionMR.setText("Ingrese Descripción");
             txtDescripcionMR.setForeground(new Color(153, 153, 153));
-        }}
-    
-   private void buscarData(String valor) {
-        String BuscarDato="Buscar medicamento R";
-       String[] titulos = {"Id Restricción", "Restricción", "Producto", "Descipcion"};
+        }
+    }
+
+    private void buscarData(String valor) {
+        String BuscarDato = "Buscar medicamento R";
+        String[] titulos = {"Id Restricción", "Restricción", "Producto", "Descipcion"};
         String[] registros = new String[13];
         String sql = "Select MR.Id_MR,P.Nombre_Producto,RMM.Restriccion,MR.Descripcion\n"
                 + "From Medicamentos_Restringuidos as MR\n"
-               + "INNER JOIN Productos AS P ON MR.Id_Producto = P.Id_Producto\n"
-               + "INNER JOIN Restricciones_Medicamentos AS RMM ON MR.Id_Restriccion =RMM.Id_Restriccion\n"
-               + "WHERE CONCAT (P.Nombre_Producto, ' ', RMM.Descripcion, ' ') LIKE '%" + valor + "%'\n"
-               + "Order By MR.Id_MR"
-                ;
-               
+                + "INNER JOIN Productos AS P ON MR.Id_Producto = P.Id_Producto\n"
+                + "INNER JOIN Restricciones_Medicamentos AS RMM ON MR.Id_Restriccion =RMM.Id_Restriccion\n"
+                + "WHERE CONCAT (P.Nombre_Producto, ' ', RMM.Descripcion, ' ') LIKE '%" + valor + "%'\n"
+                + "Order By MR.Id_MR";
 
         DefaultTableModel model = new DefaultTableModel(null, titulos);
         Connection con = Conexion.getConexion();
@@ -753,23 +795,22 @@ public class Medicamentos_Restringidos extends javax.swing.JFrame {
                 registros[1] = rs.getString("Nombre_Producto");
                 registros[1] = rs.getString("Restriccion");
                 registros[2] = rs.getString("Descripcion");
-                
+
                 model.addRow(registros);
             }
 
             TablaMedicamentoRestri.setModel(model);
             // anchoColumnas();
         } catch (SQLException ex) {
-         lo.LogBitacora("Error: No se pudo buscar medicamento " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), MedicamentoR,BuscarDato);
+            lo.LogBitacora("Error: No se pudo buscar medicamento " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), MedicamentoR, BuscarDato);
 
             Logger.getLogger(Clientes.class.getName()).log(Level.SEVERE, null, ex);
         }
-         
-        
+
     }
 
     private void validarNumerosLetras(KeyEvent e) {
-         if (e.getKeyChar() >= 33 && e.getKeyChar() <= 47
+        if (e.getKeyChar() >= 33 && e.getKeyChar() <= 47
                 || e.getKeyChar() >= 58 && e.getKeyChar() <= 64
                 || e.getKeyChar() >= 91 && e.getKeyChar() <= 96
                 || e.getKeyChar() >= 123 && e.getKeyChar() <= 129
@@ -780,6 +821,106 @@ public class Medicamentos_Restringidos extends javax.swing.JFrame {
             JOptionPane.showMessageDialog(null, "Este campo no acepta caracteres especiales", "Advertencia", JOptionPane.WARNING_MESSAGE);
         }
     }
- }
-    
 
+    public void habilitarroles() {
+        try {
+
+            PreparedStatement ps;
+            ResultSet rs;
+            Connection con = Conexion.getConexion();
+            ps = con.prepareStatement("Select PU.Agregar, PU.Guardar, PU.Cancelar, PU.Editar, PU.Activo, PU.Inactivo, PU.Reporte, PU.Anular, PU.CrearCompra, PU.Historicos, PU.Buscar\n"
+                    + "From PermisosUsuario AS PU\n"
+                    + "Inner Join Usuario as U on PU.IdUsuario=U.Id_Usuario\n"
+                    + "where PU.IdPermiso=? and U.Nombre=?");
+            ps.setInt(1, 11);
+            ps.setString(2, usuario.getText());
+            rs = ps.executeQuery();
+            System.out.println(usuario.getText());
+
+            while (rs.next()) {
+                agregari = rs.getInt("Agregar");
+                guardari = rs.getInt("Guardar");
+                cancelari = rs.getInt("Cancelar");
+                editari = rs.getInt("Editar");
+                activoi = rs.getInt("Activo");
+                inactivoi = rs.getInt("Inactivo");
+                reportesi = rs.getInt("Reporte");
+                anulari = rs.getInt("Anular");
+                crearcomprai = rs.getInt("CrearCompra");
+                historicoi = rs.getInt("Historicos");
+                buscari = rs.getInt("Buscar");
+                System.out.print(agregari + " " + guardari + " " + cancelari);
+
+            }
+        } catch (SQLException ex) {
+            //lo.LogBitacora("Error: No se pudo seleccionar la tabla" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), proveedores, tablap);
+            JOptionPane.showMessageDialog(null, ex.toString());
+        }
+        if (agregari == 1) {
+            botonAgregarMR.setEnabled(Boolean.TRUE);
+        } else if (agregari == 0) {
+            botonAgregarMR.setEnabled(Boolean.FALSE);
+            botonAgregarMR.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/obstruido (1).png")));
+        }
+
+        if (guardari == 1) {
+            botonGuardarMR.setEnabled(Boolean.TRUE);
+        } else if (guardari == 0) {
+            botonGuardarMR.setEnabled(Boolean.FALSE);
+            botonGuardarMR.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/obstruido (1).png")));
+
+        }
+        if (editari == 1) {
+            botonEditarMR.setEnabled(Boolean.TRUE);
+        } else {
+            botonEditarMR.setEnabled(Boolean.FALSE);
+            botonEditarMR.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/obstruido (1).png")));
+        }
+
+        if (cancelari == 1) {
+            botonCancelarMR.setEnabled(Boolean.TRUE);
+
+        } else {
+            botonCancelarMR.setEnabled(Boolean.FALSE);
+            botonCancelarMR.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/obstruido (1).png")));
+        }
+        if (reportesi == 1) {
+            reporte.setVisible(Boolean.TRUE);
+
+        } else {
+            reporte.setVisible(Boolean.FALSE);
+            //jLabel2.setEnabled(Boolean.TRUE);
+        }
+        if (buscari == 1) {
+            txtBuscarMR.setEnabled(Boolean.TRUE);
+        } else {
+            txtBuscarMR.setEnabled(Boolean.FALSE);
+            txtBuscarMR.setText("NO DISPONIBLE");
+        }
+        /* if (anulari == 1) {
+            Anular.setSelected(Boolean.TRUE);
+        } else {
+            Anular.setSelected(Boolean.FALSE);
+        }*/
+//        if (activoi == 1) {
+//            //BotonActivoPro.setVisible(Boolean.TRUE);
+//        } else {
+//            BotonActivoPro.setVisible(Boolean.FALSE);
+//        }
+//        if (inactivoi == 1) {
+//            //BotonInactivoPro.setVisible(Boolean.TRUE);
+//        } else {
+//            BotonInactivoPro.setVisible(Boolean.FALSE);
+//        }
+        /*if (historicoi == 1) {
+            Historico.setSelected(Boolean.TRUE);
+        } else {
+            Historico.setSelected(Boolean.FALSE);
+        }
+        if (crearcomprai == 1) {
+            CrearCompra.setSelected(Boolean.TRUE);
+        } else {
+            CrearCompra.setSelected(Boolean.FALSE);
+        }*/
+    }
+}

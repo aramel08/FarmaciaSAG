@@ -47,9 +47,23 @@ public class Productos extends javax.swing.JFrame {
 
     public static String Id_Producto = "0";
 
+    int agregari;
+    int guardari;
+    int editari;
+    int cancelari;
+    int reportesi;
+    int activoi;
+    int inactivoi;
+    int anulari;
+    int buscari;
+    int crearcomprai;
+    int historicoi;
+    String userName;
+
     public Productos() {
         initComponents();
         usuario.setText(Login.txtUsuario.getText());
+        habilitarroles();
         Productos.CargarCategoria c = new Productos.CargarCategoria();
         Productos.CargarPresentacion pr = new Productos.CargarPresentacion();
         Productos.CargarImpuesto cim = new Productos.CargarImpuesto();
@@ -70,6 +84,7 @@ public class Productos extends javax.swing.JFrame {
         Date min = cal.getTime();
         Date max = cale.getTime();
         txtFechaVencimientoP.setSelectableDateRange(min, max);
+        userName = usuario.getText();
     }
 
     @Override
@@ -77,6 +92,8 @@ public class Productos extends javax.swing.JFrame {
         Image retValue = Toolkit.getDefaultToolkit().getImage(ClassLoader.getSystemResource("componentes/LOGOSAG(2).png"));
         return retValue;
     }
+
+    int npermiso;
 
     public boolean verificarDatosExistentes(String campo, String columna, String tabla, String mensaje) {
         Conexion cc = new Conexion();
@@ -562,149 +579,162 @@ public class Productos extends javax.swing.JFrame {
     }//GEN-LAST:event_txtUnidadPActionPerformed
 
     private void botonEditarPMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_botonEditarPMouseClicked
-        String editar = "BtnEditar";
-        if (txtNombreP.getText().equals("Ingrese Nombre Producto") && txtDescripcionP.getText().equals("Ingrese Descripción Producto") && ComboCategoriaP.getSelectedIndex() == 0 && ComboPresentacionP.getSelectedIndex() == 0
-                && txtUnidadP.getText().equals("Ingrese Unidades Producto") && txtTamañosP.getText().equals("Ingrese Tamaño Producto") && txtLoteP.getText().equals("Ingrese Lote Producto") && txtFechaVencimientoP.getDate().equals("") && txtPrecioP.getText().equals("Ingrese Precio Producto")
-                && ComboImp.getSelectedIndex() == 0 && ComboDesc.getSelectedIndex() == 0) {
-            JOptionPane.showMessageDialog(null, "Debes llenar todos los campos", "Advertencia", JOptionPane.WARNING_MESSAGE);
-        } else {
-            if (txtNombreP.getText().equals("Ingrese Nombre Producto")) {
-                JOptionPane.showMessageDialog(null, "Debe ingresar un nombre al producto", "Advertencia", JOptionPane.WARNING_MESSAGE);
-            } else if (txtDescripcionP.getText().equals("Ingrese Descripción Producto")) {
-                JOptionPane.showMessageDialog(null, "Debe ingresar una descripción", "Advertencia", JOptionPane.WARNING_MESSAGE);
-            } else if (ComboCategoriaP.getSelectedIndex() == 0) {
-                JOptionPane.showMessageDialog(null, "Seleccione la categoria", "Advertencia", JOptionPane.WARNING_MESSAGE);
-            } else if (ComboPresentacionP.getSelectedIndex() == 0) {
-                JOptionPane.showMessageDialog(null, "Seleccione la presentación", "Advertencia", JOptionPane.WARNING_MESSAGE);
-            } else if (txtUnidadP.getText().equals("Ingrese Unidades Producto")) {
-                JOptionPane.showMessageDialog(null, "Debe ingresar una unidad", "Advertencia", JOptionPane.WARNING_MESSAGE);
-            } else if (txtTamañosP.getText().equals("Ingrese Tamaño Producto")) {
-                JOptionPane.showMessageDialog(null, "Debe ingresar un tamaño", "Advertencia", JOptionPane.WARNING_MESSAGE);
-            } else if (txtLoteP.getText().equals("Ingrese Lote Producto")) {
-                JOptionPane.showMessageDialog(null, "Debe ingresar un lote", "Advertencia", JOptionPane.WARNING_MESSAGE);
-            } else if (txtFechaVencimientoP.getDate().equals("")) {
-                JOptionPane.showMessageDialog(null, "Debe ingresar la fecha de vencimiento", "Advertencia", JOptionPane.WARNING_MESSAGE);
-            } else if (txtPrecioP.getText().equals("Ingrese Precio Producto")) {
-                JOptionPane.showMessageDialog(null, "Debe ingresar un precio", "Advertencia", JOptionPane.WARNING_MESSAGE);
-            } else if (ComboImp.getSelectedIndex() == 0) {
-                JOptionPane.showMessageDialog(null, "Debe Seleccionar un Impuesto", "Advertencia", JOptionPane.WARNING_MESSAGE);
-            } else if (ComboDesc.getSelectedIndex() == 0) {
-                JOptionPane.showMessageDialog(null, "Debe Seleccionar un Descuento", "Advertencia", JOptionPane.WARNING_MESSAGE);
+        if (editari == 1) {
+            String editar = "BtnEditar";
+            if (txtNombreP.getText().equals("Ingrese Nombre Producto") && txtDescripcionP.getText().equals("Ingrese Descripción Producto") && ComboCategoriaP.getSelectedIndex() == 0 && ComboPresentacionP.getSelectedIndex() == 0
+                    && txtUnidadP.getText().equals("Ingrese Unidades Producto") && txtTamañosP.getText().equals("Ingrese Tamaño Producto") && txtLoteP.getText().equals("Ingrese Lote Producto") && txtFechaVencimientoP.getDate().equals("") && txtPrecioP.getText().equals("Ingrese Precio Producto")
+                    && ComboImp.getSelectedIndex() == 0 && ComboDesc.getSelectedIndex() == 0) {
+                JOptionPane.showMessageDialog(null, "Debes llenar todos los campos", "Advertencia", JOptionPane.WARNING_MESSAGE);
             } else {
-                int Id = Integer.parseInt(txtIDP.getText());
-                String Nombre = txtNombreP.getText();
-                String Descripcion = txtDescripcionP.getText();
-                int Categoria = ComboCategoriaP.getSelectedIndex();
-                int Presentacion = ComboPresentacionP.getSelectedIndex();
-                String Unidades = txtUnidadP.getText();
-                String Tamaño = txtTamañosP.getText();
-                String Lote = txtLoteP.getText();
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                String FechaV = sdf.format(txtFechaVencimientoP.getDate());
-                String Precio = txtPrecioP.getText();
-                int desc = ComboDesc.getSelectedIndex();
-                int impu = ComboImp.getSelectedIndex();
+                if (txtNombreP.getText().equals("Ingrese Nombre Producto")) {
+                    JOptionPane.showMessageDialog(null, "Debe ingresar un nombre al producto", "Advertencia", JOptionPane.WARNING_MESSAGE);
+                } else if (txtDescripcionP.getText().equals("Ingrese Descripción Producto")) {
+                    JOptionPane.showMessageDialog(null, "Debe ingresar una descripción", "Advertencia", JOptionPane.WARNING_MESSAGE);
+                } else if (ComboCategoriaP.getSelectedIndex() == 0) {
+                    JOptionPane.showMessageDialog(null, "Seleccione la categoria", "Advertencia", JOptionPane.WARNING_MESSAGE);
+                } else if (ComboPresentacionP.getSelectedIndex() == 0) {
+                    JOptionPane.showMessageDialog(null, "Seleccione la presentación", "Advertencia", JOptionPane.WARNING_MESSAGE);
+                } else if (txtUnidadP.getText().equals("Ingrese Unidades Producto")) {
+                    JOptionPane.showMessageDialog(null, "Debe ingresar una unidad", "Advertencia", JOptionPane.WARNING_MESSAGE);
+                } else if (txtTamañosP.getText().equals("Ingrese Tamaño Producto")) {
+                    JOptionPane.showMessageDialog(null, "Debe ingresar un tamaño", "Advertencia", JOptionPane.WARNING_MESSAGE);
+                } else if (txtLoteP.getText().equals("Ingrese Lote Producto")) {
+                    JOptionPane.showMessageDialog(null, "Debe ingresar un lote", "Advertencia", JOptionPane.WARNING_MESSAGE);
+                } else if (txtFechaVencimientoP.getDate().equals("")) {
+                    JOptionPane.showMessageDialog(null, "Debe ingresar la fecha de vencimiento", "Advertencia", JOptionPane.WARNING_MESSAGE);
+                } else if (txtPrecioP.getText().equals("Ingrese Precio Producto")) {
+                    JOptionPane.showMessageDialog(null, "Debe ingresar un precio", "Advertencia", JOptionPane.WARNING_MESSAGE);
+                } else if (ComboImp.getSelectedIndex() == 0) {
+                    JOptionPane.showMessageDialog(null, "Debe Seleccionar un Impuesto", "Advertencia", JOptionPane.WARNING_MESSAGE);
+                } else if (ComboDesc.getSelectedIndex() == 0) {
+                    JOptionPane.showMessageDialog(null, "Debe Seleccionar un Descuento", "Advertencia", JOptionPane.WARNING_MESSAGE);
+                } else {
+                    int Id = Integer.parseInt(txtIDP.getText());
+                    String Nombre = txtNombreP.getText();
+                    String Descripcion = txtDescripcionP.getText();
+                    int Categoria = ComboCategoriaP.getSelectedIndex();
+                    int Presentacion = ComboPresentacionP.getSelectedIndex();
+                    String Unidades = txtUnidadP.getText();
+                    String Tamaño = txtTamañosP.getText();
+                    String Lote = txtLoteP.getText();
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                    String FechaV = sdf.format(txtFechaVencimientoP.getDate());
+                    String Precio = txtPrecioP.getText();
+                    int desc = ComboDesc.getSelectedIndex();
+                    int impu = ComboImp.getSelectedIndex();
 
-                try {
-                    Connection con = Conexion.getConexion();
-                    PreparedStatement ps = con.prepareStatement("Update Productos set Nombre_Producto=?,Descripcion=?,Id_Categoria=?,Id_Presentacion=?, Lote=?,Fecha_Vencimiento=?,Unidades=?,Tamaño=?,Precio=?, Id_Descuento=?,Id_Impuesto=? Where Id_Producto=?");
-                    ps.setString(1, Nombre);
-                    ps.setString(2, Descripcion);
-                    ps.setInt(3, Categoria);
-                    ps.setInt(4, Presentacion);
-                    ps.setString(7, Unidades);
-                    ps.setString(8, Tamaño);
-                    ps.setString(5, Lote);
-                    ps.setString(6, FechaV);
-                    ps.setString(9, Precio);
-                    ps.setInt(10, desc);
-                    ps.setInt(11, impu);
-                    ps.setInt(12, Id);
-                    ps.executeUpdate();
-                    JOptionPane.showMessageDialog(null, "Registro Actualizado");
-                    cargartabla();
-                    Limpiar();
-                    Inhabillitar();
-                    //txtEstadoC.setVisible(Boolean.FALSE);
+                    try {
+                        Connection con = Conexion.getConexion();
+                        PreparedStatement ps = con.prepareStatement("Update Productos set Nombre_Producto=?,Descripcion=?,Id_Categoria=?,Id_Presentacion=?, Lote=?,Fecha_Vencimiento=?,Unidades=?,Tamaño=?,Precio=?, Id_Descuento=?,Id_Impuesto=? Where Id_Producto=?");
+                        ps.setString(1, Nombre);
+                        ps.setString(2, Descripcion);
+                        ps.setInt(3, Categoria);
+                        ps.setInt(4, Presentacion);
+                        ps.setString(7, Unidades);
+                        ps.setString(8, Tamaño);
+                        ps.setString(5, Lote);
+                        ps.setString(6, FechaV);
+                        ps.setString(9, Precio);
+                        ps.setInt(10, desc);
+                        ps.setInt(11, impu);
+                        ps.setInt(12, Id);
+                        ps.executeUpdate();
+                        JOptionPane.showMessageDialog(null, "Registro Actualizado");
+                        cargartabla();
+                        Limpiar();
+                        Inhabillitar();
+                        //txtEstadoC.setVisible(Boolean.FALSE);
 
-                } catch (SQLException ex) {
-                    lo.LogBitacora("Error: No se pudo editar el dato " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), producto, editar);
-                    JOptionPane.showMessageDialog(null, ex.toString());
+                    } catch (SQLException ex) {
+                        lo.LogBitacora("Error: No se pudo editar el dato " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), producto, editar);
+                        JOptionPane.showMessageDialog(null, ex.toString());
+                    }
                 }
             }
+        } else {
+            JOptionPane.showMessageDialog(null, "Esta acción no se encuentra disponible para tu usuario", "ERROR", JOptionPane.ERROR_MESSAGE);
+            lo.LogUsuarios(producto, "Boton Editar", userName);
         }
+
     }//GEN-LAST:event_botonEditarPMouseClicked
 
     private void botonGuardarPMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_botonGuardarPMouseClicked
-        String guardar = "BtnGuardar";
-        if (txtNombreP.getText().equals("Ingrese Nombre Producto") && txtDescripcionP.getText().equals("Ingrese Descripción Producto") && ComboCategoriaP.getSelectedIndex() == 0 && ComboPresentacionP.getSelectedIndex() == 0
-                && txtUnidadP.getText().equals("Ingrese Unidades Producto") && txtTamañosP.getText().equals("Ingrese Tamaño Producto") && txtLoteP.getText().equals("Ingrese Lote Producto") && txtFechaVencimientoP.getDate().equals("") && txtPrecioP.getText().equals("Ingrese Precio Producto")
-                && ComboImp.getSelectedIndex() == 0 && ComboDesc.getSelectedIndex() == 0) {
-            JOptionPane.showMessageDialog(null, "Debes llenar todos los campos", "Advertencia", JOptionPane.WARNING_MESSAGE);
-        } else {
-            if (txtNombreP.getText().equals("Ingrese Nombre Producto")) {
-                JOptionPane.showMessageDialog(null, "Debe ingresar un nombre al producto", "Advertencia", JOptionPane.WARNING_MESSAGE);
-            } else if (txtDescripcionP.getText().equals("Ingrese Descripción Producto")) {
-                JOptionPane.showMessageDialog(null, "Debe ingresar una descripción", "Advertencia", JOptionPane.WARNING_MESSAGE);
-            } else if (ComboCategoriaP.getSelectedIndex() == 0) {
-                JOptionPane.showMessageDialog(null, "Seleccione la categoria", "Advertencia", JOptionPane.WARNING_MESSAGE);
-            } else if (ComboPresentacionP.getSelectedIndex() == 0) {
-                JOptionPane.showMessageDialog(null, "Seleccione la presentación", "Advertencia", JOptionPane.WARNING_MESSAGE);
-            } else if (txtUnidadP.getText().equals("Ingrese Unidades Producto")) {
-                JOptionPane.showMessageDialog(null, "Debe ingresar una unidad", "Advertencia", JOptionPane.WARNING_MESSAGE);
-            } else if (txtTamañosP.getText().equals("Ingrese Tamaño Producto")) {
-                JOptionPane.showMessageDialog(null, "Debe ingresar un tamaño", "Advertencia", JOptionPane.WARNING_MESSAGE);
-            } else if (txtLoteP.getText().equals("Ingrese Lote Producto")) {
-                JOptionPane.showMessageDialog(null, "Debe ingresar un lote", "Advertencia", JOptionPane.WARNING_MESSAGE);
-            } else if (txtFechaVencimientoP.getDate().equals("")) {
-                JOptionPane.showMessageDialog(null, "Debe ingresar la fecha de vencimiento", "Advertencia", JOptionPane.WARNING_MESSAGE);
-            } else if (txtPrecioP.getText().equals("Ingrese Precio Producto")) {
-                JOptionPane.showMessageDialog(null, "Debe ingresar un precio", "Advertencia", JOptionPane.WARNING_MESSAGE);
-            } else if (ComboImp.getSelectedIndex() == 0) {
-                JOptionPane.showMessageDialog(null, "Debe Seleccionar un Impuesto", "Advertencia", JOptionPane.WARNING_MESSAGE);
-            } else if (ComboDesc.getSelectedIndex() == 0) {
-                JOptionPane.showMessageDialog(null, "Debe Seleccionar un Descuento", "Advertencia", JOptionPane.WARNING_MESSAGE);
+        if (botonGuardarP.isEnabled()) {
+            String guardar = "BtnGuardar";
+            if (txtNombreP.getText().equals("Ingrese Nombre Producto") && txtDescripcionP.getText().equals("Ingrese Descripción Producto") && ComboCategoriaP.getSelectedIndex() == 0 && ComboPresentacionP.getSelectedIndex() == 0
+                    && txtUnidadP.getText().equals("Ingrese Unidades Producto") && txtTamañosP.getText().equals("Ingrese Tamaño Producto") && txtLoteP.getText().equals("Ingrese Lote Producto") && txtFechaVencimientoP.getDate().equals("") && txtPrecioP.getText().equals("Ingrese Precio Producto")
+                    && ComboImp.getSelectedIndex() == 0 && ComboDesc.getSelectedIndex() == 0) {
+                JOptionPane.showMessageDialog(null, "Debes llenar todos los campos", "Advertencia", JOptionPane.WARNING_MESSAGE);
             } else {
-                String Nombre = txtNombreP.getText();
-                String Descripcion = txtDescripcionP.getText();
-                int Categoria = ComboCategoriaP.getSelectedIndex();
-                int Presentacion = ComboPresentacionP.getSelectedIndex();
-                String Unidades = txtUnidadP.getText();
-                String Tamaño = txtTamañosP.getText();
-                String Lote = txtLoteP.getText();
-                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-                String FechaV = sdf.format(txtFechaVencimientoP.getDate());
-                String Precio = txtPrecioP.getText();
-                int desc = ComboDesc.getSelectedIndex();
-                int impu = ComboImp.getSelectedIndex();
+                if (txtNombreP.getText().equals("Ingrese Nombre Producto")) {
+                    JOptionPane.showMessageDialog(null, "Debe ingresar un nombre al producto", "Advertencia", JOptionPane.WARNING_MESSAGE);
+                } else if (txtDescripcionP.getText().equals("Ingrese Descripción Producto")) {
+                    JOptionPane.showMessageDialog(null, "Debe ingresar una descripción", "Advertencia", JOptionPane.WARNING_MESSAGE);
+                } else if (ComboCategoriaP.getSelectedIndex() == 0) {
+                    JOptionPane.showMessageDialog(null, "Seleccione la categoria", "Advertencia", JOptionPane.WARNING_MESSAGE);
+                } else if (ComboPresentacionP.getSelectedIndex() == 0) {
+                    JOptionPane.showMessageDialog(null, "Seleccione la presentación", "Advertencia", JOptionPane.WARNING_MESSAGE);
+                } else if (txtUnidadP.getText().equals("Ingrese Unidades Producto")) {
+                    JOptionPane.showMessageDialog(null, "Debe ingresar una unidad", "Advertencia", JOptionPane.WARNING_MESSAGE);
+                } else if (txtTamañosP.getText().equals("Ingrese Tamaño Producto")) {
+                    JOptionPane.showMessageDialog(null, "Debe ingresar un tamaño", "Advertencia", JOptionPane.WARNING_MESSAGE);
+                } else if (txtLoteP.getText().equals("Ingrese Lote Producto")) {
+                    JOptionPane.showMessageDialog(null, "Debe ingresar un lote", "Advertencia", JOptionPane.WARNING_MESSAGE);
+                } else if (txtFechaVencimientoP.getDate().equals("")) {
+                    JOptionPane.showMessageDialog(null, "Debe ingresar la fecha de vencimiento", "Advertencia", JOptionPane.WARNING_MESSAGE);
+                } else if (txtPrecioP.getText().equals("Ingrese Precio Producto")) {
+                    JOptionPane.showMessageDialog(null, "Debe ingresar un precio", "Advertencia", JOptionPane.WARNING_MESSAGE);
+                } else if (ComboImp.getSelectedIndex() == 0) {
+                    JOptionPane.showMessageDialog(null, "Debe Seleccionar un Impuesto", "Advertencia", JOptionPane.WARNING_MESSAGE);
+                } else if (ComboDesc.getSelectedIndex() == 0) {
+                    JOptionPane.showMessageDialog(null, "Debe Seleccionar un Descuento", "Advertencia", JOptionPane.WARNING_MESSAGE);
+                } else {
+                    String Nombre = txtNombreP.getText();
+                    String Descripcion = txtDescripcionP.getText();
+                    int Categoria = ComboCategoriaP.getSelectedIndex();
+                    int Presentacion = ComboPresentacionP.getSelectedIndex();
+                    String Unidades = txtUnidadP.getText();
+                    String Tamaño = txtTamañosP.getText();
+                    String Lote = txtLoteP.getText();
+                    SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                    String FechaV = sdf.format(txtFechaVencimientoP.getDate());
+                    String Precio = txtPrecioP.getText();
+                    int desc = ComboDesc.getSelectedIndex();
+                    int impu = ComboImp.getSelectedIndex();
 
-                try {
-                    Connection con = Conexion.getConexion();
-                    PreparedStatement ps = con.prepareStatement("Insert into Productos (Nombre_Producto, Descripcion,Id_Categoria,Id_Presentacion,Lote,Fecha_Vencimiento,Id_Estado,Unidades,Tamaño,Precio,Id_Impuesto,Id_Descuento) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)");
-                    ps.setString(1, Nombre);
-                    ps.setString(2, Descripcion);
-                    ps.setInt(3, Categoria);
-                    ps.setInt(4, Presentacion);
-                    ps.setString(5, Lote);
-                    ps.setString(6, FechaV);
-                    ps.setString(8, Unidades);
-                    ps.setString(9, Tamaño);
-                    ps.setString(10, Precio);
-                    ps.setInt(7, 1);
-                    ps.setInt(12, desc);
-                    ps.setInt(11, impu);
-                    ps.executeUpdate();
-                    JOptionPane.showMessageDialog(null, "Registro guardado");
-                    cargartabla();
-                    Limpiar();
-                    Inhabillitar();
+                    try {
+                        Connection con = Conexion.getConexion();
+                        PreparedStatement ps = con.prepareStatement("Insert into Productos (Nombre_Producto, Descripcion,Id_Categoria,Id_Presentacion,Lote,Fecha_Vencimiento,Id_Estado,Unidades,Tamaño,Precio,Id_Impuesto,Id_Descuento) VALUES(?,?,?,?,?,?,?,?,?,?,?,?)");
+                        ps.setString(1, Nombre);
+                        ps.setString(2, Descripcion);
+                        ps.setInt(3, Categoria);
+                        ps.setInt(4, Presentacion);
+                        ps.setString(5, Lote);
+                        ps.setString(6, FechaV);
+                        ps.setString(8, Unidades);
+                        ps.setString(9, Tamaño);
+                        ps.setString(10, Precio);
+                        ps.setInt(7, 1);
+                        ps.setInt(12, desc);
+                        ps.setInt(11, impu);
+                        ps.executeUpdate();
+                        JOptionPane.showMessageDialog(null, "Registro guardado");
+                        cargartabla();
+                        Limpiar();
+                        Inhabillitar();
 
-                } catch (SQLException ex) {
-                    lo.LogBitacora("Error: No se pudo guardar el dato " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), producto, guardar);
-                    JOptionPane.showMessageDialog(null, ex.toString());
+                    } catch (SQLException ex) {
+                        lo.LogBitacora("Error: No se pudo guardar el dato " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), producto, guardar);
+                        JOptionPane.showMessageDialog(null, ex.toString());
+                        JOptionPane.showMessageDialog(null, ex.toString());
+                    }
                 }
             }
+        } else {
+            JOptionPane.showMessageDialog(null, "Esta acción no se encuentra disponible para tu usuario", "ERROR", JOptionPane.ERROR_MESSAGE);
+            lo.LogUsuarios(producto, "Boton Guardar", userName);
         }
+
     }
 
     private void cargartabla() {
@@ -832,33 +862,70 @@ public class Productos extends javax.swing.JFrame {
                 txtTamañosP.setText(rs.getString("Tamaño"));
                 txtPrecioP.setText(rs.getString("Precio"));
                 //combo
-                if (rs.getString("Estado").equals("Activo")) {
-                    BotonActivoP.setSelected(true);
-                } else if (rs.getString("Estado").equals("Inactivo")) {
-                    BotonInactivoP.setSelected(true);
+                if (activoi == 1) {
+                    BotonActivoP.setVisible(Boolean.TRUE);
+                    if (rs.getString("Id_Estado").equals("1")) {
+                        BotonActivoP.setSelected(true);
+                    }
+                } else {
+                    BotonActivoP.setVisible(Boolean.FALSE);
                 }
+                if (inactivoi == 1) {
+                    BotonInactivoP.setVisible(Boolean.TRUE);
+                    if (rs.getString("Id_Estado").equals("2")) {
+                        BotonInactivoP.setSelected(true);
+
+                    }
+                } else {
+                    BotonInactivoP.setVisible(Boolean.FALSE);
+                }
+
+                Id_Producto = txtIDP.getText();
+
+                //BotonActivoPro.setVisible(Boolean.TRUE);
+                //BotonInactivoPro.setVisible(Boolean.TRUE);
+                //id = txtId_Proveedor.getText();
+                Habillitar();
             }
-            BotonInactivoP.setVisible(Boolean.TRUE);
-            BotonActivoP.setVisible(Boolean.TRUE);
-            Habillitar();
-            txtFechaVencimientoP.setEnabled(Boolean.FALSE);
-            Id_Producto = txtIDP.getText();
-            System.out.println(Id_Producto);
         } catch (SQLException ex) {
             lo.LogBitacora("Error: No se pudo seleccionar la tabla " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), producto, tablap);
             JOptionPane.showMessageDialog(null, ex.toString());
+
         }
+
 
     }//GEN-LAST:event_tablaPMouseClicked
 
     private void botonAgregarPMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_botonAgregarPMouseClicked
-        Habillitar();
-        txtFechaVencimientoP.setEnabled(Boolean.TRUE);
+        if (botonAgregarP.isEnabled()) {
+            Habillitar();
+            if (guardari == 1) {
+                botonGuardarP.isEnabled();
+                //BotonCancelarPro.isEnabled();   
+            }
+            if (cancelari == 1) {
+                //BotonGuardarPro.isEnabled();
+                botonCancelarP.isEnabled();
+            }
+        } else {
+
+            JOptionPane.showMessageDialog(null, "Esta acción no se encuentra disponible para tu usuario", "ERROR", JOptionPane.ERROR_MESSAGE);
+            lo.LogUsuarios(producto, "Boton Agregar", userName);
+
+        }
+
     }//GEN-LAST:event_botonAgregarPMouseClicked
 
     private void botonCancelarPMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_botonCancelarPMouseClicked
-        Limpiar();
-        Inhabillitar();
+        if (botonCancelarP.isEnabled()) {
+            // Limpiar();
+            //Inhabillitar();
+            botonCancelarP.setEnabled(Boolean.FALSE);
+            botonCancelarP.setEnabled(Boolean.FALSE);
+        } else {
+            JOptionPane.showMessageDialog(null, "Esta acción no se encuentra disponible para tu usuario", "ERROR", JOptionPane.ERROR_MESSAGE);
+            lo.LogUsuarios(producto, "Boton Cancelar", userName);
+        }
     }//GEN-LAST:event_botonCancelarPMouseClicked
 
     private void BotonActivoPActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BotonActivoPActionPerformed
@@ -889,7 +956,7 @@ public class Productos extends javax.swing.JFrame {
     private void BotonInactivoPActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_BotonInactivoPActionPerformed
 
         String Id = txtIDP.getText();
-        String inactivo="BtnInactivo";
+        String inactivo = "BtnInactivo";
         try {
             Connection con = Conexion.getConexion();
             PreparedStatement ps = con.prepareStatement("Update Productos set Id_Estado=? Where Id_Producto=?");
@@ -905,7 +972,7 @@ public class Productos extends javax.swing.JFrame {
             BotonInactivoP.setVisible(Boolean.FALSE);
 
         } catch (SQLException ex) {
-            lo.LogBitacora("Error: No se pudo guardar el dato " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), producto,inactivo);
+            lo.LogBitacora("Error: No se pudo guardar el dato " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), producto, inactivo);
             JOptionPane.showMessageDialog(null, ex.toString());
         }
 
@@ -1182,19 +1249,30 @@ public class Productos extends javax.swing.JFrame {
     }//GEN-LAST:event_txtFechaVencimientoPMousePressed
 
     private void txtPrecioHistoricoMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_txtPrecioHistoricoMouseClicked
-        PrecioHistoricoProducto php = new PrecioHistoricoProducto();
-        {
-            php.setVisible(true);
-            dispose();
+        if (habilitarr(12) == 12) {
+
+            PrecioHistoricoProducto php = new PrecioHistoricoProducto();
+            {
+                php.setVisible(true);
+                dispose();
+
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "Este usuario No tiene Acceso a esta pantalla", "Advertencia", JOptionPane.WARNING_MESSAGE);
 
         }
     }//GEN-LAST:event_txtPrecioHistoricoMouseClicked
 
     private void botonRestringirPMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_botonRestringirPMouseClicked
-        Medicamentos_Restringidos mr = new Medicamentos_Restringidos();
-        {
-            mr.setVisible(true);
-            dispose();
+        if (habilitarr(11) == 11) {
+            Medicamentos_Restringidos mr = new Medicamentos_Restringidos();
+            {
+                mr.setVisible(true);
+                dispose();
+            }
+
+        } else {
+            JOptionPane.showMessageDialog(null, "Este usuario No tiene Acceso a esta pantalla", "Advertencia", JOptionPane.WARNING_MESSAGE);
 
         }
     }//GEN-LAST:event_botonRestringirPMouseClicked
@@ -1314,7 +1392,7 @@ public class Productos extends javax.swing.JFrame {
     public class CargarCategoria {
 
         public DefaultComboBoxModel getvalues() {
-            String cargarc="CargarCategoria";
+            String cargarc = "CargarCategoria";
 
             DefaultComboBoxModel modelo = new DefaultComboBoxModel();
             try {
@@ -1329,7 +1407,7 @@ public class Productos extends javax.swing.JFrame {
                 con.close();
                 rs.close();
             } catch (Exception e) {
-                 lo.LogBitacora("Error: No se pudo cargar la categoria " + "Excepción: " + e + ". Origen: " + this.getClass().getSimpleName(), producto,cargarc);
+                lo.LogBitacora("Error: No se pudo cargar la categoria " + "Excepción: " + e + ". Origen: " + this.getClass().getSimpleName(), producto, cargarc);
                 System.out.println(e);
             }
             return modelo;
@@ -1339,7 +1417,7 @@ public class Productos extends javax.swing.JFrame {
     public class CargarPresentacion {
 
         public DefaultComboBoxModel getvalues() {
-            String cargarp ="CargarPresentacion";
+            String cargarp = "CargarPresentacion";
 
             DefaultComboBoxModel modelo = new DefaultComboBoxModel();
             try {
@@ -1354,7 +1432,7 @@ public class Productos extends javax.swing.JFrame {
                 con.close();
                 rs.close();
             } catch (Exception e) {
-                 lo.LogBitacora("Error: No se pudo cargar la presentacion " + "Excepción: " + e + ". Origen: " + this.getClass().getSimpleName(),producto,cargarp);
+                lo.LogBitacora("Error: No se pudo cargar la presentacion " + "Excepción: " + e + ". Origen: " + this.getClass().getSimpleName(), producto, cargarp);
                 System.out.println(e);
             }
             return modelo;
@@ -1362,7 +1440,7 @@ public class Productos extends javax.swing.JFrame {
     }
 
     void buscarData(String valor) {
-        String buscar ="Buscar";
+        String buscar = "Buscar";
         String[] titulos = {"ID Producto", "Nombre Producto", "Descripción", "Categoría Producto", "Presentación Producto", "Unidades", "Tamaño", "Lote ", "Fecha Vencimiento", "Precio", "Impuesto", "Descuento", "IdEstado"};
         String[] registros = new String[13];
         String sql = "Select P.Id_Producto,P.Nombre_Producto, P.Descripcion, C.Categoria, PR.Presentacion,P.Unidades, P.Tamaño, P.Lote, P.Fecha_Vencimiento, P.Precio,TI.ISV,DP.Descripcion as Descri ,E.Estado\n"
@@ -1403,7 +1481,7 @@ public class Productos extends javax.swing.JFrame {
             tablaP.setModel(model);
             // anchoColumnas();
         } catch (SQLException ex) {
-             lo.LogBitacora("Error: No se pudo buscar el dato " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(),producto,buscar);
+            lo.LogBitacora("Error: No se pudo buscar el dato " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), producto, buscar);
             Logger.getLogger(Clientes.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
@@ -1415,7 +1493,7 @@ public class Productos extends javax.swing.JFrame {
     public class CargarImpuesto {
 
         public DefaultComboBoxModel getvalues() {
-            String cargarI ="CargarImpuesto";
+            String cargarI = "CargarImpuesto";
 
             DefaultComboBoxModel modelo = new DefaultComboBoxModel();
             try {
@@ -1430,7 +1508,7 @@ public class Productos extends javax.swing.JFrame {
                 con.close();
                 rs.close();
             } catch (Exception e) {
-                 lo.LogBitacora("Error: No se pudo cargar el impuesto " + "Excepción: " + e + ". Origen: " + this.getClass().getSimpleName(), producto,cargarI);
+                lo.LogBitacora("Error: No se pudo cargar el impuesto " + "Excepción: " + e + ". Origen: " + this.getClass().getSimpleName(), producto, cargarI);
                 System.out.println(e);
             }
             return modelo;
@@ -1440,7 +1518,7 @@ public class Productos extends javax.swing.JFrame {
     public class CargarDescuento {
 
         public DefaultComboBoxModel getvalues() {
-            String cargarD="CargarDescuento";
+            String cargarD = "CargarDescuento";
 
             DefaultComboBoxModel modelo = new DefaultComboBoxModel();
             try {
@@ -1455,10 +1533,140 @@ public class Productos extends javax.swing.JFrame {
                 con.close();
                 rs.close();
             } catch (Exception e) {
-                 lo.LogBitacora("Error: No se pudo cargar el descuento " + "Excepción: " + e + ". Origen: " + this.getClass().getSimpleName(), producto,cargarD);
+                lo.LogBitacora("Error: No se pudo cargar el descuento " + "Excepción: " + e + ". Origen: " + this.getClass().getSimpleName(), producto, cargarD);
                 System.out.println(e);
             }
             return modelo;
         }
     }
+
+    private void habilitarroles() {
+        try {
+
+            PreparedStatement ps;
+            ResultSet rs;
+            Connection con = Conexion.getConexion();
+            ps = con.prepareStatement("Select PU.Agregar, PU.Guardar, PU.Cancelar, PU.Editar, PU.Activo, PU.Inactivo, PU.Reporte, PU.Anular, PU.CrearCompra, PU.Historicos, PU.Buscar\n"
+                    + "From PermisosUsuario AS PU\n"
+                    + "Inner Join Usuario as U on PU.IdUsuario=U.Id_Usuario\n"
+                    + "where PU.IdPermiso=? and U.Nombre=?");
+            ps.setInt(1, 4);
+            ps.setString(2, usuario.getText());
+            rs = ps.executeQuery();
+            System.out.println(usuario.getText());
+
+            while (rs.next()) {
+                agregari = rs.getInt("Agregar");
+                guardari = rs.getInt("Guardar");
+                cancelari = rs.getInt("Cancelar");
+                editari = rs.getInt("Editar");
+                activoi = rs.getInt("Activo");
+                inactivoi = rs.getInt("Inactivo");
+                reportesi = rs.getInt("Reporte");
+                anulari = rs.getInt("Anular");
+                crearcomprai = rs.getInt("CrearCompra");
+                historicoi = rs.getInt("Historicos");
+                buscari = rs.getInt("Buscar");
+                System.out.print(agregari + " " + guardari + " " + cancelari);
+
+            }
+        } catch (SQLException ex) {
+            //lo.LogBitacora("Error: No se pudo seleccionar la tabla" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), proveedores, tablap);
+            JOptionPane.showMessageDialog(null, ex.toString());
+        }
+        if (agregari == 1) {
+            botonAgregarP.setEnabled(Boolean.TRUE);
+        } else if (agregari == 0) {
+            botonAgregarP.setEnabled(Boolean.FALSE);
+            botonAgregarP.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/obstruido (1).png")));
+        }
+
+        if (guardari == 1) {
+            botonGuardarP.setEnabled(Boolean.TRUE);
+        } else if (guardari == 0) {
+            botonGuardarP.setEnabled(Boolean.FALSE);
+            botonGuardarP.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/obstruido (1).png")));
+
+        }
+        if (editari == 1) {
+            botonEditarP.setEnabled(Boolean.TRUE);
+        } else {
+            botonEditarP.setEnabled(Boolean.FALSE);
+            botonEditarP.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/obstruido (1).png")));
+        }
+
+        if (cancelari == 1) {
+            botonCancelarP.setEnabled(Boolean.TRUE);
+
+        } else {
+            botonCancelarP.setEnabled(Boolean.FALSE);
+            botonCancelarP.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/obstruido (1).png")));
+        }
+        if (reportesi == 1) {
+            reporte.setVisible(Boolean.TRUE);
+
+        } else {
+            reporte.setVisible(Boolean.FALSE);
+            //jLabel2.setEnabled(Boolean.TRUE);
+        }
+        if (buscari == 1) {
+            txtBuscarP.setEnabled(Boolean.TRUE);
+        } else {
+            txtBuscarP.setEnabled(Boolean.FALSE);
+            txtBuscarP.setText("NO DISPONIBLE");
+        }
+        /* if (anulari == 1) {
+            Anular.setSelected(Boolean.TRUE);
+        } else {
+            Anular.setSelected(Boolean.FALSE);
+        }*/
+        if (activoi == 1) {
+            //BotonActivoPro.setVisible(Boolean.TRUE);
+        } else {
+            BotonActivoP.setVisible(Boolean.FALSE);
+        }
+        if (inactivoi == 1) {
+            //BotonInactivoPro.setVisible(Boolean.TRUE);
+        } else {
+            BotonInactivoP.setVisible(Boolean.FALSE);
+        }
+        /*if (historicoi == 1) {
+            Historico.setSelected(Boolean.TRUE);
+        } else {
+            Historico.setSelected(Boolean.FALSE);
+        }
+        if (crearcomprai == 1) {
+            CrearCompra.setSelected(Boolean.TRUE);
+        } else {
+            CrearCompra.setSelected(Boolean.FALSE);
+        }*/
+    }
+
+    public int habilitarr(int numeroPermiso) {
+        try {
+
+            PreparedStatement ps;
+            ResultSet rs;
+            Connection con = Conexion.getConexion();
+            ps = con.prepareStatement("Select PU.IdPermiso\n"
+                    + "From PermisosUsuario AS PU\n"
+                    + "Inner Join Usuario as U on PU.IdUsuario=U.Id_Usuario\n"
+                    + "where PU.IdPermiso=? and U.Nombre=?");
+            ps.setInt(1, numeroPermiso);
+            ps.setString(2, usuario.getText());
+            rs = ps.executeQuery();
+            System.out.println(usuario.getText());
+
+            while (rs.next()) {
+                npermiso = rs.getInt("IdPermiso");
+
+            }
+        } catch (SQLException ex) {
+            //lo.LogBitacora("Error: No se pudo seleccionar la tabla" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), proveedores, tablap);
+            JOptionPane.showMessageDialog(null, ex.toString());
+        }
+        return npermiso;
+
+    }
+
 }

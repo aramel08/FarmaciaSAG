@@ -6,6 +6,7 @@
 package Formularios_SAG;
 
 import Conexion.Conexion;
+import static Formularios_SAG.Login.usuario;
 import Logs.log;
 import java.awt.Color;
 import java.awt.Image;
@@ -37,6 +38,19 @@ public class CargoHistorico extends javax.swing.JFrame {
      */
     log lo = new log();
     String cargoH = "Cargo Historico";
+    public static String Id_Proveedor = "0";
+    int agregari;
+    int guardari;
+    int editari;
+    int cancelari;
+    int reportesi;
+    int activoi;
+    int inactivoi;
+    int anulari;
+    int buscari;
+    int crearcomprai;
+    int historicoi;
+    String userName;
 
     @Override
     public Image getIconImage() {
@@ -59,6 +73,9 @@ public class CargoHistorico extends javax.swing.JFrame {
         Date mini = cale.getTime();
         Date max = new Date();
         Date maxi = calen.getTime();
+        usuario.setText(Login.txtUsuario.getText());
+        habilitarroles();
+        userName = usuario.getText();
 
         txtFechaFinalCH.setSelectableDateRange(min, max);
         txtFechaIncioCH.setSelectableDateRange(mini, maxi);
@@ -92,6 +109,8 @@ public class CargoHistorico extends javax.swing.JFrame {
         txtIdCargoCH = new javax.swing.JLabel();
         Table = new javax.swing.JScrollPane();
         TablaCH = new javax.swing.JTable();
+        usuario = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
         jLabel1 = new javax.swing.JLabel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
@@ -119,21 +138,21 @@ public class CargoHistorico extends javax.swing.JFrame {
                 BotonEditarCHMouseClicked(evt);
             }
         });
-        getContentPane().add(BotonEditarCH, new org.netbeans.lib.awtextra.AbsoluteConstraints(480, 150, 130, 40));
+        getContentPane().add(BotonEditarCH, new org.netbeans.lib.awtextra.AbsoluteConstraints(470, 140, 130, 40));
 
         BotonGuardarCH.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 BotonGuardarCHMouseClicked(evt);
             }
         });
-        getContentPane().add(BotonGuardarCH, new org.netbeans.lib.awtextra.AbsoluteConstraints(650, 150, 130, 40));
+        getContentPane().add(BotonGuardarCH, new org.netbeans.lib.awtextra.AbsoluteConstraints(630, 140, 130, 40));
 
         BotonCancelarCH.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mouseClicked(java.awt.event.MouseEvent evt) {
                 BotonCancelarCHMouseClicked(evt);
             }
         });
-        getContentPane().add(BotonCancelarCH, new org.netbeans.lib.awtextra.AbsoluteConstraints(800, 150, 140, 40));
+        getContentPane().add(BotonCancelarCH, new org.netbeans.lib.awtextra.AbsoluteConstraints(790, 140, 140, 40));
 
         txtBuscarCH.setFont(new java.awt.Font("Georgia", 0, 14)); // NOI18N
         txtBuscarCH.setForeground(new java.awt.Color(153, 153, 153));
@@ -285,7 +304,14 @@ public class CargoHistorico extends javax.swing.JFrame {
         });
         Table.setViewportView(TablaCH);
 
-        getContentPane().add(Table, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 270, 710, 310));
+        getContentPane().add(Table, new org.netbeans.lib.awtextra.AbsoluteConstraints(280, 270, 710, 270));
+        getContentPane().add(usuario, new org.netbeans.lib.awtextra.AbsoluteConstraints(510, 550, 120, 20));
+
+        jLabel2.setFont(new java.awt.Font("Georgia", 1, 12)); // NOI18N
+        jLabel2.setForeground(new java.awt.Color(102, 102, 102));
+        jLabel2.setText("Usuario");
+        jLabel2.setToolTipText("");
+        getContentPane().add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(550, 570, -1, -1));
 
         jLabel1.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/Pantalla Cargo Historico_1.png"))); // NOI18N
         getContentPane().add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, -10, 1000, 610));
@@ -369,78 +395,112 @@ public class CargoHistorico extends javax.swing.JFrame {
     }//GEN-LAST:event_BotonRegresarCHMouseClicked
 
     private void BotonCancelarCHMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonCancelarCHMouseClicked
-
-        Limpiar();
+        if (BotonCancelarCH.isEnabled()) {
+            // Limpiar();
+            //Inhabillitar();
+            BotonCancelarCH.setEnabled(Boolean.FALSE);
+            BotonCancelarCH.setEnabled(Boolean.FALSE);
+        } else {
+            JOptionPane.showMessageDialog(null, "Esta acción no se encuentra disponible para tu usuario", "ERROR", JOptionPane.ERROR_MESSAGE);
+            lo.LogUsuarios(cargoH, "Boton Cancelar", userName);
+        }
     }//GEN-LAST:event_BotonCancelarCHMouseClicked
 
     private void BotonAgregarCHMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonAgregarCHMouseClicked
-        Habillitar();
+
+        if (BotonAgregarCH.isEnabled()) {
+            Habillitar();
+            if (guardari == 1) {
+                BotonGuardarCH.isEnabled();
+                //BotonCancelarPro.isEnabled();   
+            }
+            if (cancelari == 1) {
+                //BotonGuardarPro.isEnabled();
+                BotonCancelarCH.isEnabled();
+            }
+        } else {
+
+            JOptionPane.showMessageDialog(null, "Esta acción no se encuentra disponible para tu usuario", "ERROR", JOptionPane.ERROR_MESSAGE);
+            lo.LogUsuarios(cargoH, "Boton Agregar", userName);
+        }
     }//GEN-LAST:event_BotonAgregarCHMouseClicked
 
     private void BotonGuardarCHMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonGuardarCHMouseClicked
-        String Guardar = "BtnGuardar";
-        if (txtNombreCH.getText().equals("Ingrese Nombre Empleado") || txtFechaIncioCH.getDate().equals("") || txtFechaFinalCH.getDate().equals("")
-                || txtCargoCH.getText().equals("Ingrese Cargo")) {
-            JOptionPane.showMessageDialog(null, "No se puede Guardar datos vacios");
+        if (BotonGuardarCH.isEnabled()) {
+            String Guardar = "BtnGuardar";
+            if (txtNombreCH.getText().equals("Ingrese Nombre Empleado") || txtFechaIncioCH.getDate().equals("") || txtFechaFinalCH.getDate().equals("")
+                    || txtCargoCH.getText().equals("Ingrese Cargo")) {
+                JOptionPane.showMessageDialog(null, "No se puede Guardar datos vacios");
 
-        } else {
-            String Id_Empleado = txtIdE.getText();
-            String NombreE = txtNombreCH.getText();
-            SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-            String FechaInicio = sdf.format(txtFechaIncioCH.getDate());
-            String FechaFinal = sdf.format(txtFechaFinalCH.getDate());
-            String Cargo = txtCargoCH.getText();
+            } else {
+                String Id_Empleado = txtIdE.getText();
+                String NombreE = txtNombreCH.getText();
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                String FechaInicio = sdf.format(txtFechaIncioCH.getDate());
+                String FechaFinal = sdf.format(txtFechaFinalCH.getDate());
+                String Cargo = txtCargoCH.getText();
 
-            try {
-                Connection con = Conexion.getConexion();
-                PreparedStatement ps = con.prepareStatement("Insert in Cargo_Historico(Id_Empleado,Fecha_Inicio,Fecha_Finalizacion,Cargo) VALUES(?,?,?,?)");
+                try {
+                    Connection con = Conexion.getConexion();
+                    PreparedStatement ps = con.prepareStatement("Insert in Cargo_Historico(Id_Empleado,Fecha_Inicio,Fecha_Finalizacion,Cargo) VALUES(?,?,?,?)");
 
-                ps.setInt(1, Integer.parseInt(Id_Empleado));
-                ps.setString(2, FechaInicio);
-                ps.setString(3, FechaFinal);
-                ps.setString(4, Cargo);
-                ps.executeUpdate();
-                JOptionPane.showMessageDialog(null, "Registro guardado");
-                cargartabla();
-                Limpiar();
-            } catch (SQLException ex) {
-                lo.LogBitacora("Error: No se pudo guardar el dato " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), cargoH, Guardar);
-                JOptionPane.showMessageDialog(null, ex.toString());
+                    ps.setInt(1, Integer.parseInt(Id_Empleado));
+                    ps.setString(2, FechaInicio);
+                    ps.setString(3, FechaFinal);
+                    ps.setString(4, Cargo);
+                    ps.executeUpdate();
+                    JOptionPane.showMessageDialog(null, "Registro guardado");
+                    cargartabla();
+                    Limpiar();
+                } catch (SQLException ex) {
+                    lo.LogBitacora("Error: No se pudo guardar el dato " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), cargoH, Guardar);
+                    JOptionPane.showMessageDialog(null, ex.toString());
+                }
             }
+        } else {
+
+            JOptionPane.showMessageDialog(null, "Esta acción no se encuentra disponible para tu usuario", "ERROR", JOptionPane.ERROR_MESSAGE);
+            lo.LogUsuarios(cargoH, "Boton Guardar", userName);
         }
+
     }//GEN-LAST:event_BotonGuardarCHMouseClicked
 
     private void BotonEditarCHMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_BotonEditarCHMouseClicked
-        String editar = "BtnEditar";
-        if (txtCargoCH.getText().equals("Ingrese Nombre Empleado") || txtCargoCH.getText().equals("Ingrese Número de Documento")) {
-            JOptionPane.showMessageDialog(null, "No se puede Guardar datos vacios");
-        } else {
-            int IdCargo = Integer.parseInt(txtIdCargoCH.getText());
+        if (editari == 1) {
+            String editar = "BtnEditar";
+            if (txtCargoCH.getText().equals("Ingrese Nombre Empleado") || txtCargoCH.getText().equals("Ingrese Número de Documento")) {
+                JOptionPane.showMessageDialog(null, "No se puede Guardar datos vacios");
+            } else {
+                int IdCargo = Integer.parseInt(txtIdCargoCH.getText());
 
-            SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
-            String FechaI = sdf.format(txtFechaIncioCH.getDate());
-            String FechaF = sdf.format(txtFechaFinalCH.getDate());
-            String Cargo = txtCargoCH.getText();
+                SimpleDateFormat sdf = new SimpleDateFormat("dd-MM-yyyy");
+                String FechaI = sdf.format(txtFechaIncioCH.getDate());
+                String FechaF = sdf.format(txtFechaFinalCH.getDate());
+                String Cargo = txtCargoCH.getText();
 
-            try {
-                Connection con = Conexion.getConexion();
-                PreparedStatement ps = con.prepareStatement("Update Cargo_Historico set  Fecha_Inicio=?,Fecha_Finalizacion=?,Cargo=? Where Id_Cargo_Historico=?");
-                ps.setString(1, FechaI);
-                ps.setString(2, FechaF);
-                ps.setString(3, Cargo);
-                ps.setInt(4, IdCargo);
-                ps.executeUpdate();
-                JOptionPane.showMessageDialog(null, "Registro Actualizado");
-                cargartabla();
+                try {
+                    Connection con = Conexion.getConexion();
+                    PreparedStatement ps = con.prepareStatement("Update Cargo_Historico set  Fecha_Inicio=?,Fecha_Finalizacion=?,Cargo=? Where Id_Cargo_Historico=?");
+                    ps.setString(1, FechaI);
+                    ps.setString(2, FechaF);
+                    ps.setString(3, Cargo);
+                    ps.setInt(4, IdCargo);
+                    ps.executeUpdate();
+                    JOptionPane.showMessageDialog(null, "Registro Actualizado");
+                    cargartabla();
 
-                Limpiar();
-                // Inhabillitar();
+                    Limpiar();
+                    // Inhabillitar();
 
-            } catch (SQLException ex) {
-                lo.LogBitacora("Error: No se pudo editar el datos " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), cargoH, editar);
-                JOptionPane.showMessageDialog(null, ex.toString());
+                } catch (SQLException ex) {
+                    lo.LogBitacora("Error: No se pudo editar el datos " + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), cargoH, editar);
+                    JOptionPane.showMessageDialog(null, ex.toString());
 
+                }
             }
+        } else {
+            JOptionPane.showMessageDialog(null, "Esta acción no se encuentra disponible para tu usuario", "ERROR", JOptionPane.ERROR_MESSAGE);
+            lo.LogUsuarios(cargoH, "Boton Editar", userName);
         }
     }//GEN-LAST:event_BotonEditarCHMouseClicked
 
@@ -647,6 +707,7 @@ public class CargoHistorico extends javax.swing.JFrame {
     private javax.swing.JScrollPane Table;
     private javax.swing.JComboBox<String> comboCargarEmpleado;
     private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
     private javax.swing.JTextField txtBuscarCH;
     private javax.swing.JTextField txtCargoCH;
     private com.toedter.calendar.JDateChooser txtFechaFinalCH;
@@ -654,6 +715,7 @@ public class CargoHistorico extends javax.swing.JFrame {
     private javax.swing.JLabel txtIdCargoCH;
     private javax.swing.JLabel txtIdE;
     private javax.swing.JTextField txtNombreCH;
+    private javax.swing.JLabel usuario;
     // End of variables declaration//GEN-END:variables
 
     private void Limpiar() {
@@ -738,7 +800,7 @@ public class CargoHistorico extends javax.swing.JFrame {
     public class CargaE {
 
         public DefaultComboBoxModel getvalues() {
-          String CargarEmpleado="Cargar Empleado";
+            String CargarEmpleado = "Cargar Empleado";
             DefaultComboBoxModel modelo = new DefaultComboBoxModel();
             try {
                 Connection con = Conexion.getConexion();
@@ -752,7 +814,7 @@ public class CargoHistorico extends javax.swing.JFrame {
                 con.close();
                 rs.close();
             } catch (Exception e) {
-                            lo.LogBitacora("Error: No se pudo cargar empleado " + "Excepción: " + e + ". Origen: " + this.getClass().getSimpleName(), cargoH, CargarEmpleado);
+                lo.LogBitacora("Error: No se pudo cargar empleado " + "Excepción: " + e + ". Origen: " + this.getClass().getSimpleName(), cargoH, CargarEmpleado);
 
                 System.out.println(e);
             }
@@ -795,5 +857,92 @@ public class CargoHistorico extends javax.swing.JFrame {
             Logger.getLogger(Clientes.class.getName()).log(Level.SEVERE, null, ex);
         }
 
+    }
+
+    public void habilitarroles() {
+        try {
+
+            PreparedStatement ps;
+            ResultSet rs;
+            Connection con = Conexion.getConexion();
+            ps = con.prepareStatement("Select PU.Agregar, PU.Guardar, PU.Cancelar, PU.Editar, PU.Activo, PU.Inactivo, PU.Reporte, PU.Anular, PU.CrearCompra, PU.Historicos, PU.Buscar\n"
+                    + "From PermisosUsuario AS PU\n"
+                    + "Inner Join Usuario as U on PU.IdUsuario=U.Id_Usuario\n"
+                    + "where PU.IdPermiso=? and U.Nombre=?");
+            ps.setInt(1, 10);
+            ps.setString(2, usuario.getText());
+            rs = ps.executeQuery();
+            System.out.println(usuario.getText());
+
+            while (rs.next()) {
+                agregari = rs.getInt("Agregar");
+                guardari = rs.getInt("Guardar");
+                cancelari = rs.getInt("Cancelar");
+                editari = rs.getInt("Editar");
+                activoi = rs.getInt("Activo");
+                inactivoi = rs.getInt("Inactivo");
+                reportesi = rs.getInt("Reporte");
+                anulari = rs.getInt("Anular");
+                crearcomprai = rs.getInt("CrearCompra");
+                historicoi = rs.getInt("Historicos");
+                buscari = rs.getInt("Buscar");
+                System.out.print(agregari + " " + guardari + " " + cancelari);
+
+            }
+        } catch (SQLException ex) {
+            //lo.LogBitacora("Error: No se pudo seleccionar la tabla" + "Excepción: " + ex + ". Origen: " + this.getClass().getSimpleName(), proveedores, tablap);
+            JOptionPane.showMessageDialog(null, ex.toString());
+        }
+        if (agregari == 1) {
+            BotonAgregarCH.setEnabled(Boolean.TRUE);
+        } else if (agregari == 0) {
+            BotonAgregarCH.setEnabled(Boolean.FALSE);
+            BotonAgregarCH.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/obstruido (1).png")));
+        }
+
+        if (guardari == 1) {
+            BotonGuardarCH.setEnabled(Boolean.TRUE);
+        } else if (guardari == 0) {
+            BotonGuardarCH.setEnabled(Boolean.FALSE);
+            BotonGuardarCH.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/obstruido (1).png")));
+
+        }
+        if (editari == 1) {
+            BotonEditarCH.setEnabled(Boolean.TRUE);
+        } else {
+            BotonEditarCH.setEnabled(Boolean.FALSE);
+            BotonEditarCH.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/obstruido (1).png")));
+        }
+
+        if (cancelari == 1) {
+            BotonCancelarCH.setEnabled(Boolean.TRUE);
+
+        } else {
+            BotonCancelarCH.setEnabled(Boolean.FALSE);
+            BotonCancelarCH.setIcon(new javax.swing.ImageIcon(getClass().getResource("/componentes/obstruido (1).png")));
+        }
+
+        if (buscari == 1) {
+            txtBuscarCH.setEnabled(Boolean.TRUE);
+        } else {
+            txtBuscarCH.setEnabled(Boolean.FALSE);
+            txtBuscarCH.setText("NO DISPONIBLE");
+        }
+        /* if (anulari == 1) {
+            Anular.setSelected(Boolean.TRUE);
+        } else {
+            Anular.setSelected(Boolean.FALSE);
+        }*/
+
+ /*if (historicoi == 1) {
+            Historico.setSelected(Boolean.TRUE);
+        } else {
+            Historico.setSelected(Boolean.FALSE);
+        }
+        if (crearcomprai == 1) {
+            CrearCompra.setSelected(Boolean.TRUE);
+        } else {
+            CrearCompra.setSelected(Boolean.FALSE);
+        }*/
     }
 }
